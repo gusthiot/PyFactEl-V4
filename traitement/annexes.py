@@ -1054,22 +1054,20 @@ class Annexes(object):
 
         # ## 1.3
 
-        structure_emolument = r'''{|r|r|l|r|r|r|r|r|}'''
+        structure_emolument = r'''{|r|r|r|r|}'''
         legende_emolument = r'''Table I.3 - Emolument mensuel'''
 
-        dico_emolument = {'emb':  Outils.format_2_dec(client['emol_base_mens']),
-                          'ef':  Outils.format_2_dec(client['emol_fixe']),
-                          'pente': client['coef'], 'tot_eq_r': Outils.format_2_dec(scl['r']),
-                          'tot_eq_m': Outils.format_2_dec(scl['mat']), 'tot_eq': Outils.format_2_dec(scl['somme_eq']),
+        dico_emolument = {'emb':  Outils.format_2_dec(client['emb']),
+                          'tot_eq_m': Outils.format_2_dec(scl['mat']),
                           'rabais': Outils.format_2_dec(scl['er']), 'emo': scl['e']}
 
         contenu_emolument = r'''
             \hline
-            \multicolumn{1}{|l|}{Emolument de base} & \multicolumn{1}{l|}{Emolument fixe} & Pente
-            & \multicolumn{1}{l|}{Total EQ R} & \multicolumn{1}{l|}{Total EQ M} & \multicolumn{1}{l|}{Total EQ} &
+            \multicolumn{1}{|l|}{Emolument de base}
+            & \multicolumn{1}{l|}{Total EQ M} &
             \multicolumn{1}{l|}{Rabais émolument} & \multicolumn{1}{l|}{Emolument} \\
             \hline
-            %(emb)s & %(ef)s & %(pente)s & %(tot_eq_r)s & %(tot_eq_m)s & %(tot_eq)s & %(rabais)s & %(emo)s \\
+            %(emb)s & %(tot_eq_m)s & %(rabais)s & %(emo)s \\
             \hline
             ''' % dico_emolument
 

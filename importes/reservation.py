@@ -104,7 +104,7 @@ class Reservation(Fichier):
             id_user = donnee['id_user']
             machine = machines.donnees[id_machine]
             client = clients.donnees[code_client]
-            coefmachine = coefmachines.donnees[client['id_classe_tarif'] + machine['categorie']]
+            coefmachine = coefmachines.donnees[client['id_classe_tarif']]
             duree_fact_hp, duree_fact_hc = Rabais.rabais_reservation(machine['delai_sans_frais'],
                                                                      donnee['duree_ouvree'],
                                                                      donnee['duree_hp'],

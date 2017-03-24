@@ -13,7 +13,7 @@ class Sommes(object):
                          'mu3', 'mmo', 'mu1_d', 'mu2_d', 'mu3_d', 'mmo_d']
 
     cles_somme_client = ['mat', 'mot', 'dst', 'dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_eq',
-                         'somme_t', 'em', 'er0', 'er', 'e', 'res', 'rm', 'rm_d', 'rr', 'r']
+                         'somme_t', 'em', 'er', 'e', 'res', 'rm', 'rm_d', 'rr', 'r']
 
     def __init__(self, verification, generaux):
         """
@@ -302,10 +302,9 @@ class Sommes(object):
             for code_client, somme in spcl.items():
                 client = clients.donnees[code_client]
                 somme['somme_t_mb'] += math.ceil(client['bs'] * somme['dst']) + math.ceil(client['bh'] * somme['dht'])
-                somme['somme_eq'], somme['somme_t'], somme['em'], somme['er0'], somme['er'] = \
+                somme['somme_eq'], somme['somme_t'], somme['em'], somme['er'] = \
                     Rabais.rabais_emolument(somme['r'], somme['mt'], somme['mat'], somme['tot_cat'],
-                                            client['emol_base_mens'], client['emol_fixe'], client['coef'],
-                                            client['emol_sans_activite'])
+                                            client['emb'])
                 somme['e'] = somme['em'] - somme['er']
                 somme['somme_t'] += somme['e']
 

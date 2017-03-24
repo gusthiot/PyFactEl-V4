@@ -37,7 +37,7 @@ class BilanMensuel(object):
         with dossier_destination.writer(nom) as fichier_writer:
 
             ligne = ["année", "mois", "référence", "code client", "code client sap", "abrév. labo", "nom labo",
-                     "type client", "nature client", "Em base", "somme EQ", "rabais Em", "règle", "nb utilisateurs",
+                     "type client", "nature client", "Em base", "somme EQ", "rabais Em", "nb utilisateurs",
                      "nb comptes", "MAt", "MOt", "DSt", "DHt", "Et", "Rt", "Mt"]
             for categorie in generaux.codes_d3():
                 ligne.append(categorie + "t")
@@ -61,7 +61,7 @@ class BilanMensuel(object):
 
                 ligne = [edition.annee, edition.mois, reference, code_client, client['code_sap'], client['abrev_labo'],
                          client['nom_labo'], 'U', client['type_labo'], scl['em'], Outils.format_2_dec(scl['somme_eq']),
-                         scl['er'], client['emol_sans_activite'], nb_u, nb_c, Outils.format_2_dec(scl['mat']),
+                         scl['er'], nb_u, nb_c, Outils.format_2_dec(scl['mat']),
                          Outils.format_2_dec(scl['mot']), Outils.format_2_dec(scl['dst']),
                          Outils.format_2_dec(scl['dht']), scl['e'], Outils.format_2_dec(scl['r']),
                          Outils.format_2_dec(scl['mt'])]

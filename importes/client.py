@@ -9,7 +9,7 @@ class Client(Fichier):
     """
 
     cles = ['annee', 'mois', 'code', 'code_sap', 'abrev_labo', 'nom_labo', 'ref', 'dest', 'email', 'mode',
-            'type_labo', 'emol_sans_activite', 'emol_base_mens', 'emol_fixe', 'coef', 'id_classe_tarif',
+            'type_labo', 'id_classe_tarif',
             'classe_tarif']
     nom_fichier = "client.csv"
     libelle = "Clients"
@@ -85,18 +85,7 @@ class Client(Fichier):
                 msg += "le format de l'e-mail '" + donnee['email'] + "' de la ligne " + str(ligne) +\
                     " n'est pas correct\n"
 
-            if not((donnee['emol_sans_activite'] == "NON") or (donnee['emol_sans_activite'] == "ZERO") or
-                    (donnee['emol_sans_activite'] == "OUI")):
-                msg += "l'émolument à payer même sans activité de la ligne " + str(ligne) \
-                       + " doit valoir ZERO, NON ou OUI\n"
-
-            donnee['emol_base_mens'], info = Outils.est_un_nombre(donnee['emol_base_mens'], "l'émolument de base",
-                                                                  ligne)
-            msg += info
-            donnee['emol_fixe'], info = Outils.est_un_nombre(donnee['emol_fixe'], "l'émolument fixe", ligne)
-            msg += info
-            donnee['coef'], info = Outils.est_un_nombre(donnee['coef'], "le coefficient a", ligne)
-            msg += info
+            donnee['emb'] = coefmachines.donnees[donnee['id_classe_tarif']]['emolument']
 
             av_ds = generaux.avantage_ds_par_code_n(donnee['type_labo'])
             av_hc = generaux.avantage_hc_par_code_n(donnee['type_labo'])

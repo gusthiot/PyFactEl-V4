@@ -127,7 +127,7 @@ class Acces(Fichier):
             code_client = comptes.donnees[id_compte]['code_client']
             machine = machines.donnees[id_machine]
             client = clients.donnees[code_client]
-            coefmachine = coefmachines.donnees[client['id_classe_tarif'] + machine['categorie']]
+            coefmachine = coefmachines.donnees[client['id_classe_tarif']]
 
             if code_client not in self.sommes:
                 self.sommes[code_client] = {'comptes': {}, 'machines': {}}

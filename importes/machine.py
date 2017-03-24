@@ -7,7 +7,7 @@ class Machine(Fichier):
     Classe pour l'importation des données de Machines Cmi
     """
 
-    cles = ['annee', 'mois', 'id_machine', 'nom', 'categorie', 'id_cout', 't_h_machine_a', 't_h_machine_b',
+    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cout', 't_h_machine_a', 't_h_machine_b',
             't_h_machine_c', 'd_h_machine_d', 'd_h_creuses_e', 't_h_operateur_hp_mo', 'tx_occ_eff_hp',
             't_h_reservation_hp', 't_h_operateur_hc_mo', 'tx_occ_eff_hc', 't_h_reservation_hc', 'delai_sans_frais']
     nom_fichier = "machine.csv"
@@ -69,12 +69,6 @@ class Machine(Fichier):
             elif couts.contient_id(donnee['id_cout']) == 0:
                 msg += "l'id catégorie cout '" + donnee['id_cout'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
-
-            if donnee['categorie'] == "":
-                msg += "la catégorie machine de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif coefmachines.contient_categorie(donnee['categorie']) == 0:
-                msg += "la catégorie machine '" + donnee['categorie'] + "' de la ligne " + str(ligne) +\
-                       " n'est pas référencée dans les coefficients\n"
 
             donnee['t_h_machine_a'], info = Outils.est_un_nombre(donnee['t_h_machine_a'], "le tarif machine A", ligne)
             msg += info
