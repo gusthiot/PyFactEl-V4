@@ -1,6 +1,4 @@
-# PyFactEl-V3
-
-(PyFactEl en mode simulation, version 3)
+# PyFactEl-V4
 
 - installer Python 3 (https://www.python.org/downloads/)
     si l'option "rajouter Python au PATH" se présente, la cocher
