@@ -19,7 +19,7 @@ class Latex(object):
         :return: texte échappé
         """
 
-        p = re.compile("[^ a-zA-Z0-9_'èéêëâàäïûùüçöô.:,;\-%#&$/|]")
+        p = re.compile("[^ a-zA-Z0-9_'Éèéêëâàäïûùüçöô.:,;\-%#&$/|]")
         texte = p.sub('', texte)
 
         caracteres = ['%', '$', '_', '&', '#']

@@ -1055,7 +1055,7 @@ class Annexes(object):
         # ## 1.3
 
         structure_emolument = r'''{|r|r|r|r|}'''
-        legende_emolument = r'''Table I.3 - Emolument mensuel'''
+        legende_emolument = r'''Table I.3 - Émolument mensuel'''
 
         dico_emolument = {'emb':  Outils.format_2_dec(client['emb']),
                           'tot_eq_m': Outils.format_2_dec(scl['mat']),
@@ -1063,9 +1063,9 @@ class Annexes(object):
 
         contenu_emolument = r'''
             \hline
-            \multicolumn{1}{|l|}{Emolument de base}
-            & \multicolumn{1}{l|}{Total EQ M} &
-            \multicolumn{1}{l|}{Rabais émolument} & \multicolumn{1}{l|}{Emolument} \\
+            \multicolumn{1}{|l|}{Émolument de base}
+            & \multicolumn{1}{l|}{Total Procédés} &
+            \multicolumn{1}{l|}{Rabais émolument} & \multicolumn{1}{l|}{Émolument} \\
             \hline
             %(emb)s & %(tot_eq_m)s & %(rabais)s & %(emo)s \\
             \hline
