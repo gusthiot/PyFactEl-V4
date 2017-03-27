@@ -1003,7 +1003,7 @@ class Annexes(object):
                 & ''' + Outils.format_2_dec(scl['somme_t']) + r'''\\
                 \hline
                 '''
-            contenu += Latex.tableau(contenu_recap_fact, structure_recap_fact, legende_recap_fact)
+            contenu += Latex.long_tableau(contenu_recap_fact, structure_recap_fact, legende_recap_fact)
         else:
             contenu += Latex.tableau_vide(r'''Table I.1 - Récapitulatif des postes de la facture :
                 table vide (aucun article facturable)''')
@@ -1058,7 +1058,7 @@ class Annexes(object):
         legende_emolument = r'''Table I.3 - Émolument mensuel'''
 
         dico_emolument = {'emb':  Outils.format_2_dec(client['emb']),
-                          'tot_eq_m': Outils.format_2_dec(scl['mat']),
+                          'tot': Outils.format_2_dec(scl['mt']),
                           'rabais': Outils.format_2_dec(scl['er']), 'emo': scl['e']}
 
         contenu_emolument = r'''
@@ -1067,7 +1067,7 @@ class Annexes(object):
             & \multicolumn{1}{l|}{Total Procédés} &
             \multicolumn{1}{l|}{Rabais émolument} & \multicolumn{1}{l|}{Émolument} \\
             \hline
-            %(emb)s & %(tot_eq_m)s & %(rabais)s & %(emo)s \\
+            %(emb)s & %(tot)s & %(rabais)s & %(emo)s \\
             \hline
             ''' % dico_emolument
 
@@ -1163,7 +1163,7 @@ class Annexes(object):
             \hline
             ''' % dico_recap
 
-        contenu += Latex.tableau(contenu_recap, structure_recap, legende_recap)
+        contenu += Latex.long_tableau(contenu_recap, structure_recap, legende_recap)
 
         # ## 1.6
 
@@ -1195,7 +1195,7 @@ class Annexes(object):
                 \hline
                 ''' % dico_procedes_client
 
-            contenu += Latex.tableau(contenu_procedes_client, structure_procedes_client, legende_procedes_client)
+            contenu += Latex.long_tableau(contenu_procedes_client, structure_procedes_client, legende_procedes_client)
         else:
             contenu += Latex.tableau_vide(r'''Table I.6 - Récapitulatif des procédés :
                 table vide (pas d'utilisations machines)''')
@@ -1255,7 +1255,7 @@ class Annexes(object):
                     \hline
                     ''' % dico_bonus
 
-                contenu += Latex.tableau(contenu_bonus, structure_bonus, legende_bonus)
+                contenu += Latex.long_tableau(contenu_bonus, structure_bonus, legende_bonus)
             else:
                 contenu += Latex.tableau_vide(r'''Table I.8 - Récapitulatif des bonus :
                     table vide (pas d'utilisations machines)''')
