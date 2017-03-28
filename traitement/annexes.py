@@ -133,7 +133,7 @@ class Annexes(object):
                 \renewcommand{\arraystretch}{1.5}
                 '''
             client = clients.donnees[code_client]
-            nature = generaux.nature_client_par_code_n(client['type_labo'])
+            nature = generaux.nature_client_par_code_n(client['nature'])
             reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
             if edition.version != "0":
                 reference += "-" + edition.version
@@ -187,15 +187,14 @@ class Annexes(object):
 
         scl = sommes.sommes_clients[code_client]
         client = clients.donnees[code_client]
-        nature = Latex.echappe_caracteres(generaux.nature_client_par_code_n(client['type_labo']))
-        av_ds = Latex.echappe_caracteres(generaux.avantage_ds_par_code_n(client['type_labo']))
-        av_hc = Latex.echappe_caracteres(generaux.avantage_hc_par_code_n(client['type_labo']))
-        an_couts = Latex.echappe_caracteres(generaux.annexe_cout_par_code_n(client['type_labo']))
+        nature = Latex.echappe_caracteres(generaux.nature_client_par_code_n(client['nature']))
+        av_hc = Latex.echappe_caracteres(generaux.avantage_hc_par_code_n(client['nature']))
+        an_couts = Latex.echappe_caracteres(generaux.annexe_cout_par_code_n(client['nature']))
         reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
         if edition.version != "0":
             reference += "-" + edition.version
 
-        filtre = generaux.filtrer_article_nul_par_code_n(client['type_labo'])
+        filtre = generaux.filtrer_article_nul_par_code_n(client['nature'])
 
         contenu_bonus_compte = ""
         contenu_procedes_compte = ""
@@ -221,7 +220,6 @@ class Annexes(object):
             comptes_utilises = Outils.comptes_in_somme(sommes.sommes_comptes[code_client], comptes)
 
             for num_compte, id_compte in sorted(comptes_utilises.items()):
-                num_compte = Latex.echappe_caracteres(num_compte)
                 id_compte = Latex.echappe_caracteres(id_compte)
 
                 # ## COMPTE
@@ -293,16 +291,15 @@ class Annexes(object):
 
                 # ## 1.6
 
-                rsj = client['rs'] * sco['somme_j_dsi']
                 rhj = client['rh'] * sco['somme_j_dhi']
                 dico_procedes_compte = {'intitule': intitule_compte, 'maij': Outils.format_2_dec(sco['somme_j_mai']),
                                         'mm': Outils.format_2_dec(sco['somme_j_mm']),
                                         'mr': Outils.format_2_dec(sco['somme_j_mr']),
-                                        'rsj': Outils.format_2_dec(rsj), 'rhj': Outils.format_2_dec(rhj),
+                                        'rhj': Outils.format_2_dec(rhj),
                                         'moij': Outils.format_2_dec(sco['somme_j_moi']),
                                         'mj': Outils.format_2_dec(sco['mj'])}
                 contenu_procedes_compte += r'''
-                    %(intitule)s & %(maij)s & %(moij)s & %(rsj)s & %(rhj)s & %(mm)s & %(mr)s & %(mj)s \\
+                    %(intitule)s & %(maij)s & %(moij)s & %(rhj)s & %(mm)s & %(mr)s & %(mj)s \\
                     \hline
                     ''' % dico_procedes_compte
 
@@ -332,12 +329,10 @@ class Annexes(object):
                 # ## ligne 1.8
 
                 if code_client in acces.sommes and id_compte in acces.sommes[code_client]['comptes']:
-                    bsj = client['bs'] * sco['somme_j_dsi']
                     bhj = client['bh'] * sco['somme_j_dhi']
-                    dico_bonus_compte = {'compte': intitule_compte, 'bsj': Outils.format_2_dec(bsj),
-                                         'bhj': Outils.format_2_dec(bhj), 'tot': Outils.format_2_dec(sco['somme_j_mb'])}
+                    dico_bonus_compte = {'compte': intitule_compte, 'bhj': Outils.format_2_dec(bhj)}
                     contenu_bonus_compte += r'''
-                        %(compte)s & %(bsj)s & %(bhj)s & %(tot)s \\
+                        %(compte)s & %(bhj)s \\
                         \hline
                         ''' % dico_bonus_compte
 
@@ -349,8 +344,6 @@ class Annexes(object):
                 dico_recap_poste = {'mm': Outils.format_2_dec(sco['somme_j_mm']),
                                     'mr': Outils.format_2_dec(sco['somme_j_mr']),
                                     'maij': Outils.format_2_dec(sco['somme_j_mai']),
-                                    'dsij': Outils.format_2_dec(sco['somme_j_dsi']),
-                                    'dhij': Outils.format_2_dec(sco['somme_j_dhi']),
                                     'mj': Outils.format_2_dec(sco['mj']),
                                     'nmij': Outils.format_2_dec((sco['somme_j_mai']-sco['somme_j_mr'])),
                                     'moij': Outils.format_2_dec(sco['somme_j_moi']),
@@ -392,19 +385,17 @@ class Annexes(object):
                 # ## 2.2
 
                 if code_client in acces.sommes and id_compte in acces.sommes[code_client]['comptes']:
-                    structure_utilise_compte = r'''{|l|c|c|c|r|r|r|r|r|r|}'''
+                    structure_utilise_compte = r'''{|l|c|c|c|r|r|r|r|r|}'''
                     legende_utilise_compte = r'''Table II.2 - Procédés (machine + main d'oeuvre)'''
 
                     contenu_utilise_compte = r'''
-                        \cline{3-10}
+                        \cline{3-9}
                         \multicolumn{2}{c}{} & \multicolumn{2}{|c|}{Machine} & \multicolumn{2}{c|}{PU [CHF/h]}
-                        & \multicolumn{2}{c|}{Montant [CHF]} & \multicolumn{1}{c|}{Déduc. Sp.}
-                        & \multicolumn{1}{c|}{Déduc. HC} \\
+                        & \multicolumn{2}{c|}{Montant [CHF]} & \multicolumn{1}{c|}{Déduc. HC} \\
                         \hline
                         \multicolumn{2}{|l|}{\textbf{''' + intitule_compte + r'''}} & Mach. & Oper.
                         & \multicolumn{1}{c|}{Mach.} & \multicolumn{1}{c|}{Oper.} & \multicolumn{1}{c|}{Mach.}
-                        & \multicolumn{1}{c|}{Oper.} & \multicolumn{1}{c|}{''' + av_ds + r'''}
-                        & \multicolumn{1}{c|}{''' + av_hc + r'''} \\
+                        & \multicolumn{1}{c|}{Oper.} & \multicolumn{1}{c|}{''' + av_hc + r'''} \\
                         \hline
                         '''
 
@@ -417,59 +408,71 @@ class Annexes(object):
                             dico_machine = {'machine': Latex.echappe_caracteres(nom),
                                             'hp': Outils.format_heure(somme[id_machine]['duree_hp']),
                                             'hc': Outils.format_heure(somme[id_machine]['duree_hc']),
-                                            'mo_hp': Outils.format_heure(somme[id_machine]['mo_hp']),
-                                            'mo_hc': Outils.format_heure(somme[id_machine]['mo_hc']),
+                                            'mo': Outils.format_heure(somme[id_machine]['mo']),
                                             'pu_m': Outils.format_2_dec(somme[id_machine]['pum']),
-                                            'puo_hp': Outils.format_2_dec(somme[id_machine]['puo_hp']),
-                                            'puo_hc': Outils.format_2_dec(somme[id_machine]['puo_hc']),
+                                            'puo': Outils.format_2_dec(somme[id_machine]['puo']),
                                             'mai_hp': Outils.format_2_dec(somme[id_machine]['mai_hp']),
                                             'mai_hc': Outils.format_2_dec(somme[id_machine]['mai_hc']),
-                                            'moi_hp': Outils.format_2_dec(somme[id_machine]['moi_hp']),
-                                            'moi_hc': Outils.format_2_dec(somme[id_machine]['moi_hc']),
-                                            'dsi_hp': Outils.format_2_dec(somme[id_machine]['dsi_hp']),
-                                            'dsi_hc': Outils.format_2_dec(somme[id_machine]['dsi_hc']),
+                                            'moi': Outils.format_2_dec(somme[id_machine]['moi']),
                                             'dhi': Outils.format_2_dec(somme[id_machine]['dhi'])}
 
-                            if somme[id_machine]['duree_hp'] > 0 or somme[id_machine]['mo_hp'] > 0:
-                                contenu_utilise_compte += r'''
-                                    %(machine)s & HP & %(hp)s & %(mo_hp)s & %(pu_m)s & %(puo_hp)s & %(mai_hp)s
-                                    & %(moi_hp)s & %(dsi_hp)s & \\
-                                    \hline
-                                    ''' % dico_machine
+                            mo_double = False
+                            if somme[id_machine]['duree_hp'] > 0 and somme[id_machine]['duree_hc'] > 0:
+                                mo_double = True
 
-                            if somme[id_machine]['duree_hc'] > 0 or somme[id_machine]['mo_hc'] > 0:
-                                contenu_utilise_compte += r'''
-                                    %(machine)s & HC & %(hc)s & %(mo_hc)s & %(pu_m)s & %(puo_hc)s & %(mai_hc)s
-                                    & %(moi_hc)s & %(dsi_hc)s & %(dhi)s \\
-                                    \hline
-                                    ''' % dico_machine
+                            if somme[id_machine]['duree_hp'] > 0:
+                                if mo_double:
+                                    contenu_utilise_compte += r'''
+                                        \multirow{2}{*}{%(machine)s} & HP & %(hp)s & \multirow{2}{*}{%(mo)s} & %(pu_m)s & %(puo)s 
+                                        & %(mai_hp)s & \multirow{2}{*}{%(moi)s} & \\
+                                        \cline{2-3} 
+                                        \cline{5-7} 
+                                        \cline{9-9} 
+                                        ''' % dico_machine
+                                else:
+                                    contenu_utilise_compte += r'''
+                                        %(machine)s & HP & %(hp)s & %(mo)s & %(pu_m)s & %(puo)s & %(mai_hp)s
+                                        & %(moi)s & \\
+                                        \hline
+                                        ''' % dico_machine
+
+                            if somme[id_machine]['duree_hc'] > 0:
+                                if mo_double:
+                                    contenu_utilise_compte += r'''
+                                         & HC & %(hc)s & & %(pu_m)s & %(puo)s & %(mai_hc)s
+                                        &  & %(dhi)s \\
+                                        \hline
+                                        ''' % dico_machine
+                                else:
+                                    contenu_utilise_compte += r'''
+                                        %(machine)s & HC & %(hc)s & %(mo)s & %(pu_m)s & %(puo)s & %(mai_hc)s
+                                        & %(moi)s & %(dhi)s \\
+                                        \hline
+                                        ''' % dico_machine
 
                     dico_tot = {'maij_d': Outils.format_2_dec(sco['somme_j_mai_d']),
                                 'moij_d': Outils.format_2_dec(sco['somme_j_moi_d']),
-                                'dsij_d': Outils.format_2_dec(sco['somme_j_dsi_d']),
                                 'dhij_d': Outils.format_2_dec(sco['somme_j_dhi_d']),
                                 'maij': Outils.format_2_dec(sco['somme_j_mai']),
                                 'moij': Outils.format_2_dec(sco['somme_j_moi']),
-                                'dsij': Outils.format_2_dec(sco['somme_j_dsi']),
                                 'dhij': Outils.format_2_dec(sco['somme_j_dhi']),
                                 'rabais': Outils.format_2_dec(sco['somme_j_mr']),
                                 'bonus': Outils.format_2_dec(sco['somme_j_mb'])}
                     contenu_utilise_compte += r'''
-                        \multicolumn{6}{|r|}{Arrondi} & %(maij_d)s & %(moij_d)s & %(dsij_d)s & %(dhij_d)s \\
+                        \multicolumn{6}{|r|}{Arrondi} & %(maij_d)s & %(moij_d)s & %(dhij_d)s \\
                         \hline
-                        \multicolumn{6}{|r|}{Total} & %(maij)s & %(moij)s & %(dsij)s & %(dhij)s \\
+                        \multicolumn{6}{|r|}{Total} & %(maij)s & %(moij)s & %(dhij)s \\
                         \hline
                         ''' % dico_tot
-                    if av_ds == "RABAIS" or av_hc == "RABAIS":
+                    if av_hc == "RABAIS":
                         contenu_utilise_compte += r'''
-                            \multicolumn{6}{r}{} & \multicolumn{2}{|r|}{Rabais total}
-                            & \multicolumn{2}{r|}{%(rabais)s} \\
-                            \cline{7-10}
+                            \multicolumn{6}{r}{} & \multicolumn{2}{|r|}{Rabais total} & %(rabais)s \\
+                            \cline{7-9}
                             ''' % dico_tot
-                    if av_ds == "BONUS" or av_hc == "BONUS":
+                    if av_hc == "BONUS":
                         contenu_utilise_compte += r'''
-                            \multicolumn{6}{r}{} & \multicolumn{2}{|r|}{Bonus total} & \multicolumn{2}{r|}{%(bonus)s} \\
-                            \cline{7-10}
+                            \multicolumn{6}{r}{} & \multicolumn{2}{|r|}{Bonus total} & %(bonus)s \\
+                            \cline{7-9}
                             ''' % dico_tot
 
                     contenu_compte_annexe2 += Latex.tableau(contenu_utilise_compte, structure_utilise_compte,
@@ -534,15 +537,15 @@ class Annexes(object):
 
                 if code_client in acces.sommes and id_compte in acces.sommes[code_client]['comptes']:
 
-                    structure_machuts_compte = r'''{|l|l|l|c|c|c|c|}'''
+                    structure_machuts_compte = r'''{|l|l|l|c|c|c|}'''
                     legende_machuts_compte = r'''Table IV.1 - Détails des utilisations machines'''
 
                     contenu_machuts_compte = r'''
                         \hline
                         \multicolumn{3}{|l|}{\multirow{2}{*}{\scriptsize{\textbf{''' + intitule_compte + r'''}}}}
-                        & \multicolumn{2}{c|}{Machine} & \multicolumn{2}{c|}{Main d'oeuvre} \\
-                        \cline{4-7}
-                        \multicolumn{3}{|l|}{} & HP & HC & HP & HC \\
+                        & \multicolumn{2}{c|}{Machine} & Main d'oeuvre \\
+                        \cline{4-6}
+                        \multicolumn{3}{|l|}{} & HP & HC &  \\
                         \hline
                         '''
 
@@ -556,11 +559,10 @@ class Annexes(object):
                             dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
                                             'hp': Outils.format_heure(somme[id_machine]['duree_hp']),
                                             'hc': Outils.format_heure(somme[id_machine]['duree_hc']),
-                                            'mo_hp': Outils.format_heure(somme[id_machine]['mo_hp']),
-                                            'mo_hc': Outils.format_heure(somme[id_machine]['mo_hc'])}
+                                            'mo': Outils.format_heure(somme[id_machine]['mo'])}
                             contenu_machuts_compte += r'''
                                 \multicolumn{3}{|l|}{\textbf{%(machine)s}} & \hspace{5mm} %(hp)s & \hspace{5mm} %(hc)s &
-                                 \hspace{5mm} %(mo_hp)s & \hspace{5mm} %(mo_hc)s \\
+                                 \hspace{5mm} %(mo)s \\
                                 \hline
                                 ''' % dico_machine
 
@@ -573,11 +575,9 @@ class Annexes(object):
                                         dico_user = {'user': Latex.echappe_caracteres(nom + " " + prenom),
                                                      'hp': Outils.format_heure(smu['duree_hp']),
                                                      'hc': Outils.format_heure(smu['duree_hc']),
-                                                     'mo_hp': Outils.format_heure(smu['mo_hp']),
-                                                     'mo_hc': Outils.format_heure(smu['mo_hc'])}
+                                                     'mo': Outils.format_heure(smu['mo'])}
                                         contenu_machuts_compte += r'''
-                                            \multicolumn{3}{|l|}{\hspace{5mm} %(user)s} & %(hp)s & %(hc)s & %(mo_hp)s
-                                            & %(mo_hc)s \\
+                                            \multicolumn{3}{|l|}{\hspace{5mm} %(user)s} & %(hp)s & %(hc)s & %(mo)s \\
                                             \hline
                                         ''' % dico_user
                                         for p1 in smu['data']:
@@ -608,12 +608,10 @@ class Annexes(object):
                                                         'rem': Latex.echappe_caracteres(rem),
                                                         'hp': Outils.format_heure(cae['duree_machine_hp']),
                                                         'hc': Outils.format_heure(cae['duree_machine_hc']),
-                                                        'mo_hp': Outils.format_heure(cae['duree_operateur_hp']),
-                                                        'mo_hc': Outils.format_heure(cae['duree_operateur_hc'])}
+                                                        'mo': Outils.format_heure(cae['duree_operateur'])}
                                             contenu_machuts_compte += r'''
                                                 \hspace{10mm} %(date)s & %(heure)s & \parbox{5cm}{%(rem)s}
-                                                & %(hp)s \hspace{5mm} & %(hc)s \hspace{5mm} & %(mo_hp)s \hspace{5mm}
-                                                & %(mo_hc)s \hspace{5mm} \\
+                                                & %(hp)s \hspace{5mm} & %(hc)s \hspace{5mm} & %(mo)s \hspace{5mm} \\
                                                 \hline
                                             ''' % dico_pos
 
@@ -855,14 +853,14 @@ class Annexes(object):
 
                         for nom_machine, id_machine in sorted(mics.items()):
                             duree = somme[id_machine]['duree_hp'] + somme[id_machine]['duree_hc']
-                            mo = somme[id_machine]['mo_hp'] + somme[id_machine]['mo_hc']
 
                             dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
-                                            'duree': Outils.format_heure(duree), 'mo': Outils.format_heure(mo),
-                                            'cu1': Outils.format_2_dec(couts.donnees[id_cout]['u1']),
-                                            'cu2': Outils.format_2_dec(couts.donnees[id_cout]['u2']),
-                                            'cu3': Outils.format_2_dec(couts.donnees[id_cout]['u3']),
-                                            'cmo': Outils.format_2_dec(couts.donnees[id_cout]['mo']),
+                                            'duree': Outils.format_heure(duree),
+                                            'mo': Outils.format_heure(somme[id_machine]['mo']),
+                                            'cu1': Outils.format_2_dec(couts.donnees[id_cout]['U1']),
+                                            'cu2': Outils.format_2_dec(couts.donnees[id_cout]['U2']),
+                                            'cu3': Outils.format_2_dec(couts.donnees[id_cout]['U3']),
+                                            'cmo': Outils.format_2_dec(couts.donnees[id_cout]['MO']),
                                             'mu1': Outils.format_2_dec(somme[id_machine]['mu1']),
                                             'mu2': Outils.format_2_dec(somme[id_machine]['mu2']),
                                             'mu3': Outils.format_2_dec(somme[id_machine]['mu3']),
@@ -1168,30 +1166,29 @@ class Annexes(object):
         # ## 1.6
 
         if code_client in acces.sommes:
-            structure_procedes_client = r'''{|l|r|r|r|r|r|r|r|}'''
+            structure_procedes_client = r'''{|l|r|r|r|r|r|r|}'''
             legende_procedes_client = r'''Table I.6 - Récapitulatif des procédés'''
 
             contenu_procedes_client = r'''
-                \cline{2-8}
-                \multicolumn{1}{c}{} & \multicolumn{2}{|c|}{Procédés} & \multicolumn{2}{c|}{Rabais}
+                \cline{2-7}
+                \multicolumn{1}{c}{} & \multicolumn{2}{|c|}{Procédés} & \multicolumn{1}{c|}{Rabais}
                 & \multicolumn{2}{c|}{Facture} & Montant \\
-                \cline{1-7}
-                Compte & Machine & M.O. opér. & Déduc. Sp. & Déduc. HC & Montant & Rabais & \multicolumn{1}{c|}{net} \\
+                \cline{1-6}
+                Compte & Machine & M.O. opér. & Déduc. HC & Montant & Rabais & \multicolumn{1}{c|}{net} \\
                 \hline
                 '''
 
             contenu_procedes_client += contenu_procedes_compte
 
-            rst = client['rs'] * scl['dst']
             rht = client['rh'] * scl['dht']
             dico_procedes_client = {'mat': Outils.format_2_dec(scl['mat']),
                                     'mr': Outils.format_2_dec(scl['somme_t_mr']),
                                     'mm': Outils.format_2_dec(scl['somme_t_mm']),
                                     'mot': Outils.format_2_dec(scl['mot']),
                                     'mt': Outils.format_2_dec(scl['mt']),
-                                    'rst': Outils.format_2_dec(rst), 'rht': Outils.format_2_dec(rht)}
+                                    'rht': Outils.format_2_dec(rht)}
             contenu_procedes_client += r'''
-                Total & %(mat)s & %(mot)s & %(rst)s & %(rht)s & %(mm)s & %(mr)s & %(mt)s \\
+                Total & %(mat)s & %(mot)s & %(rht)s & %(mm)s & %(mr)s & %(mt)s \\
                 \hline
                 ''' % dico_procedes_client
 
@@ -1232,26 +1229,23 @@ class Annexes(object):
 
         # ## 1.8
 
-        if av_ds == "BONUS" or av_hc == "BONUS":
+        if av_hc == "BONUS":
             if code_client in acces.sommes:
-                structure_bonus = r'''{|l|r|r|r|}'''
+                structure_bonus = r'''{|l|r|}'''
                 legende_bonus = r'''Table I.8 - Récapitulatif des bonus'''
 
                 contenu_bonus = r'''
-                    \cline{2-4}
-                    \multicolumn{1}{c}{} & \multicolumn{3}{|c|}{Bonus (Points)} \\
+                    \cline{2-2}
+                    \multicolumn{1}{c}{} & \multicolumn{1}{|c|}{Bonus (Points)} \\
                     \hline
-                    Compte & \multicolumn{1}{c|}{Déduc. Sp.} & \multicolumn{1}{c|}{Déduc. HC}
-                    & \multicolumn{1}{c|}{Total} \\
+                    Compte & \multicolumn{1}{c|}{Déduc. HC} \\
                     \hline
                     '''
                 contenu_bonus += contenu_bonus_compte
 
-                bst = client['bs'] * scl['dst']
                 bht = client['bh'] * scl['dht']
-                dico_bonus = {'bst': math.ceil(bst), 'bht': math.ceil(bht),
-                              'mbt': scl['somme_t_mb']}
-                contenu_bonus += r'''Total & \multicolumn{1}{c|}{%(bst)s} & \multicolumn{1}{c|}{%(bht)s} & \multicolumn{1}{c|}{%(mbt)s} \\
+                dico_bonus = {'bht': math.ceil(bht)}
+                contenu_bonus += r'''Total & \multicolumn{1}{c|}{%(bht)s} \\
                     \hline
                     ''' % dico_bonus
 

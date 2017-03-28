@@ -24,20 +24,13 @@ class Rabais(object):
             return fhp, fhc
 
     @staticmethod
-    def rabais_emolument(rt, mt, mat, cat_t, emb):
+    def rabais_emolument(mt, emb):
         """
         calcule le rabais sur émolument
-        :param rt: rt
         :param mt: mt
-        :param mat: mat
-        :param cat_t: dico des totaux des catégories de prestations
         :param emb: émolument de base mensuel
-        :return: somme EQ, somme SB, somme T, em, er
+        :return: em, er
         """
-        somme_eq = rt + mat
-        somme_t = rt + mt
-        for cat, tt in cat_t.items():
-            somme_t += tt
 
         em = emb
 
@@ -45,7 +38,7 @@ class Rabais(object):
             er = 0
         else:
             er = emb
-        return somme_eq, somme_t, em, er
+        return em, er
 
     @staticmethod
     def rabais_reservation_petit_montant(rm, rmin):

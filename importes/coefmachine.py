@@ -8,30 +8,17 @@ class CoefMachine(Fichier):
     """
 
     nom_fichier = "coeffmachine.csv"
-    cles = ['annee', 'mois', 'id_classe_tarif', 'intitule', 'emolument', 'coef_a', 'coef_b', 'coef_c', 'coef_d',
-            'coef_e', 'coef_mo', 'coef_r']
+    cles = ['annee', 'mois', 'nature', 'emolument', 'tarif_u', 'coef_a', 'coef_e', 'coef_mo', 'coef_r']
     libelle = "Coefficients Machines"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.classes = []
 
-    def obtenir_classes(self):
-        """
-        retourne toutes les classes de tarif présentes
-        :return: toutes les classes de tarif présentes
-        """
-        if self.verifie_coherence == 0:
-            info = self.libelle + ". vous devez vérifier la cohérence avant de pouvoir obtenir les classes"
-            print(info)
-            Outils.affiche_message(info)
-            return []
-        return self.classes
-
-    def est_coherent(self):
+    def est_coherent(self, generaux):
         """
         vérifie que les données du fichier importé sont cohérentes (si couple catégorie - classe de tarif est unique),
         et efface les colonnes mois et année
+        :param generaux: paramètres généraux
         :return: 1 s'il y a une erreur, 0 sinon
         """
         if self.verifie_date == 0:
@@ -47,26 +34,28 @@ class CoefMachine(Fichier):
         msg = ""
         ligne = 1
         donnees_dict = {}
+        natures = []
 
         for donnee in self.donnees:
-            if donnee['id_classe_tarif'] == "":
-                msg += "la classe de tarif de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_classe_tarif'] not in self.classes:
-                if donnee['id_classe_tarif'] not in self.classes:
-                    self.classes.append(donnee['id_classe_tarif'])
+            if donnee['nature'] == "":
+                msg += "la nature client de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif donnee['nature'] not in generaux.obtenir_code_n():
+                msg += "la nature client de la ligne " + str(ligne) + " n'existe pas dans les codes N\n"
+            elif donnee['nature'] not in natures:
+                if donnee['nature'] not in natures:
+                    natures.append(donnee['nature'])
                 else:
-                    msg += "la classe de tarif '" + donnee['id_classe_tarif'] + "' de la ligne " + str(ligne) +\
+                    msg += "la nature '" + donnee['nature'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
+
+            if donnee['tarif_u'] == "":
+                msg += "le tarif U de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif donnee['tarif_u'] not in ['U1', 'U2', 'U3']:
+                msg += "le tarif U de la ligne " + str(ligne) + " n'est pas parmi [U1, U2, U3]\n"
 
             donnee['emolument'], info = Outils.est_un_nombre(donnee['emolument'], "l'émolument", ligne)
             msg += info
             donnee['coef_a'], info = Outils.est_un_nombre(donnee['coef_a'], "le coefficient A", ligne)
-            msg += info
-            donnee['coef_b'], info = Outils.est_un_nombre(donnee['coef_b'], "le coefficient B", ligne)
-            msg += info
-            donnee['coef_c'], info = Outils.est_un_nombre(donnee['coef_c'], "le coefficient C", ligne)
-            msg += info
-            donnee['coef_d'], info = Outils.est_un_nombre(donnee['coef_d'], "le coefficient D", ligne)
             msg += info
             donnee['coef_e'], info = Outils.est_un_nombre(donnee['coef_e'], "le coefficient E", ligne)
             msg += info
@@ -77,7 +66,7 @@ class CoefMachine(Fichier):
 
             del donnee['annee']
             del donnee['mois']
-            donnees_dict[donnee['id_classe_tarif']] = donnee
+            donnees_dict[donnee['nature']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict

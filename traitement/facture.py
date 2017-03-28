@@ -72,16 +72,16 @@ class Facture(object):
                 if self.prod2qual and not (self.prod2qual.code_client_existe(code_sap)):
                     continue
     
-                if client['type_labo'] == "I":
+                if client['nature'] == "I":
                     genre = generaux.code_int
                 else:
                     genre = generaux.code_ext
-                nature = generaux.nature_client_par_code_n(client['type_labo'])
+                nature = generaux.nature_client_par_code_n(client['nature'])
                 reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
                 if edition.version != "0":
                     reference += "-" + edition.version
 
-                filtre = generaux.filtrer_article_nul_par_code_n(client['type_labo'])
+                filtre = generaux.filtrer_article_nul_par_code_n(client['nature'])
     
                 nom_annexe = "annexe_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + \
                              "_" + str(edition.version) + "_" + code_client + ".pdf"
@@ -127,7 +127,7 @@ class Facture(object):
                                          code_sap_traduit, generaux.devise, client['mode'], reference, "", "",
                                          generaux.entete, lien_annexe, "", lien_annexe_technique, "X"])
     
-                op_centre = client['type_labo'] + str(edition.annee)[2:] + Outils.mois_string(edition.mois)
+                op_centre = client['nature'] + str(edition.annee)[2:] + Outils.mois_string(edition.mois)
 
                 if scl['em'] > 0 and not (filtre == "OUI" and scl['e'] == 0):
                     poste = generaux.poste_emolument

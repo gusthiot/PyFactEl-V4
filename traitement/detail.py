@@ -48,7 +48,7 @@ class Detail(object):
                     sclo = sommes.sommes_comptes[code_client]
                     comptes_utilises = Outils.comptes_in_somme(sclo, comptes)
                     base_client = [edition.annee, edition.mois, code_client, client['code_sap'], client['abrev_labo'],
-                                   'U', client['type_labo']]
+                                   'U', client['nature']]
 
                     for num_compte, id_compte in sorted(comptes_utilises.items()):
                         compte = comptes.donnees[id_compte]

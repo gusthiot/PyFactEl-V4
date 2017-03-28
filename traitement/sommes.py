@@ -8,12 +8,12 @@ class Sommes(object):
     Classe contenant les méthodes pour le calcul des sommes par compte, catégorie et client
     """
 
-    cles_somme_compte = ['somme_j_mai', 'maij_d', 'somme_j_moi', 'moij_d', 'somme_j_dsi', 'dsij_d', 'somme_j_dhi',
+    cles_somme_compte = ['somme_j_mai', 'maij_d', 'somme_j_moi', 'moij_d', 'somme_j_dhi',
                          'dhij_d', 'somme_j_mm', 'somme_j_mr', 'somme_j_mb', 'mj', 'c1', 'c2', 'res', 'mu1', 'mu2',
                          'mu3', 'mmo', 'mu1_d', 'mu2_d', 'mu3_d', 'mmo_d']
 
-    cles_somme_client = ['mat', 'mot', 'dst', 'dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_eq',
-                         'somme_t', 'em', 'er', 'e', 'res', 'rm', 'rm_d', 'rr', 'r']
+    cles_somme_client = ['mat', 'mot', 'dst', 'dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'em',
+                         'er', 'e', 'res', 'rm', 'rm_d', 'rr', 'r']
 
     def __init__(self, verification, generaux):
         """
@@ -104,8 +104,7 @@ class Sommes(object):
                         somme['mu3'] += som['mu3']
                         somme['mmo'] += som['mmo']
                         somme['somme_j_mai'] += som['mai_hp'] + som['mai_hc']
-                        somme['somme_j_moi'] += som['moi_hp'] + som['moi_hc']
-                        somme['somme_j_dsi'] += som['dsi_hp'] + som['dsi_hc']
+                        somme['somme_j_moi'] += som['moi']
                         somme['somme_j_dhi'] += som['dhi']
 
         for code_client in livraisons.sommes:
@@ -139,14 +138,10 @@ class Sommes(object):
                 somme['somme_j_dhi_d'] = dhij - somme['somme_j_dhi']
                 somme['somme_j_dhi'] = dhij
 
-                dsij = round(2 * somme['somme_j_dsi'], 1) / 2
-                somme['somme_j_dsi_d'] = dsij - somme['somme_j_dsi']
-                somme['somme_j_dsi'] = dsij
-
                 client = clients.donnees[code_client]
                 somme['somme_j_mm'] += somme['somme_j_mai'] + somme['somme_j_moi']
-                somme['somme_j_mr'] = client['rs'] * somme['somme_j_dsi'] + client['rh'] * somme['somme_j_dhi']
-                somme['somme_j_mb'] = client['bs'] * somme['somme_j_dsi'] + client['bh'] * somme['somme_j_dhi']
+                somme['somme_j_mr'] = client['rh'] * somme['somme_j_dhi']
+                somme['somme_j_mb'] = client['bh'] * somme['somme_j_dhi']
                 somme['mj'] = somme['somme_j_mm'] - somme['somme_j_mr']
 
                 for categorie in self.categories:
@@ -230,7 +225,6 @@ class Sommes(object):
                 for id_compte, som_co in spco_cl.items():
                     somme['mat'] += som_co['somme_j_mai']
                     somme['mot'] += som_co['somme_j_moi']
-                    somme['dst'] += som_co['somme_j_dsi']
                     somme['dht'] += som_co['somme_j_dhi']
                     somme['somme_t_mm'] += som_co['somme_j_mm']
                     somme['somme_t_mr'] += som_co['somme_j_mr']
@@ -301,12 +295,13 @@ class Sommes(object):
 
             for code_client, somme in spcl.items():
                 client = clients.donnees[code_client]
-                somme['somme_t_mb'] += math.ceil(client['bs'] * somme['dst']) + math.ceil(client['bh'] * somme['dht'])
-                somme['somme_eq'], somme['somme_t'], somme['em'], somme['er'] = \
-                    Rabais.rabais_emolument(somme['r'], somme['mt'], somme['mat'], somme['tot_cat'],
-                                            client['emb'])
+                somme['somme_t_mb'] += math.ceil(client['bh'] * somme['dht'])
+                somme['em'], somme['er'] = Rabais.rabais_emolument(somme['mt'], client['emb'])
                 somme['e'] = somme['em'] - somme['er']
-                somme['somme_t'] += somme['e']
+
+                somme['somme_t'] = somme['r'] + somme['mt'] + somme['e']
+                for cat, tt in somme['tot_cat'].items():
+                    somme['somme_t'] += tt
 
             # print("")
             # print("spcl")

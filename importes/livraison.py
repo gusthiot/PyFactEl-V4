@@ -117,7 +117,7 @@ class Livraison(Fichier):
             prestation = prestations.donnees[donnee['id_prestation']]
             no_prestation = prestation['no_prestation']
             client = clients.donnees[code_client]
-            coefprest = coefprests.donnees[client['id_classe_tarif'] + prestation['categorie']]
+            coefprest = coefprests.donnees[client['nature'] + prestation['categorie']]
             prix_unit_client = round(prestation['prix_unit'] * coefprest['coefficient'], 2)
             donnee['rabais_r'] = round(donnee['rabais'], 2)
             categorie = prestation['categorie']

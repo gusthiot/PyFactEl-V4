@@ -7,25 +7,12 @@ class CoefPrest(Fichier):
     Classe pour l'importation des données de Coefficients Prestations
     """
 
-    cles = ['annee', 'mois', 'id_classe_tarif', 'intitule', 'categorie', 'nom_categorie', 'coefficient']
+    cles = ['annee', 'mois', 'nature', 'categorie', 'nom_categorie', 'coefficient']
     nom_fichier = "coeffprestation.csv"
     libelle = "Coefficients Prestations"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.classes = []
-
-    def obtenir_classes(self):
-        """
-        retourne toutes les classes de tarif présentes
-        :return: toutes les classes de tarif présentes
-        """
-        if self.verifie_coherence == 0:
-            info = self.libelle + ". vous devez vérifier la cohérence avant de pouvoir obtenir les classes"
-            print(info)
-            Outils.affiche_message(info)
-            return []
-        return self.classes
 
     def contient_categorie(self, categorie):
         """
@@ -65,8 +52,17 @@ class CoefPrest(Fichier):
         categories = []
         couples = []
         donnees_dict = {}
+        natures = []
 
         for donnee in self.donnees:
+            if donnee['nature'] == "":
+                msg += "la nature client de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif donnee['nature'] not in generaux.obtenir_code_n():
+                msg += "la nature client de la ligne " + str(ligne) + " n'existe pas dans les codes N\n"
+            elif donnee['nature'] not in natures:
+                if donnee['nature'] not in natures:
+                    natures.append(donnee['nature'])
+
             if donnee['categorie'] == "":
                 msg += "la catégorie de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['categorie'] not in generaux.codes_d3():
@@ -75,25 +71,20 @@ class CoefPrest(Fichier):
             elif donnee['categorie'] not in categories:
                 categories.append(donnee['categorie'])
 
-            if donnee['id_classe_tarif'] == "":
-                msg += "la classe de tarif de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_classe_tarif'] not in self.classes:
-                self.classes.append(donnee['id_classe_tarif'])
-
-            if (donnee['categorie'] != "") and (donnee['id_classe_tarif'] != ""):
-                couple = [donnee['categorie'], donnee['id_classe_tarif']]
+            if (donnee['categorie'] != "") and (donnee['nature'] != ""):
+                couple = [donnee['categorie'], donnee['nature']]
                 if couple not in couples:
                     couples.append(couple)
                 else:
-                    msg += "Couple categorie '" + donnee['categorie'] + "' et classe de tarif '" + \
-                           donnee['id_classe_tarif'] + "' de la ligne " + str(ligne) + " pas unique\n"
+                    msg += "Couple categorie '" + donnee['categorie'] + "' et nature '" + \
+                           donnee['nature'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
             donnee['coefficient'], info = Outils.est_un_nombre(donnee['coefficient'], "le coefficient", ligne)
             msg += info
 
             del donnee['annee']
             del donnee['mois']
-            donnees_dict[donnee['id_classe_tarif'] + donnee['categorie']] = donnee
+            donnees_dict[donnee['nature'] + donnee['categorie']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict
@@ -105,11 +96,11 @@ class CoefPrest(Fichier):
                                                          "les coefficients de prestations\n"
 
         for categorie in categories:
-            for classe in self.classes:
-                couple = [categorie, classe]
+            for nature in natures:
+                couple = [categorie, nature]
                 if couple not in couples:
-                    msg += "Couple categorie '" + categorie + "' et classe de tarif '" + \
-                           classe + "' n'existe pas\n"
+                    msg += "Couple categorie '" + categorie + "' et nature client '" + \
+                           nature + "' n'existe pas\n"
 
         if msg != "":
             msg = self.libelle + "\n" + msg

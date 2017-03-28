@@ -16,7 +16,7 @@ class Generaux(object):
     libelle = "Paramètres Généraux"
     cles_obligatoires = ['origine', 'code_int', 'code_ext', 'commerciale', 'canal', 'secteur', 'devise', 'financier',
                          'fonds', 'entete', 'poste_emolument', 'poste_reservation',  'lien', 'chemin', 'code_t',
-                         'code_n', 'nature_client', 'avantage_DS', 'avantage_HC', 'annexe_cout', 'filtrer_article_nul',
+                         'code_n', 'nature_client', 'avantage_HC', 'annexe_cout', 'filtrer_article_nul',
                          'code_d', 'code_sap', 'quantite', 'unite', 'type_prix', 'type_rabais', 'texte_sap',
                          'intitule_long', 'intitule_court', 'eligible_U1', 'eligible_U2', 'eligible_U3', 'modes',
                          'min_fact_rese']
@@ -142,10 +142,6 @@ class Generaux(object):
     def nature_client_par_code_n(self, nature_client):
         return self._donnees['nature_client'][
             self._donnees['code_n'].index(nature_client)]
-
-    def avantage_ds_par_code_n(self, avantage_ds):
-        return self._donnees['avantage_DS'][
-            self._donnees['code_n'].index(avantage_ds)]
 
     def avantage_hc_par_code_n(self, avantage_hc):
         return self._donnees['avantage_HC'][

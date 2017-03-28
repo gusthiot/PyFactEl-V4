@@ -7,7 +7,7 @@ class Couts(Fichier):
     Classe pour l'importation des données de Catégories de Coûts
     """
 
-    cles = ['annee', 'mois', 'id_cat_cout', 'intitule', 'u1', 'u2', 'u3', 'mo']
+    cles = ['annee', 'mois', 'id_cat_cout', 'intitule', 'U1', 'U2', 'U3', 'MO']
     nom_fichier = "categcout.csv"
     libelle = "Catégories Coûts"
 
@@ -64,16 +64,16 @@ class Couts(Fichier):
                 msg += "l'id catégorie '" + donnee['id_cat_cout'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
-            donnee['u1'], info = Outils.est_un_nombre(donnee['u1'], "le coût U1 ", ligne)
+            donnee['U1'], info = Outils.est_un_nombre(donnee['U1'], "le coût U1 ", ligne)
             msg += info
 
-            donnee['u2'], info = Outils.est_un_nombre(donnee['u2'], "le coût U2 ", ligne)
+            donnee['U2'], info = Outils.est_un_nombre(donnee['U2'], "le coût U2 ", ligne)
             msg += info
 
-            donnee['u3'], info = Outils.est_un_nombre(donnee['u3'], "le coût U3 ", ligne)
+            donnee['U3'], info = Outils.est_un_nombre(donnee['U3'], "le coût U3 ", ligne)
             msg += info
 
-            donnee['mo'], info = Outils.est_un_nombre(donnee['mo'], "le coût MO ", ligne)
+            donnee['MO'], info = Outils.est_un_nombre(donnee['MO'], "le coût MO ", ligne)
             msg += info
 
             del donnee['annee']

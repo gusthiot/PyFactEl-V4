@@ -7,9 +7,8 @@ class Machine(Fichier):
     Classe pour l'importation des données de Machines Cmi
     """
 
-    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cout', 't_h_machine_a', 't_h_machine_b',
-            't_h_machine_c', 'd_h_machine_d', 'd_h_creuses_e', 't_h_operateur_hp_mo', 'tx_occ_eff_hp',
-            't_h_reservation_hp', 't_h_operateur_hc_mo', 'tx_occ_eff_hc', 't_h_reservation_hc', 'delai_sans_frais']
+    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cout', 'd_h_creuses_e', 'tx_occ_eff_hp',
+            't_h_reservation_hp', 'tx_occ_eff_hc', 't_h_reservation_hc', 'delai_sans_frais']
     nom_fichier = "machine.csv"
     libelle = "Machines"
 
@@ -32,11 +31,10 @@ class Machine(Fichier):
                 ligne += 1
         return 0
 
-    def est_coherent(self, coefmachines, couts):
+    def est_coherent(self, couts):
         """
         vérifie que les données du fichier importé sont cohérentes (id machine unique, id catégorie cout référencé,
         catégorie machine référencé dans les coefficients machines), et efface les colonnes mois et année
-        :param coefmachines: coefficients machines importés
         :param couts: catégories couts importés
         :return: 1 s'il y a une erreur, 0 sinon
         """
@@ -70,31 +68,14 @@ class Machine(Fichier):
                 msg += "l'id catégorie cout '" + donnee['id_cout'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
-            donnee['t_h_machine_a'], info = Outils.est_un_nombre(donnee['t_h_machine_a'], "le tarif machine A", ligne)
-            msg += info
-            donnee['t_h_machine_b'], info = Outils.est_un_nombre(donnee['t_h_machine_b'],
-                                                                 "le tarif machine B", ligne)
-            msg += info
-            donnee['t_h_machine_c'], info = Outils.est_un_nombre(donnee['t_h_machine_c'],
-                                                                 "le tarif machine C", ligne)
-            msg += info
-            donnee['d_h_machine_d'], info = Outils.est_un_nombre(donnee['d_h_machine_d'],
-                                                                 "la déduction machine D", ligne)
-            msg += info
             donnee['d_h_creuses_e'], info = Outils.est_un_nombre(donnee['d_h_creuses_e'],
                                                                  "la déduction heures creuses E", ligne)
-            msg += info
-            donnee['t_h_operateur_hp_mo'], info = Outils.est_un_nombre(donnee['t_h_operateur_hp_mo'],
-                                                                       "le tarif opérateur HP MO", ligne)
             msg += info
             donnee['tx_occ_eff_hp'], info = Outils.est_un_nombre(donnee['tx_occ_eff_hp'],
                                                                  "le taux effectif d'occupation HP", ligne)
             msg += info
             donnee['t_h_reservation_hp'], info = Outils.est_un_nombre(donnee['t_h_reservation_hp'],
                                                                       "le tarif réservation HP", ligne)
-            msg += info
-            donnee['t_h_operateur_hc_mo'], info = Outils.est_un_nombre(donnee['t_h_operateur_hc_mo'],
-                                                                       "le tarif opérateur HC MO", ligne)
             msg += info
             donnee['tx_occ_eff_hc'], info = Outils.est_un_nombre(donnee['tx_occ_eff_hc'],
                                                                  "le taux effectif d'occupation HC", ligne)

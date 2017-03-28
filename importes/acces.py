@@ -8,7 +8,7 @@ class Acces(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_compte', 'id_user', 'id_machine', 'date_login', 'duree_machine_hp', 'duree_machine_hc',
-            'duree_operateur_hp', 'duree_operateur_hc', 'id_op', 'nom_op', 'remarque_op', 'remarque_staff']
+            'duree_operateur', 'id_op', 'nom_op', 'remarque_op', 'remarque_staff']
     nom_fichier = "cae.csv"
     libelle = "Contrôle Accès Equipement"
 
@@ -78,11 +78,8 @@ class Acces(Fichier):
             donnee['duree_machine_hc'], info = Outils.est_un_nombre(donnee['duree_machine_hc'], "la durée machine hc",
                                                                     ligne)
             msg += info
-            donnee['duree_operateur_hp'], info = Outils.est_un_nombre(donnee['duree_operateur_hp'],
-                                                                      "la durée opérateur hp", ligne)
-            msg += info
-            donnee['duree_operateur_hc'], info = Outils.est_un_nombre(donnee['duree_operateur_hc'],
-                                                                      "la durée opérateur hc", ligne)
+            donnee['duree_operateur'], info = Outils.est_un_nombre(donnee['duree_operateur'],
+                                                                      "la durée opérateur", ligne)
             msg += info
 
             del donnee['annee']
@@ -127,7 +124,7 @@ class Acces(Fichier):
             code_client = comptes.donnees[id_compte]['code_client']
             machine = machines.donnees[id_machine]
             client = clients.donnees[code_client]
-            coefmachine = coefmachines.donnees[client['id_classe_tarif']]
+            coefmachine = coefmachines.donnees[client['nature']]
 
             if code_client not in self.sommes:
                 self.sommes[code_client] = {'comptes': {}, 'machines': {}}
@@ -137,29 +134,23 @@ class Acces(Fichier):
             sco = scl[id_compte]
 
             if id_machine not in sco:
-                pum = coefmachine['coef_a'] * machine['t_h_machine_a'] + \
-                      coefmachine['coef_b'] * machine['t_h_machine_b'] + \
-                      coefmachine['coef_c'] * machine['t_h_machine_c']
-                puo_hp = coefmachine['coef_mo'] * machine['t_h_operateur_hp_mo']
-                puo_hc = coefmachine['coef_mo'] * machine['t_h_operateur_hc_mo']
-                coef_d = coefmachine['coef_d'] * machine['d_h_machine_d']
+                pum = round(couts.donnees[machine['id_cout']][coefmachine['tarif_u']] * coefmachine['coef_a'], 2)
+                puo = round(couts.donnees[machine['id_cout']]['MO'] * coefmachine['coef_mo'], 2)
                 coef_e = coefmachine['coef_e'] * machine['d_h_creuses_e']
-                sco[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'mo_hp': 0, 'mo_hc': 0, 'users': {},
-                                   'coef_d': coef_d, 'coef_e': coef_e, 'pum': pum, 'puo_hp': puo_hp, 'puo_hc': puo_hc}
+                sco[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'mo': 0, 'users': {},
+                                   'coef_e': coef_e, 'pum': pum, 'puo': puo}
             sco[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             sco[id_machine]['duree_hc'] += donnee['duree_machine_hc']
-            sco[id_machine]['mo_hp'] += donnee['duree_operateur_hp']
-            sco[id_machine]['mo_hc'] += donnee['duree_operateur_hc']
+            sco[id_machine]['mo'] += donnee['duree_operateur']
 
             scm = sco[id_machine]['users']
 
             if id_user not in scm:
-                scm[id_user] = {'duree_hp': 0, 'duree_hc': 0, 'mo_hp': 0, 'mo_hc': 0, 'data': []}
+                scm[id_user] = {'duree_hp': 0, 'duree_hc': 0, 'mo': 0, 'data': []}
 
             scm[id_user]['duree_hp'] += donnee['duree_machine_hp']
             scm[id_user]['duree_hc'] += donnee['duree_machine_hc']
-            scm[id_user]['mo_hp'] += donnee['duree_operateur_hp']
-            scm[id_user]['mo_hc'] += donnee['duree_operateur_hc']
+            scm[id_user]['mo'] += donnee['duree_operateur']
             scm[id_user]['data'].append(pos)
 
             scma = self.sommes[code_client]['machines']
@@ -196,17 +187,14 @@ class Acces(Fichier):
                     machine = machines.donnees[id_machine]
                     id_cout = machine['id_cout']
                     tm = sco[id_machine]['duree_hp'] / 60 + sco[id_machine]['duree_hc'] / 60
-                    tmo = sco[id_machine]['mo_hp'] / 60 + sco[id_machine]['mo_hc'] / 60
-                    sco[id_machine]['mu1'] = round(couts.donnees[id_cout]['u1'] * tm, 2)
-                    sco[id_machine]['mu2'] = round(couts.donnees[id_cout]['u2'] * tm, 2)
-                    sco[id_machine]['mu3'] = round(couts.donnees[id_cout]['u3'] * tm, 2)
-                    sco[id_machine]['mmo'] = round(couts.donnees[id_cout]['mo'] * tmo, 2)
+                    tmo = sco[id_machine]['mo'] / 60
+                    sco[id_machine]['mu1'] = round(couts.donnees[id_cout]['U1'] * tm, 2)
+                    sco[id_machine]['mu2'] = round(couts.donnees[id_cout]['U2'] * tm, 2)
+                    sco[id_machine]['mu3'] = round(couts.donnees[id_cout]['U3'] * tm, 2)
+                    sco[id_machine]['mmo'] = round(couts.donnees[id_cout]['MO'] * tmo, 2)
                     sco[id_machine]['mai_hp'] = round(sco[id_machine]['duree_hp'] / 60 * sco[id_machine]['pum'], 2)
                     sco[id_machine]['mai_hc'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['pum'], 2)
-                    sco[id_machine]['moi_hp'] = round(sco[id_machine]['mo_hp'] / 60 * sco[id_machine]['puo_hp'], 2)
-                    sco[id_machine]['moi_hc'] = round(sco[id_machine]['mo_hp'] / 60 * sco[id_machine]['puo_hc'], 2)
-                    sco[id_machine]['dsi_hp'] = round(sco[id_machine]['duree_hp'] / 60 * sco[id_machine]['coef_d'], 2)
-                    sco[id_machine]['dsi_hc'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['coef_d'], 2)
+                    sco[id_machine]['moi'] = round(sco[id_machine]['mo'] / 60 * sco[id_machine]['puo'], 2)
                     sco[id_machine]['dhi'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['coef_e'], 2)
 
                     if id_cout not in scat:

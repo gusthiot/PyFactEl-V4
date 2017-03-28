@@ -8,9 +8,7 @@ class Client(Fichier):
     Classe pour l'importation des données de Clients Cmi
     """
 
-    cles = ['annee', 'mois', 'code', 'code_sap', 'abrev_labo', 'nom_labo', 'ref', 'dest', 'email', 'mode',
-            'type_labo', 'id_classe_tarif',
-            'classe_tarif']
+    cles = ['annee', 'mois', 'code', 'code_sap', 'abrev_labo', 'nom_labo', 'ref', 'dest', 'email', 'mode', 'nature']
     nom_fichier = "client.csv"
     libelle = "Clients"
 
@@ -30,12 +28,11 @@ class Client(Fichier):
             return []
         return self.codes
 
-    def est_coherent(self, coefmachines, coefprests, generaux):
+    def est_coherent(self, coefmachines, generaux):
         """
         vérifie que les données du fichier importé sont cohérentes (code client unique,
         classe tarif présente dans coefficients, type de labo dans paramètres), et efface les colonnes mois et année
         :param coefmachines: coefficients machines importés
-        :param coefprests: coefficients prestations importés
         :param generaux: paramètres généraux
         :return: 1 s'il y a une erreur, 0 sinon
         """
@@ -51,15 +48,9 @@ class Client(Fichier):
 
         msg = ""
         ligne = 1
-        classes = []
         donnees_dict = {}
 
         for donnee in self.donnees:
-            if donnee['id_classe_tarif'] == "":
-                msg += "la classe de tarif de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_classe_tarif'] not in classes:
-                classes.append(donnee['id_classe_tarif'])
-
             if donnee['code_sap'] == "":
                 msg += "le code sap de la ligne " + str(ligne) + " ne peut être vide\n"
 
@@ -71,10 +62,10 @@ class Client(Fichier):
                 msg += "le code client '" + donnee['code'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
-            if donnee['type_labo'] == "":
+            if donnee['nature'] == "":
                 msg += "le type de labo de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['type_labo'] not in generaux.obtenir_code_n():
-                msg += "le type de labo '" + donnee['type_labo'] + "' de la ligne " + str(ligne) +\
+            elif donnee['nature'] not in generaux.obtenir_code_n():
+                msg += "le type de labo '" + donnee['nature'] + "' de la ligne " + str(ligne) +\
                     " n'existe pas dans les types N\n"
 
             if (donnee['mode'] != "") and (donnee['mode'] not in generaux.obtenir_modes_envoi()):
@@ -85,18 +76,12 @@ class Client(Fichier):
                 msg += "le format de l'e-mail '" + donnee['email'] + "' de la ligne " + str(ligne) +\
                     " n'est pas correct\n"
 
-            donnee['emb'] = coefmachines.donnees[donnee['id_classe_tarif']]['emolument']
+            donnee['emb'] = coefmachines.donnees[donnee['nature']]['emolument']
 
-            av_ds = generaux.avantage_ds_par_code_n(donnee['type_labo'])
-            av_hc = generaux.avantage_hc_par_code_n(donnee['type_labo'])
+            av_hc = generaux.avantage_hc_par_code_n(donnee['nature'])
 
-            donnee['rs'] = 1
-            donnee['bs'] = 0
             donnee['rh'] = 1
             donnee['bh'] = 0
-            if av_ds == 'BONUS':
-                donnee['bs'] = 1
-                donnee['rs'] = 0
             if av_hc == 'BONUS':
                 donnee['bh'] = 1
                 donnee['rh'] = 0
@@ -109,12 +94,6 @@ class Client(Fichier):
 
         self.donnees = donnees_dict
         self.verifie_coherence = 1
-
-        for classe in classes:
-            if classe not in coefmachines.obtenir_classes():
-                msg += "la classe de tarif '" + classe + "' n'est pas présente dans les coefficients machines\n"
-            if classe not in coefprests.obtenir_classes():
-                msg += "la classe de tarif '" + classe + "' n'est pas présente dans les coefficients prestations\n"
 
         if msg != "":
             msg = self.libelle + "\n" + msg

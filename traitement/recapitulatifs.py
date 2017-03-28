@@ -15,9 +15,8 @@ class Recapitulatifs(object):
 
             ligne = [edition.annee, edition.mois, "Id-Compte", "Numéro de compte", "Intitulé compte", "Code Client CMi",
                      "Abrev. Labo", "Id-User", "Nom User", "Prénom User", "Id-Machine", "Nom Machine",
-                     "Date et Heure login", "Durée machine HP", "Durée machine HC", "Durée opérateur HP",
-                     "Durée opérateur HC", "Id-Opérateur", "Prénom Nom opérateur", "Remarque opérateur",
-                     "Remarque staff"]
+                     "Date et Heure login", "Durée machine HP", "Durée machine HC", "Durée opérateur",
+                     "Id-Opérateur", "Prénom Nom opérateur", "Remarque opérateur", "Remarque staff"]
             fichier_writer.writerow(ligne)
 
             for donnee in acces.donnees:
@@ -28,7 +27,7 @@ class Recapitulatifs(object):
                 ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
                          compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'], user['prenom'],
                          donnee['id_machine'], machine['nom'], donnee['date_login'], donnee['duree_machine_hp'],
-                         donnee['duree_machine_hc'], donnee['duree_operateur_hp'], donnee['duree_operateur_hc'],
+                         donnee['duree_machine_hc'], donnee['duree_operateur'],
                          donnee['id_op'], donnee['nom_op'], donnee['remarque_op'], donnee['remarque_staff']]
                 fichier_writer.writerow(ligne)
 

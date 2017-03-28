@@ -37,17 +37,17 @@ class BilanMensuel(object):
         with dossier_destination.writer(nom) as fichier_writer:
 
             ligne = ["année", "mois", "référence", "code client", "code client sap", "abrév. labo", "nom labo",
-                     "type client", "nature client", "Em base", "somme EQ", "rabais Em", "nb utilisateurs",
-                     "nb comptes", "MAt", "MOt", "DSt", "DHt", "Et", "Rt", "Mt"]
+                     "type client", "nature client", "Em base", "rabais Em", "nb utilisateurs",
+                     "nb comptes", "MAt", "MOt", "DHt", "Et", "Rt", "Mt"]
             for categorie in generaux.codes_d3():
                 ligne.append(categorie + "t")
-            ligne += ["total facturé HT", "Bonus St", "Bonus Ht", "Montant Bonus"]
+            ligne += ["total facturé HT", "Bonus Ht"]
             fichier_writer.writerow(ligne)
 
             for code_client in sorted(sommes.sommes_clients.keys()):
                 scl = sommes.sommes_clients[code_client]
                 client = clients.donnees[code_client]
-                nature = generaux.nature_client_par_code_n(client['type_labo'])
+                nature = generaux.nature_client_par_code_n(client['nature'])
                 reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
                 if edition.version != "0":
                     reference += "-" + edition.version
@@ -56,30 +56,28 @@ class BilanMensuel(object):
                 nb_u = len(users)
                 nb_c = len(cptes)
 
-                bst = client['bs'] * scl['dst']
                 bht = client['bh'] * scl['dht']
 
                 ligne = [edition.annee, edition.mois, reference, code_client, client['code_sap'], client['abrev_labo'],
-                         client['nom_labo'], 'U', client['type_labo'], scl['em'], Outils.format_2_dec(scl['somme_eq']),
-                         scl['er'], nb_u, nb_c, Outils.format_2_dec(scl['mat']),
-                         Outils.format_2_dec(scl['mot']), Outils.format_2_dec(scl['dst']),
+                         client['nom_labo'], 'U', client['nature'], scl['em'], scl['er'], nb_u, nb_c,
+                         Outils.format_2_dec(scl['mat']), Outils.format_2_dec(scl['mot']),
                          Outils.format_2_dec(scl['dht']), scl['e'], Outils.format_2_dec(scl['r']),
                          Outils.format_2_dec(scl['mt'])]
                 for categorie in generaux.codes_d3():
                     ligne.append(Outils.format_2_dec(scl['tot_cat'][categorie]))
-                ligne += [Outils.format_2_dec(scl['somme_t']), math.ceil(bst), math.ceil(bht),
-                          scl['somme_t_mb']]
+                ligne += [Outils.format_2_dec(scl['somme_t']), math.ceil(bht)]
                 fichier_writer.writerow(ligne)
 
     @staticmethod
     def utilisateurs_et_comptes(acces, livraisons, code_client, comptes, reservations):
         """
-        retourne la liste de tous les comptes et utilisateurs concernés pour les accès, les réservations et les livraisons
-        pour un client donné
+        retourne la liste de tous les comptes et utilisateurs concernés pour les accès, les réservations et 
+        les livraisons pour un client donné
         :param acces: accès importés
         :param livraisons: livraisons importées
         :param code_client: client donné
-        :param comptes: comptes importés
+        :param comptes: comptes importés      
+        :param reservations: reservations importées
         :return: liste des comptes
         """
         cptes = []
