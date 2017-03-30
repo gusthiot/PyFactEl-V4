@@ -423,8 +423,8 @@ class Annexes(object):
                             if somme[id_machine]['duree_hp'] > 0:
                                 if mo_double:
                                     contenu_utilise_compte += r'''
-                                        \multirow{2}{*}{%(machine)s} & HP & %(hp)s & \multirow{2}{*}{%(mo)s} & %(pu_m)s & %(puo)s 
-                                        & %(mai_hp)s & \multirow{2}{*}{%(moi)s} & \\
+                                        \multirow{2}{*}{%(machine)s} & HP & %(hp)s & \multirow{2}{*}{%(mo)s} & %(pu_m)s 
+                                        & %(puo)s & %(mai_hp)s & \multirow{2}{*}{%(moi)s} & \\
                                         \cline{2-3} 
                                         \cline{5-7} 
                                         \cline{9-9} 
@@ -464,16 +464,6 @@ class Annexes(object):
                         \multicolumn{6}{|r|}{Total} & %(maij)s & %(moij)s & %(dhij)s \\
                         \hline
                         ''' % dico_tot
-                    if av_hc == "RABAIS":
-                        contenu_utilise_compte += r'''
-                            \multicolumn{6}{r}{} & \multicolumn{2}{|r|}{Rabais total} & %(rabais)s \\
-                            \cline{7-9}
-                            ''' % dico_tot
-                    if av_hc == "BONUS":
-                        contenu_utilise_compte += r'''
-                            \multicolumn{6}{r}{} & \multicolumn{2}{|r|}{Bonus total} & %(bonus)s \\
-                            \cline{7-9}
-                            ''' % dico_tot
 
                     contenu_compte_annexe2 += Latex.tableau(contenu_utilise_compte, structure_utilise_compte,
                                                             legende_utilise_compte)

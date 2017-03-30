@@ -133,12 +133,14 @@ class Acces(Fichier):
                 scl[id_compte] = {}
             sco = scl[id_compte]
 
+            alpha_u = couts.donnees[machine['id_cout']][coefmachine['tarif_u']] * coefmachine['coef_a']
+
             if id_machine not in sco:
-                pum = round(couts.donnees[machine['id_cout']][coefmachine['tarif_u']] * coefmachine['coef_a'], 2)
+                pum = round(alpha_u, 2)
                 puo = round(couts.donnees[machine['id_cout']]['MO'] * coefmachine['coef_mo'], 2)
-                coef_e = coefmachine['coef_e'] * machine['d_h_creuses_e']
+                du_hc = round(alpha_u * machine['rabais_hc'], 2)
                 sco[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'mo': 0, 'users': {},
-                                   'coef_e': coef_e, 'pum': pum, 'puo': puo}
+                                   'du_hc': du_hc, 'pum': pum, 'puo': puo}
             sco[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             sco[id_machine]['duree_hc'] += donnee['duree_machine_hc']
             sco[id_machine]['mo'] += donnee['duree_operateur']
@@ -155,8 +157,8 @@ class Acces(Fichier):
 
             scma = self.sommes[code_client]['machines']
             if id_machine not in scma:
-                pur_hp = round(coefmachine['coef_r'] * machine['t_h_reservation_hp'], 2)
-                pur_hc = round(coefmachine['coef_r'] * machine['t_h_reservation_hc'], 2)
+                pur_hp = round(alpha_u * machine['penalite_hp'], 2)
+                pur_hc = round(alpha_u * machine['penalite_hc'] * (1 - machine['rabais_hc']), 2)
                 scma[id_machine] = {'duree_hp': 0, 'duree_hc': 0,  'pur_hp': pur_hp, 'pur_hc': pur_hc, 'users': {}}
             scma[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             scma[id_machine]['duree_hc'] += donnee['duree_machine_hc']
@@ -195,7 +197,7 @@ class Acces(Fichier):
                     sco[id_machine]['mai_hp'] = round(sco[id_machine]['duree_hp'] / 60 * sco[id_machine]['pum'], 2)
                     sco[id_machine]['mai_hc'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['pum'], 2)
                     sco[id_machine]['moi'] = round(sco[id_machine]['mo'] / 60 * sco[id_machine]['puo'], 2)
-                    sco[id_machine]['dhi'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['coef_e'], 2)
+                    sco[id_machine]['dhi'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['du_hc'], 2)
 
                     if id_cout not in scat:
                         scat[id_cout] = {'mu1': 0, 'mu2': 0, 'mu3': 0, 'mmo': 0}

@@ -86,7 +86,7 @@ dossier_enregistrement = Outils.chemin_dossier([generaux.chemin, edition.annee,
 dossier_lien = Outils.lien_dossier([generaux.lien, edition.annee, Outils.mois_string(edition.mois)],
                                    plateforme, generaux)
 livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
-reservations.calcul_montants(machines, coefmachines, clients, verification)
+reservations.calcul_montants(machines, coefmachines, clients, verification, couts)
 acces.calcul_montants(machines, coefmachines, clients, verification, couts, comptes)
 
 sommes = Sommes(verification, generaux)

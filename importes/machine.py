@@ -7,8 +7,8 @@ class Machine(Fichier):
     Classe pour l'importation des données de Machines Cmi
     """
 
-    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cout', 'd_h_creuses_e', 'tx_occ_eff_hp',
-            't_h_reservation_hp', 'tx_occ_eff_hc', 't_h_reservation_hc', 'delai_sans_frais']
+    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cout', 'rabais_hc', 'tx_occ_eff_hp',
+            'penalite_hp', 'tx_occ_eff_hc', 'penalite_hc', 'delai_sans_frais']
     nom_fichier = "machine.csv"
     libelle = "Machines"
 
@@ -68,20 +68,20 @@ class Machine(Fichier):
                 msg += "l'id catégorie cout '" + donnee['id_cout'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
-            donnee['d_h_creuses_e'], info = Outils.est_un_nombre(donnee['d_h_creuses_e'],
-                                                                 "la déduction heures creuses E", ligne)
+            donnee['rabais_hc'], info = Outils.est_un_nombre(donnee['rabais_hc'],
+                                                             "le rabais heures creuses", ligne)
             msg += info
             donnee['tx_occ_eff_hp'], info = Outils.est_un_nombre(donnee['tx_occ_eff_hp'],
                                                                  "le taux effectif d'occupation HP", ligne)
             msg += info
-            donnee['t_h_reservation_hp'], info = Outils.est_un_nombre(donnee['t_h_reservation_hp'],
-                                                                      "le tarif réservation HP", ligne)
+            donnee['penalite_hp'], info = Outils.est_un_nombre(donnee['penalite_hp'],
+                                                               "la pénalité HP", ligne)
             msg += info
             donnee['tx_occ_eff_hc'], info = Outils.est_un_nombre(donnee['tx_occ_eff_hc'],
                                                                  "le taux effectif d'occupation HC", ligne)
             msg += info
-            donnee['t_h_reservation_hc'], info = Outils.est_un_nombre(donnee['t_h_reservation_hc'],
-                                                                      "le tarif réservation HC", ligne)
+            donnee['penalite_hc'], info = Outils.est_un_nombre(donnee['penalite_hc'],
+                                                               "la pénalité HC", ligne)
             msg += info
             donnee['delai_sans_frais'], info = Outils.est_un_nombre(donnee['delai_sans_frais'], "le délai sans frais",
                                                                     ligne)

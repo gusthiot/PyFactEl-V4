@@ -82,13 +82,14 @@ class Reservation(Fichier):
             return 1
         return 0
 
-    def calcul_montants(self, machines, coefmachines, clients, verification):
+    def calcul_montants(self, machines, coefmachines, clients, verification, couts):
         """
         calcule les sous-totaux nécessaires
         :param machines: machines importées et vérifiées
         :param coefmachines: coefficients machines importés et vérifiés
         :param clients: clients importés et vérifiés
         :param verification: pour vérifier si les dates et les cohérences sont correctes
+        :param couts: catégories coûts importées
         """
         if verification.a_verifier != 0:
             info = self.libelle + ". vous devez faire les vérifications avant de calculer les montants"
@@ -115,8 +116,9 @@ class Reservation(Fichier):
 
             tx_hp = machine['tx_occ_eff_hp']
             tx_hc = machine['tx_occ_eff_hc']
-            pu_hp = round(coefmachine['coef_r'] * machine['t_h_reservation_hp'], 2)
-            pu_hc = round(coefmachine['coef_r'] * machine['t_h_reservation_hc'], 2)
+            alpha_u = couts.donnees[machine['id_cout']][coefmachine['tarif_u']] * coefmachine['coef_a']
+            pu_hp = round(alpha_u * machine['penalite_hp'], 2)
+            pu_hc = round(alpha_u * machine['penalite_hc'] * (1 - machine['rabais_hc']), 2)
             ok_hp = False
             ok_hc = False
             if duree_fact_hp > 0 and pu_hp > 0 and tx_hp > 0:
