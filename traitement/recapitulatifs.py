@@ -13,10 +13,10 @@ class Recapitulatifs(object):
 
         with dossier_destination.writer(nom) as fichier_writer:
 
-            ligne = [edition.annee, edition.mois, "Id-Compte", "Numéro de compte", "Intitulé compte", "Code Client CMi",
-                     "Abrev. Labo", "Id-User", "Nom User", "Prénom User", "Id-Machine", "Nom Machine",
-                     "Date et Heure login", "Durée machine HP", "Durée machine HC", "Durée opérateur",
-                     "Id-Opérateur", "Prénom Nom opérateur", "Remarque opérateur", "Remarque staff"]
+            ligne = [edition.annee, edition.mois, "Id-Compte", "Numéro de compte", "Intitulé compte",
+                     "Code Type Compte", "Code Client CMi", "Abrev. Labo", "Id-User", "Nom User", "Prénom User",
+                     "Id-Machine", "Nom Machine", "Date et Heure login", "Durée machine HP", "Durée machine HC",
+                     "Durée opérateur", "Id-Opérateur", "Prénom Nom opérateur", "Remarque opérateur", "Remarque staff"]
             fichier_writer.writerow(ligne)
 
             for donnee in acces.donnees:
@@ -25,9 +25,9 @@ class Recapitulatifs(object):
                 user = users.donnees[donnee['id_user']]
                 machine = machines.donnees[donnee['id_machine']]
                 ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
-                         compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'], user['prenom'],
-                         donnee['id_machine'], machine['nom'], donnee['date_login'], donnee['duree_machine_hp'],
-                         donnee['duree_machine_hc'], donnee['duree_operateur'],
+                         compte['type'], compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'],
+                         user['prenom'], donnee['id_machine'], machine['nom'], donnee['date_login'],
+                         donnee['duree_machine_hp'], donnee['duree_machine_hc'], donnee['duree_operateur'],
                          donnee['id_op'], donnee['nom_op'], donnee['remarque_op'], donnee['remarque_staff']]
                 fichier_writer.writerow(ligne)
 
@@ -40,11 +40,11 @@ class Recapitulatifs(object):
 
         with dossier_destination.writer(nom) as fichier_writer:
 
-            ligne = [edition.annee, edition.mois, "Id-Compte", "Numéro de compte", "Intitulé compte", "Code Client CMi",
-                     "Abrev. Labo", "Id-User", "Nom User", "Prénom User", "Id-Prestation", "Numéro de prestation",
-                     "Désignation prestation", "Date de livraison", "Quantité livrée", "Unité de livraison",
-                     "Rabais [CHF]", "Responsable", "ID-Livraison", "Date et Heure de la commande",
-                     "Date et Heure de la prise en charge", "Remarque"]
+            ligne = [edition.annee, edition.mois, "Id-Compte", "Numéro de compte", "Intitulé compte",
+                     "Code Type Compte", "Code Client CMi", "Abrev. Labo", "Id-User", "Nom User", "Prénom User",
+                     "Id-Prestation", "Numéro de prestation", "Désignation prestation", "Date de livraison",
+                     "Quantité livrée", "Unité de livraison", "Rabais [CHF]", "Responsable", "ID-Livraison",
+                     "Date et Heure de la commande", "Date et Heure de la prise en charge", "Remarque"]
             fichier_writer.writerow(ligne)
 
             for donnee in livraisons.donnees:
@@ -53,11 +53,11 @@ class Recapitulatifs(object):
                 user = users.donnees[donnee['id_user']]
                 prestation = prestations.donnees[donnee['id_prestation']]
                 ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
-                         compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'], user['prenom'],
-                         donnee['id_prestation'], prestation['no_prestation'], prestation['designation'],
-                         donnee['date_livraison'], donnee['quantite'], prestation['unite_prest'], donnee['rabais'],
-                         donnee['responsable'], donnee['id_livraison'], donnee['date_commande'], donnee['date_prise'],
-                         donnee['remarque']]
+                         compte['type'], compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'],
+                         user['prenom'], donnee['id_prestation'], prestation['no_prestation'],
+                         prestation['designation'], donnee['date_livraison'], donnee['quantite'],
+                         prestation['unite_prest'], donnee['rabais'], donnee['responsable'], donnee['id_livraison'],
+                         donnee['date_commande'], donnee['date_prise'], donnee['remarque']]
                 fichier_writer.writerow(ligne)
 
     @staticmethod

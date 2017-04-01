@@ -274,9 +274,9 @@ class Annexes(object):
                 # ## ligne 1.5
 
                 total = sco['mj']
-                dico_recap_compte = {'compte': intitule_compte, 'procede': Outils.format_2_dec(sco['mj'])}
+                dico_recap_compte = {'compte': intitule_compte, 'type': compte['type'], 'procede': Outils.format_2_dec(sco['mj'])}
 
-                ligne = r'''%(compte)s & %(procede)s ''' % dico_recap_compte
+                ligne = r'''%(compte)s & %(type)s & %(procede)s ''' % dico_recap_compte
 
                 for categorie in generaux.codes_d3():
                     total += sco['tot_cat'][categorie]
@@ -292,14 +292,15 @@ class Annexes(object):
                 # ## 1.6
 
                 rhj = client['rh'] * sco['somme_j_dhi']
-                dico_procedes_compte = {'intitule': intitule_compte, 'maij': Outils.format_2_dec(sco['somme_j_mai']),
+                dico_procedes_compte = {'intitule': intitule_compte, 'type': compte['type'],
+                                        'maij': Outils.format_2_dec(sco['somme_j_mai']),
                                         'mm': Outils.format_2_dec(sco['somme_j_mm']),
                                         'mr': Outils.format_2_dec(sco['somme_j_mr']),
                                         'rhj': Outils.format_2_dec(rhj),
                                         'moij': Outils.format_2_dec(sco['somme_j_moi']),
                                         'mj': Outils.format_2_dec(sco['mj'])}
                 contenu_procedes_compte += r'''
-                    %(intitule)s & %(maij)s & %(moij)s & %(rhj)s & %(mm)s & %(mr)s & %(mj)s \\
+                    %(intitule)s & %(type)s & %(maij)s & %(moij)s & %(rhj)s & %(mm)s & %(mr)s & %(mj)s \\
                     \hline
                     ''' % dico_procedes_compte
 
@@ -1123,10 +1124,10 @@ class Annexes(object):
 
         legende_recap = r'''Table I.5 - Récapitulatif des comptes'''
 
-        structure_recap = r'''{|l|r|r|'''
+        structure_recap = r'''{|l|l|r|r|'''
         contenu_recap = r'''
             \hline
-            Compte & \multicolumn{1}{c|}{Procédés}'''
+            Compte & Type & \multicolumn{1}{c|}{Procédés}'''
 
         for article in generaux.articles_d3:
             structure_recap += r'''r|'''
@@ -1142,7 +1143,7 @@ class Annexes(object):
         dico_recap = {'procedes': Outils.format_2_dec(scl['mt']),
                       'total': Outils.format_2_dec((scl['somme_t']-scl['r']-scl['e']))}
 
-        contenu_recap += r'''Total article & %(procedes)s''' % dico_recap
+        contenu_recap += r'''Total article & & %(procedes)s''' % dico_recap
 
         for categorie in generaux.codes_d3():
             contenu_recap += r''' & ''' + Outils.format_2_dec(scl['tot_cat'][categorie])
@@ -1156,15 +1157,15 @@ class Annexes(object):
         # ## 1.6
 
         if code_client in acces.sommes:
-            structure_procedes_client = r'''{|l|r|r|r|r|r|r|}'''
+            structure_procedes_client = r'''{|l|l|r|r|r|r|r|r|}'''
             legende_procedes_client = r'''Table I.6 - Récapitulatif des procédés'''
 
             contenu_procedes_client = r'''
-                \cline{2-7}
-                \multicolumn{1}{c}{} & \multicolumn{2}{|c|}{Procédés} & \multicolumn{1}{c|}{Rabais}
+                \cline{3-8}
+                \multicolumn{2}{c}{} & \multicolumn{2}{|c|}{Procédés} & \multicolumn{1}{c|}{Rabais}
                 & \multicolumn{2}{c|}{Facture} & Montant \\
-                \cline{1-6}
-                Compte & Machine & M.O. opér. & Déduc. HC & Montant & Rabais & \multicolumn{1}{c|}{net} \\
+                \cline{1-7}
+                Compte & Type & Machine & M.O. opér. & Déduc. HC & Montant & Rabais & \multicolumn{1}{c|}{net} \\
                 \hline
                 '''
 
@@ -1178,7 +1179,7 @@ class Annexes(object):
                                     'mt': Outils.format_2_dec(scl['mt']),
                                     'rht': Outils.format_2_dec(rht)}
             contenu_procedes_client += r'''
-                Total & %(mat)s & %(mot)s & %(rht)s & %(mm)s & %(mr)s & %(mt)s \\
+                Total & & %(mat)s & %(mot)s & %(rht)s & %(mm)s & %(mr)s & %(mt)s \\
                 \hline
                 ''' % dico_procedes_client
 

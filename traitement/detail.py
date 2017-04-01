@@ -36,7 +36,7 @@ class Detail(object):
         with dossier_destination.writer(nom) as fichier_writer:
 
             ligne = ["Année", "Mois", "Code Client CMi", "Code Client SAP", "Abrev. Labo", "type client",
-                     "nature client", "Id-Compte", "Numéro de compte", "Intitulé compte", "code_d", "Id-categ-cout",
+                     "nature client", "Id-Compte", "Numéro de compte", "Intitulé compte", "Code Type Compte", "code_d", "Id-categ-cout",
                      "Intitulé catégorie coût", "U1", "U2", "U3", "MO", "intitule_court", "N. prestation", "Intitulé",
                      "Montant", "Rabais"]
             fichier_writer.writerow(ligne)
@@ -52,7 +52,7 @@ class Detail(object):
 
                     for num_compte, id_compte in sorted(comptes_utilises.items()):
                         compte = comptes.donnees[id_compte]
-                        base_compte = base_client + [id_compte, num_compte, compte['intitule']]
+                        base_compte = base_client + [id_compte, num_compte, compte['intitule'], compte['type']]
 
                         if code_client in acces.sommes and id_compte in acces.sommes[code_client]['categories']:
                             som_cats = acces.sommes[code_client]['categories'][id_compte]
