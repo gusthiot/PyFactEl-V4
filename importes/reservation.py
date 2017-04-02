@@ -117,8 +117,8 @@ class Reservation(Fichier):
             tx_hp = machine['tx_occ_eff_hp']
             tx_hc = machine['tx_occ_eff_hc']
             alpha_u = couts.donnees[machine['id_cout']][coefmachine['tarif_u']] * coefmachine['coef_a']
-            pu_hp = round(alpha_u * machine['penalite_hp'], 2)
-            pu_hc = round(alpha_u * machine['penalite_hc'] * (1 - machine['rabais_hc']), 2)
+            pu_hp = round(alpha_u * machine['tx_penalite_hp'] / 100, 2)
+            pu_hc = round(alpha_u * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
             ok_hp = False
             ok_hc = False
             if duree_fact_hp > 0 and pu_hp > 0 and tx_hp > 0:

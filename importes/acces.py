@@ -138,7 +138,7 @@ class Acces(Fichier):
             if id_machine not in sco:
                 pum = round(alpha_u, 2)
                 puo = round(couts.donnees[machine['id_cout']]['MO'] * coefmachine['coef_mo'], 2)
-                du_hc = round(alpha_u * machine['rabais_hc'], 2)
+                du_hc = round(alpha_u * machine['tx_rabais_hc'] / 100, 2)
                 sco[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'mo': 0, 'users': {},
                                    'du_hc': du_hc, 'pum': pum, 'puo': puo}
             sco[id_machine]['duree_hp'] += donnee['duree_machine_hp']
@@ -157,8 +157,8 @@ class Acces(Fichier):
 
             scma = self.sommes[code_client]['machines']
             if id_machine not in scma:
-                pur_hp = round(alpha_u * machine['penalite_hp'], 2)
-                pur_hc = round(alpha_u * machine['penalite_hc'] * (1 - machine['rabais_hc']), 2)
+                pur_hp = round(alpha_u * machine['tx_penalite_hp'] / 100, 2)
+                pur_hc = round(alpha_u * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
                 scma[id_machine] = {'duree_hp': 0, 'duree_hc': 0,  'pur_hp': pur_hp, 'pur_hc': pur_hc, 'users': {}}
             scma[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             scma[id_machine]['duree_hc'] += donnee['duree_machine_hc']
