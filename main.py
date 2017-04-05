@@ -34,6 +34,7 @@ from parametres import (Edition,
                         Generaux)
 from traitement import (Annexes,
                         BilanMensuel,
+                        BilanComptes,
                         Facture,
                         Sommes,
                         Verification,
@@ -124,6 +125,7 @@ if Latex.possibles():
                     plateforme, generaux, users, couts)
 
 BilanMensuel.bilan(dossier_destination, edition, sommes, clients, generaux, acces, livraisons, comptes, reservations)
+BilanComptes.bilan(dossier_destination, edition, sommes, clients, generaux, comptes)
 Detail.detail(dossier_destination, edition, sommes, clients, generaux, acces, livraisons, comptes, couts)
 
 Recapitulatifs.cae(dossier_destination, edition, acces, comptes, clients, users, machines)
