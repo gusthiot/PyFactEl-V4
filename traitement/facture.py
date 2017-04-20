@@ -254,8 +254,6 @@ class Facture(object):
 
         nom = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
               str(edition.version) + suffixe
-        Outils.copier_dossier("./reveal.js/", "js", destination.chemin)
-        Outils.copier_dossier("./reveal.js/", "css", destination.chemin)
         with destination.open(nom) as fichier:
 
             html = r'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -288,8 +286,8 @@ class Facture(object):
                     margin-left: 50px;
                 }
                 </style>
-                <link rel="stylesheet" href="css/reveal.css">
-                <link rel="stylesheet" href="css/white.css">
+                <link rel="stylesheet" href="../css/reveal.css">
+                <link rel="stylesheet" href="../css/white.css">
                 </head>
                 <body>
                 <div id="combo">
@@ -306,7 +304,7 @@ class Facture(object):
                 '''
             html += contenu
             html += r'''</div></div>
-                    <script src="js/reveal.js"></script>
+                    <script src="../js/reveal.js"></script>
                     <script>
                         Reveal.initialize();
                     </script>

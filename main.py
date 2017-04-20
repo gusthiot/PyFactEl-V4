@@ -114,6 +114,8 @@ annexes_techniques = "annexes_techniques"
 dossier_annexes_techniques, nouveau = Outils.chemin_dossier([dossier_enregistrement, annexes_techniques], plateforme, generaux)
 lien_annexes_techniques = Outils.lien_dossier([dossier_lien, annexes_techniques], plateforme, generaux)
 
+Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
+Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
 facture_prod = Facture()
 facture_prod.factures(sommes, dossier_destination, edition, generaux, clients, comptes, lien_annexes,
                       lien_annexes_techniques, annexes, annexes_techniques)
@@ -151,9 +153,9 @@ if edition.version == '0':
         DossierDestination(dossier_enregistrement).ecrire(
             fichier_complet + ".csv", DossierSource(dossier_csv).lire(fichier_complet + "_0.csv"))
     ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois)
-    DossierDestination(dossier_enregistrement).ecrire(
-        ticket_complet + ".html", DossierSource(dossier_csv).lire(ticket_complet + "_0.html"))
-    Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
-    Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
+    ticket_texte = DossierSource(dossier_csv).string_lire(ticket_complet + "_0.html")
+    ticket_texte = ticket_texte.replace("..", ".")
+    DossierDestination(dossier_enregistrement).string_ecrire(
+        ticket_complet + ".html", ticket_texte)
 
 Outils.affiche_message("OK !!!")

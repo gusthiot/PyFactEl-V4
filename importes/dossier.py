@@ -54,6 +54,9 @@ class DossierSource(_DossierBase):
     def dict_reader(self, chemin_relatif):
         return csv.DictReader(self._open(chemin_relatif, "r"), delimiter=self.delimiteur, quotechar=self.quotechar)
 
+    def string_lire(self, chemin_relatif):
+        return self._open(chemin_relatif, "r").read()
+
     def lire(self, chemin_relatif):
         """Renvoie le contenu d'un fichier, en binaire."""
         return self._open(chemin_relatif, "rb").read()
@@ -79,6 +82,10 @@ class DossierDestination(_DossierBase):
         with self._open(chemin_relatif, "w") as csv_fichier:
             yield csv.writer(csv_fichier, delimiter=self.delimiteur,
                              quotechar=self.quotechar)
+
+    def string_ecrire(self, chemin_relatif, texte):
+        with self._open(chemin_relatif, "w") as fd:
+            fd.write(texte)
 
     def ecrire(self, chemin_relatif, binaire):
         """Écrit un fichier, en binaire."""
