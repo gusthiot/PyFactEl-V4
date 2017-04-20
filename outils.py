@@ -216,14 +216,16 @@ class Outils(object):
         :param structure: éléments du chemin
         :param plateforme:OS utilisé
         :param generaux: paramètres généraux
-        :return:chemin logique complet pour dossier
+        :return:chemin logique complet pour dossier, si le dossier a dû être créé
         """
         chemin = ""
+        nouveau = False
         for element in structure:
             chemin += str(element) + Outils.separateur_os(plateforme)
         if not os.path.exists(chemin):
+            nouveau = True
             os.makedirs(chemin)
-        return Outils.eliminer_double_separateur(Outils.separateur_dossier(chemin, generaux))
+        return Outils.eliminer_double_separateur(Outils.separateur_dossier(chemin, generaux)), nouveau
 
     @staticmethod
     def lien_dossier(structure, plateforme, generaux):

@@ -82,10 +82,24 @@ if verification.verification_cohérence(generaux, edition, acces, clients, coefm
                                        machines, prestations, reservations, couts, users) > 0:
     sys.exit("Erreur dans la cohérence")
 
-dossier_enregistrement = Outils.chemin_dossier([generaux.chemin, edition.annee,
+dossier_enregistrement, nouveau = Outils.chemin_dossier([generaux.chemin, edition.annee,
                                                 Outils.mois_string(edition.mois)], plateforme, generaux)
 dossier_lien = Outils.lien_dossier([generaux.lien, edition.annee, Outils.mois_string(edition.mois)],
                                    plateforme, generaux)
+
+if edition.version == '0' and not nouveau:
+    msg = "Le répertoire " + str(edition.annee) + "/" + Outils.mois_string(edition.mois) + " existe déjà !"
+    print("msg : " + msg)
+    Outils.affiche_message(msg)
+    sys.exit("Erreur sur le répértoire")
+
+if edition.version == '0':
+    dossier_csv, nouveau = Outils.chemin_dossier([dossier_enregistrement, "csv_0"], plateforme, generaux)
+else:
+    dossier_csv, nouveau = Outils.chemin_dossier([dossier_enregistrement, "csv_" + edition.version + "_" +
+                                         edition.client_unique], plateforme, generaux)
+dossier_destination = DossierDestination(dossier_csv)
+
 livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
 reservations.calcul_montants(machines, coefmachines, clients, verification, couts)
 acces.calcul_montants(machines, coefmachines, clients, verification, couts, comptes)
@@ -93,18 +107,11 @@ acces.calcul_montants(machines, coefmachines, clients, verification, couts, comp
 sommes = Sommes(verification, generaux)
 sommes.calculer_toutes(livraisons, reservations, acces, clients, machines)
 
-if edition.version == '0':
-    dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_0"], plateforme, generaux)
-else:
-    dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + edition.version + "_" +
-                                         edition.client_unique], plateforme, generaux)
-dossier_destination = DossierDestination(dossier_csv)
-
 annexes = "annexes"
-dossier_annexes = Outils.chemin_dossier([dossier_enregistrement, annexes], plateforme, generaux)
+dossier_annexes, nouveau = Outils.chemin_dossier([dossier_enregistrement, annexes], plateforme, generaux)
 lien_annexes = Outils.lien_dossier([dossier_lien, annexes], plateforme, generaux)
 annexes_techniques = "annexes_techniques"
-dossier_annexes_techniques = Outils.chemin_dossier([dossier_enregistrement, annexes_techniques], plateforme, generaux)
+dossier_annexes_techniques, nouveau = Outils.chemin_dossier([dossier_enregistrement, annexes_techniques], plateforme, generaux)
 lien_annexes_techniques = Outils.lien_dossier([dossier_lien, annexes_techniques], plateforme, generaux)
 
 facture_prod = Facture()
@@ -137,5 +144,17 @@ for fichier in [acces.nom_fichier, clients.nom_fichier, coefmachines.nom_fichier
                 reservations.nom_fichier, couts.nom_fichier, users.nom_fichier, generaux.nom_fichier,
                 edition.nom_fichier]:
     dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
+
+if edition.version == '0':
+    for fichier in ["bilan-comptes", "cae", "lvr", "res", "bilan", "detail"]:
+        DossierDestination(dossier_enregistrement).ecrire(
+            fichier + ".csv", DossierSource(dossier_csv).lire(fichier + "_" + str(edition.annee) + "_" +
+                                                              Outils.mois_string(edition.mois) + "_0.csv"))
+    DossierDestination(dossier_enregistrement).ecrire(
+        "ticket.html", DossierSource(dossier_csv).lire("ticket_" + str(edition.annee) + "_" +
+                                                              Outils.mois_string(edition.mois) + "_0.html"))
+    Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
+    Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
+
 
 Outils.affiche_message("OK !!!")

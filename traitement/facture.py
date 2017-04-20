@@ -187,7 +187,7 @@ class Facture(object):
                     ''' + nom_annexe_technique + r'''</a>'''
                 contenu_client += "</section>"
                 contenu += contenu_client
-        self.creer_html(contenu, destination, combo_list)
+        self.creer_html(contenu, destination, combo_list, edition)
 
     @staticmethod
     def ligne_tableau(article, poste, net, rabais, consommateur, edition):
@@ -246,15 +246,17 @@ class Facture(object):
                 generaux.fonds, "", "", code_op, "", "", "", article.texte_sap,
                 Latex.echappe_caracteres(consommateur)]
 
-    def creer_html(self, contenu, destination, combo_list):
+    def creer_html(self, contenu, destination, combo_list, edition):
         if self.prod2qual:
             suffixe = "_qualite.html"
         else:
             suffixe = ".html"
 
+        nom = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
+              str(edition.version) + suffixe
         Outils.copier_dossier("./reveal.js/", "js", destination.chemin)
         Outils.copier_dossier("./reveal.js/", "css", destination.chemin)
-        with destination.open("ticket" + suffixe) as fichier:
+        with destination.open(nom) as fichier:
 
             html = r'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
