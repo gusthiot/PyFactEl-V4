@@ -147,14 +147,13 @@ for fichier in [acces.nom_fichier, clients.nom_fichier, coefmachines.nom_fichier
 
 if edition.version == '0':
     for fichier in ["bilan-comptes", "cae", "lvr", "res", "bilan", "detail"]:
+        fichier_complet = fichier + "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois)
         DossierDestination(dossier_enregistrement).ecrire(
-            fichier + ".csv", DossierSource(dossier_csv).lire(fichier + "_" + str(edition.annee) + "_" +
-                                                              Outils.mois_string(edition.mois) + "_0.csv"))
+            fichier_complet + ".csv", DossierSource(dossier_csv).lire(fichier_complet + "_0.csv"))
+    ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois)
     DossierDestination(dossier_enregistrement).ecrire(
-        "ticket.html", DossierSource(dossier_csv).lire("ticket_" + str(edition.annee) + "_" +
-                                                              Outils.mois_string(edition.mois) + "_0.html"))
+        ticket_complet + ".html", DossierSource(dossier_csv).lire(ticket_complet + "_0.html"))
     Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
     Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
-
 
 Outils.affiche_message("OK !!!")
