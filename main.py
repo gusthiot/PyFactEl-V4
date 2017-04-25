@@ -39,6 +39,7 @@ from traitement import (Annexes,
                         Sommes,
                         Verification,
                         Detail,
+                        Resumes,
                         Recapitulatifs)
 from prod2qual import Prod2Qual
 from latex import Latex
@@ -82,7 +83,8 @@ if verification.verification_cohérence(generaux, edition, acces, clients, coefm
                                        machines, prestations, reservations, couts, users) > 0:
     sys.exit("Erreur dans la cohérence")
 
-dossier_enregistrement, nouveau = Outils.chemin_dossier([generaux.chemin, edition.annee,
+nouveau = Outils.dossier_existe([generaux.chemin, edition.annee, Outils.mois_string(edition.mois)], plateforme)
+dossier_enregistrement = Outils.chemin_dossier([generaux.chemin, edition.annee,
                                                 Outils.mois_string(edition.mois)], plateforme, generaux)
 dossier_lien = Outils.lien_dossier([generaux.lien, edition.annee, Outils.mois_string(edition.mois)],
                                    plateforme, generaux)
@@ -94,9 +96,9 @@ if edition.version == '0' and not nouveau:
     sys.exit("Erreur sur le répértoire")
 
 if edition.version == '0':
-    dossier_csv, nouveau = Outils.chemin_dossier([dossier_enregistrement, "csv_0"], plateforme, generaux)
+    dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_0"], plateforme, generaux)
 else:
-    dossier_csv, nouveau = Outils.chemin_dossier([dossier_enregistrement, "csv_" + edition.version + "_" +
+    dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + edition.version + "_" +
                                          edition.client_unique], plateforme, generaux)
 dossier_destination = DossierDestination(dossier_csv)
 
@@ -108,17 +110,17 @@ sommes = Sommes(verification, generaux)
 sommes.calculer_toutes(livraisons, reservations, acces, clients, machines)
 
 annexes = "annexes"
-dossier_annexes, nouveau = Outils.chemin_dossier([dossier_enregistrement, annexes], plateforme, generaux)
+dossier_annexes = Outils.chemin_dossier([dossier_enregistrement, annexes], plateforme, generaux)
 lien_annexes = Outils.lien_dossier([dossier_lien, annexes], plateforme, generaux)
 annexes_techniques = "annexes_techniques"
-dossier_annexes_techniques, nouveau = Outils.chemin_dossier([dossier_enregistrement, annexes_techniques], plateforme, generaux)
+dossier_annexes_techniques = Outils.chemin_dossier([dossier_enregistrement, annexes_techniques], plateforme, generaux)
 lien_annexes_techniques = Outils.lien_dossier([dossier_lien, annexes_techniques], plateforme, generaux)
 
 Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
 Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
 facture_prod = Facture()
-facture_prod.factures(sommes, dossier_destination, edition, generaux, clients, comptes, lien_annexes,
-                      lien_annexes_techniques, annexes, annexes_techniques)
+f_html_sections = facture_prod.factures(sommes, dossier_destination, edition, generaux, clients, comptes, lien_annexes,
+                                        lien_annexes_techniques, annexes, annexes_techniques)
 
 prod2qual = Prod2Qual(dossier_source)
 if prod2qual.actif:
@@ -133,13 +135,19 @@ if Latex.possibles():
     Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, dossier_annexes,
                     plateforme, generaux, users, couts)
 
-BilanMensuel.bilan(dossier_destination, edition, sommes, clients, generaux, acces, livraisons, comptes, reservations)
-BilanComptes.bilan(dossier_destination, edition, sommes, clients, generaux, comptes)
-Detail.detail(dossier_destination, edition, sommes, clients, generaux, acces, livraisons, comptes, couts)
+bm_lignes = BilanMensuel.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, reservations)
+BilanMensuel.bilan(dossier_destination, edition, generaux, bm_lignes)
+bc_lignes = BilanComptes.creation_lignes(edition, sommes, clients, generaux, comptes)
+BilanComptes.bilan(dossier_destination, edition, generaux, bc_lignes)
+det_lignes = Detail.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, couts)
+Detail.detail(dossier_destination, edition, det_lignes)
 
-Recapitulatifs.cae(dossier_destination, edition, acces, comptes, clients, users, machines)
-Recapitulatifs.lvr(dossier_destination, edition, livraisons, comptes, clients, users, prestations)
-Recapitulatifs.res(dossier_destination, edition, reservations, clients, users, machines)
+cae_lignes = Recapitulatifs.cae_lignes(edition, acces, comptes, clients, users, machines)
+Recapitulatifs.cae(dossier_destination, edition, cae_lignes)
+lvr_lignes = Recapitulatifs.lvr_lignes(edition, livraisons, comptes, clients, users, prestations)
+Recapitulatifs.lvr(dossier_destination, edition, lvr_lignes)
+res_lignes = Recapitulatifs.res_lignes(edition, reservations, clients, users, machines)
+Recapitulatifs.res(dossier_destination, edition, res_lignes)
 
 for fichier in [acces.nom_fichier, clients.nom_fichier, coefmachines.nom_fichier, coefprests.nom_fichier,
                 comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
@@ -148,14 +156,10 @@ for fichier in [acces.nom_fichier, clients.nom_fichier, coefmachines.nom_fichier
     dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
 
 if edition.version == '0':
-    for fichier in ["bilan-comptes", "cae", "lvr", "res", "bilan", "detail"]:
-        fichier_complet = fichier + "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois)
-        DossierDestination(dossier_enregistrement).ecrire(
-            fichier_complet + ".csv", DossierSource(dossier_csv).lire(fichier_complet + "_0.csv"))
-    ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois)
-    ticket_texte = DossierSource(dossier_csv).string_lire(ticket_complet + "_0.html")
-    ticket_texte = ticket_texte.replace("..", ".")
-    DossierDestination(dossier_enregistrement).string_ecrire(
-        ticket_complet + ".html", ticket_texte)
+    Resumes.base(edition, DossierSource(dossier_csv), DossierDestination(dossier_enregistrement))
+elif Outils.dossier_existe([dossier_enregistrement, "csv_0"], plateforme):
+    maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, res_lignes]
+    Resumes.mise_a_jour(edition, DossierSource(dossier_enregistrement),
+                        DossierDestination(dossier_enregistrement), maj, f_html_sections)
 
 Outils.affiche_message("OK !!!")

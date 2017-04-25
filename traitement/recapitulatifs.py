@@ -2,9 +2,18 @@ from outils import Outils
 
 
 class Recapitulatifs(object):
+    """
+    Classe pour la création des récapitulatifs
+    """
 
     @staticmethod
-    def cae(dossier_destination, edition, acces, comptes, clients, users, machines):
+    def cae(dossier_destination, edition, lignes):
+        """
+        création du récapitulatif des accès machines
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
+        :param edition: paramètres d'édition
+        :param lignes: lignes de données du récapitulatif
+        """
 
         nom = "cae_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + str(edition.version)
         if edition.version != '0':
@@ -19,20 +28,43 @@ class Recapitulatifs(object):
                      "Durée opérateur", "Id-Opérateur", "Prénom Nom opérateur", "Remarque opérateur", "Remarque staff"]
             fichier_writer.writerow(ligne)
 
-            for donnee in acces.donnees:
-                compte = comptes.donnees[donnee['id_compte']]
-                client = clients.donnees[compte['code_client']]
-                user = users.donnees[donnee['id_user']]
-                machine = machines.donnees[donnee['id_machine']]
-                ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
-                         compte['type'], compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'],
-                         user['prenom'], donnee['id_machine'], machine['nom'], donnee['date_login'],
-                         donnee['duree_machine_hp'], donnee['duree_machine_hc'], donnee['duree_operateur'],
-                         donnee['id_op'], donnee['nom_op'], donnee['remarque_op'], donnee['remarque_staff']]
+            for ligne in lignes:
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def lvr(dossier_destination, edition, livraisons, comptes, clients, users, prestations):
+    def cae_lignes(edition, acces, comptes, clients, users, machines):
+        """
+        génération des lignes de données du récapitulatif des accès machines
+        :param edition: paramètres d'édition
+        :param acces: accès importés
+        :param comptes: comptes importés
+        :param clients: clients importés
+        :param users: users importés
+        :param machines: machines importées
+        :return: lignes de données du récapitulatif
+        """
+        lignes = []
+        for donnee in acces.donnees:
+            compte = comptes.donnees[donnee['id_compte']]
+            client = clients.donnees[compte['code_client']]
+            user = users.donnees[donnee['id_user']]
+            machine = machines.donnees[donnee['id_machine']]
+            ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
+                     compte['type'], compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'],
+                     user['prenom'], donnee['id_machine'], machine['nom'], donnee['date_login'],
+                     donnee['duree_machine_hp'], donnee['duree_machine_hc'], donnee['duree_operateur'],
+                     donnee['id_op'], donnee['nom_op'], donnee['remarque_op'], donnee['remarque_staff']]
+            lignes.append(ligne)
+        return lignes
+
+    @staticmethod
+    def lvr(dossier_destination, edition, lignes):
+        """
+        création du récapitulatif des livraisons
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
+        :param edition: paramètres d'édition
+        :param lignes: lignes de données du récapitulatif
+        """
         nom = "lvr_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + str(edition.version)
         if edition.version != '0':
             nom += "_" + str(edition.client_unique)
@@ -47,21 +79,44 @@ class Recapitulatifs(object):
                      "Date et Heure de la commande", "Date et Heure de la prise en charge", "Remarque"]
             fichier_writer.writerow(ligne)
 
-            for donnee in livraisons.donnees:
-                compte = comptes.donnees[donnee['id_compte']]
-                client = clients.donnees[compte['code_client']]
-                user = users.donnees[donnee['id_user']]
-                prestation = prestations.donnees[donnee['id_prestation']]
-                ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
-                         compte['type'], compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'],
-                         user['prenom'], donnee['id_prestation'], prestation['no_prestation'],
-                         prestation['designation'], donnee['date_livraison'], donnee['quantite'],
-                         prestation['unite_prest'], donnee['rabais'], donnee['responsable'], donnee['id_livraison'],
-                         donnee['date_commande'], donnee['date_prise'], donnee['remarque']]
+            for ligne in lignes:
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def res(dossier_destination, edition, reservations, clients, users, machines):
+    def lvr_lignes(edition, livraisons, comptes, clients, users, prestations):
+        """
+        génération des lignes de données du récapitulatif des livraisons
+        :param edition: paramètres d'édition
+        :param livraisons: livraisons importées
+        :param comptes: comptes importés
+        :param clients: clients importés
+        :param users: users importés
+        :param prestations: prestations importées
+        :return: lignes de données du récapitulatif
+        """
+        lignes = []
+        for donnee in livraisons.donnees:
+            compte = comptes.donnees[donnee['id_compte']]
+            client = clients.donnees[compte['code_client']]
+            user = users.donnees[donnee['id_user']]
+            prestation = prestations.donnees[donnee['id_prestation']]
+            ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
+                     compte['type'], compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'],
+                     user['prenom'], donnee['id_prestation'], prestation['no_prestation'],
+                     prestation['designation'], donnee['date_livraison'], donnee['quantite'],
+                     prestation['unite_prest'], donnee['rabais'], donnee['responsable'], donnee['id_livraison'],
+                     donnee['date_commande'], donnee['date_prise'], donnee['remarque']]
+            lignes.append(ligne)
+        return lignes
+
+    @staticmethod
+    def res(dossier_destination, edition, lignes):
+        """
+        création du récapitulatif des réservations
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
+        :param edition: paramètres d'édition
+        :param lignes: lignes de données du récapitulatif
+        """
         nom = "res_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + str(edition.version)
         if edition.version != '0':
             nom += "_" + str(edition.client_unique)
@@ -75,12 +130,28 @@ class Recapitulatifs(object):
                      "Date et Heure de réservation", "Date et Heure de suppression"]
             fichier_writer.writerow(ligne)
 
-            for donnee in reservations.donnees:
-                client = clients.donnees[donnee['code_client']]
-                user = users.donnees[donnee['id_user']]
-                machine = machines.donnees[donnee['id_machine']]
-                ligne = [edition.annee, edition.mois, donnee['code_client'], client['abrev_labo'],
-                         donnee['id_user'], user['nom'], user['prenom'], donnee['id_machine'], machine['nom'],
-                         donnee['date_debut'], donnee['duree_hp'], donnee['duree_hc'], donnee['si_supprime'],
-                         donnee['duree_ouvree'], donnee['date_reservation'], donnee['date_suppression']]
+            for ligne in lignes:
                 fichier_writer.writerow(ligne)
+
+    @staticmethod
+    def res_lignes(edition, reservations, clients, users, machines):
+        """
+        génération des lignes de données du récapitulatif des réservations
+        :param edition: paramètres d'édition
+        :param reservations: 
+        :param clients: clients importés
+        :param users: users importés
+        :param machines: machines importées
+        :return: lignes de données du récapitulatif
+        """
+        lignes = []
+        for donnee in reservations.donnees:
+            client = clients.donnees[donnee['code_client']]
+            user = users.donnees[donnee['id_user']]
+            machine = machines.donnees[donnee['id_machine']]
+            ligne = [edition.annee, edition.mois, donnee['code_client'], client['abrev_labo'],
+                     donnee['id_user'], user['nom'], user['prenom'], donnee['id_machine'], machine['nom'],
+                     donnee['date_debut'], donnee['duree_hp'], donnee['duree_hc'], donnee['si_supprime'],
+                     donnee['duree_ouvree'], donnee['date_reservation'], donnee['date_suppression']]
+            lignes.append(ligne)
+        return lignes

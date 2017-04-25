@@ -20,6 +20,7 @@ class Facture(object):
                  lien_annexes, lien_annexes_techniques, annexes, annexes_techniques):
         """
         génère la facture sous forme de csv
+        
         :param sommes: sommes calculées
         :param destination: Une instance de la classe dossier.DossierDestination
         :param edition: paramètres d'édition
@@ -103,7 +104,7 @@ class Facture(object):
                 dico_contenu = {'code': code_client, 'abrev': client['abrev_labo'],
                                 'nom': client['nom_labo'], 'dest': client['dest'], 'ref': client['ref'],
                                 'ref_fact': reference, 'texte': generaux.entete}
-                contenu_client = r'''<section><div id="entete"> %(code)s <br />
+                contenu_client = r'''<section id="%(code)s"><div id="entete"> %(code)s <br />
                     %(abrev)s <br />
                     %(nom)s <br />
                     %(dest)s <br />
@@ -181,13 +182,14 @@ class Facture(object):
                     ''' + "%.2f" % scl['somme_t'] + r'''</td></tr>
                     </table>
                     '''
-                contenu_client += r'''<a href="''' + dossier_annexe + r'''" target="new">''' + nom_annexe + r'''
-                    </a>&nbsp;&nbsp;&nbsp;'''
-                contenu_client += r'''<a href="''' + dossier_annexe_technique + r'''" target="new">
-                    ''' + nom_annexe_technique + r'''</a>'''
+                contenu_client += r'''<table><tr><td><a href="''' + dossier_annexe + r'''" target="new">''' + nom_annexe + r'''
+                    </a></td>'''
+                contenu_client += r'''<td><a href="''' + dossier_annexe_technique + r'''" target="new">
+                    ''' + nom_annexe_technique + r'''</a></td></tr></table>'''
                 contenu_client += "</section>"
                 contenu += contenu_client
         self.creer_html(contenu, destination, combo_list, edition)
+        return contenu
 
     @staticmethod
     def ligne_tableau(article, poste, net, rabais, consommateur, edition):
@@ -247,6 +249,14 @@ class Facture(object):
                 Latex.echappe_caracteres(consommateur)]
 
     def creer_html(self, contenu, destination, combo_list, edition):
+        """
+        crée une page html autour d'une liste de sections
+        
+        :param contenu: liste de section
+        :param destination:  Une instance de la classe dossier.DossierDestination
+        :param combo_list: liste des clients
+        :param edition: paramètres d'édition
+        """
         if self.prod2qual:
             suffixe = "_qualite.html"
         else:

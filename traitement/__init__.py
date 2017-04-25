@@ -7,3 +7,4 @@ from .verification import Verification
 from .detail import Detail
 from .recapitulatifs import Recapitulatifs
 from .bilan_comptes import BilanComptes
+from .resumes import Resumes
