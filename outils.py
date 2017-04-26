@@ -223,21 +223,29 @@ class Outils(object):
             chemin += str(element) + Outils.separateur_os(plateforme)
         if not os.path.exists(chemin):
             os.makedirs(chemin)
-        return Outils.eliminer_double_separateur(Outils.separateur_dossier(chemin, generaux))
+        if generaux == None:
+            return Outils.eliminer_double_separateur(chemin)
+        else:
+            return Outils.eliminer_double_separateur(Outils.separateur_dossier(chemin, generaux))
 
 
     @staticmethod
-    def dossier_existe(structure, plateforme):
+    def existe(structure, plateforme):
         """
-        vérifie si le dossier existe
+        vérifie si le dossier/fichier existe
         :param structure: éléments du chemin
         :param plateforme:OS utilisé
-        :return: True si le dossier existe, False sinon
+        :return: True si le dossier/fichier existe, False sinon
         """
         chemin = ""
         existe = True
+        first = True
         for element in structure:
-            chemin += str(element) + Outils.separateur_os(plateforme)
+            if not first:
+                chemin += Outils.separateur_os(plateforme)
+            else:
+                first = False
+            chemin += str(element)
         if not os.path.exists(chemin):
             existe = False
         return existe

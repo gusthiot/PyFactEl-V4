@@ -72,6 +72,74 @@ class Resumes(object):
             Outils.affiche_message(info)
 
     @staticmethod
+    def suppression(suppression, dossier_source, dossier_destination):
+        """
+        suppression des résumés mensuels au niveau du client dont la facture est supprimée 
+        :param suppression: paramètres de suppression
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
+        """
+
+        for i in range(len(Resumes.fichiers)):
+            fichier_complet = Resumes.fichiers[i] + "_" + str(suppression.annee) + "_" + \
+                              Outils.mois_string(suppression.mois) + ".csv"
+            print("suppression dans " + Resumes.fichiers[i] + " : " + suppression.client_unique)
+            donnees_csv = Resumes.ouvrir_csv_sans_client(
+                dossier_source, fichier_complet, suppression.client_unique, Resumes.positions[i])
+            with dossier_destination.writer(fichier_complet) as fichier_writer:
+                for ligne in donnees_csv:
+                    fichier_writer.writerow(ligne)
+
+        ticket_complet = "ticket_" + str(suppression.annee) + "_" + Outils.mois_string(suppression.mois) + ".html"
+        ticket_texte = dossier_source.string_lire(ticket_complet)
+        index = ticket_texte.find('<section id="' + suppression.client_unique + '">')
+        if index > -1:
+            index2 = ticket_texte.find('</section>', index)
+            if index2 > -1:
+                texte = ticket_texte[:index] + ticket_texte[(index2+10):]
+                texte = texte.replace("..", ".")
+                dossier_destination.string_ecrire(ticket_complet, texte)
+            else:
+                info = "Fin de section non trouvée"
+                print(info)
+                Outils.affiche_message(info)
+        else:
+            info = "Section attendue non trouvée"
+            print(info)
+            Outils.affiche_message(info)
+
+        index = ticket_texte.find('<select name="client"')
+        if index > -1:
+            index2 = ticket_texte.find('</select>', index)
+            if index2 > -1:
+                select_texte = ticket_texte[index:index2+9]
+                clients_liste = []
+                ind = select_texte.find('</option>')
+                while -1 < ind < len(select_texte):
+                    ind2 = select_texte.rfind('>', 0, ind)
+                    if ind2 > -1:
+                        part = select_texte[ind2+1:ind]
+                        if suppression.client_unique not in part:
+                            clients_liste.append(part)
+                    ind = select_texte.find('</option>', ind+5)
+                nouveau_select = r'''<select name="client" onchange="changeClient(this)">'''
+                for i in range(len(clients_liste)):
+                    nouveau_select += r'''<option value="''' + str(i) + r'''">''' + \
+                                      str(clients_liste[i]) + r'''</option>'''
+                nouveau_select += r'''</select>'''
+                texte = ticket_texte[:index] + nouveau_select + ticket_texte[(index2 + 9):]
+                texte = texte.replace("..", ".")
+                dossier_destination.string_ecrire(ticket_complet, texte)
+            else:
+                info = "Fin de select non trouvée"
+                print(info)
+                Outils.affiche_message(info)
+        else:
+            info = "Select attendu non trouvée"
+            print(info)
+            Outils.affiche_message(info)
+
+    @staticmethod
     def ouvrir_csv_sans_client(dossier_source, fichier, code_client, position_code):
         """
         ouverture d'un csv comme string sans les données d'un client donné
