@@ -204,6 +204,9 @@ elif sup_present:
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
+        dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + suppression.version + "_" +
+                                             suppression.client_unique], plateforme, None)
+        DossierDestination(dossier_csv).ecrire(suppression.nom_fichier, dossier_source.lire(suppression.nom_fichier))
 
         Resumes.suppression(suppression, DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement))
 else:
