@@ -12,7 +12,7 @@ Options:
   --entrees <chemin>       Chemin des fichiers d'entrée
   --sansgraphiques         Pas d'interface graphique
 """
-
+import datetime
 import sys
 from docopt import docopt
 
@@ -32,6 +32,7 @@ from importes import (Client,
 from outils import Outils
 from parametres import (Edition,
                         Suppression,
+                        Annulation,
                         Generaux)
 from traitement import (Annexes,
                         BilanMensuel,
@@ -60,14 +61,39 @@ dossier_source = DossierSource(dossier_data)
 
 pg_present = Outils.existe([dossier_data, Generaux.nom_fichier], plateforme)
 sup_present = Outils.existe([dossier_data, Suppression.nom_fichier], plateforme)
+ann_present = Outils.existe([dossier_data, Annulation.nom_fichier], plateforme)
 
-if pg_present:
-    if sup_present:
+if pg_present and sup_present and not ann_present:
         msg = "Deux fichiers bruts incompatibles dans le répertoire : supprfact.csv et paramedit.csv"
         print("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur les fichiers")
 
+if pg_present and ann_present and not sup_present:
+        msg = "Deux fichiers bruts incompatibles dans le répertoire : paramedit.csv et annulversion.csv"
+        print("msg : " + msg)
+        Outils.affiche_message(msg)
+        sys.exit("Erreur sur les fichiers")
+
+if ann_present and sup_present and not pg_present:
+    msg = "Deux fichiers bruts incompatibles dans le répertoire : supprfact.csv et annulversion.csv"
+    print("msg : " + msg)
+    Outils.affiche_message(msg)
+    sys.exit("Erreur sur les fichiers")
+
+if ann_present and sup_present and pg_present:
+    msg = "Trois fichiers bruts incompatibles dans le répertoire : supprfact.csv, annulversion.csv et paramedit.csv"
+    print("msg : " + msg)
+    Outils.affiche_message(msg)
+    sys.exit("Erreur sur les fichiers")
+
+if not ann_present and not sup_present and not pg_present:
+    msg = "Ni supprfact.csv, ni paramedit.csv, ni annulversion.csv dans le répértoire, rien ne sera fait !"
+    print("msg : " + msg)
+    Outils.affiche_message(msg)
+    sys.exit("Erreur sur les fichiers")
+
+if pg_present:
     edition = Edition(dossier_source)
     generaux = Generaux(dossier_source)
 
@@ -179,7 +205,8 @@ if pg_present:
         maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, res_lignes]
         Resumes.mise_a_jour(edition, DossierSource(dossier_enregistrement),
                             DossierDestination(dossier_enregistrement), maj, f_html_sections)
-elif sup_present:
+
+if sup_present:
     suppression = Suppression(dossier_source)
     dossier_enregistrement = Outils.chemin_dossier([suppression.chemin, suppression.annee,
                                                     Outils.mois_string(suppression.mois)], plateforme, None)
@@ -188,32 +215,81 @@ elif sup_present:
         print("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur la version")
-    else:
-        existe = Outils.existe([dossier_enregistrement, "csv_" + suppression.version + "_" +
-                                suppression.client_unique], plateforme)
-        if existe:
-            msg = "La version " + suppression.version + " du client " + suppression.client_unique + " existe déjà !"
-            print("msg : " + msg)
-            Outils.affiche_message(msg)
-            sys.exit("Erreur sur la version")
 
+    existe = Outils.existe([dossier_enregistrement, "csv_" + suppression.version + "_" +
+                            suppression.client_unique], plateforme)
+    if existe:
+        msg = "La version " + suppression.version + " du client " + suppression.client_unique + " existe déjà !"
+        print("msg : " + msg)
+        Outils.affiche_message(msg)
+        sys.exit("Erreur sur la version")
+
+    existe = Outils.existe([dossier_enregistrement, "csv_0"], plateforme)
+    if not existe:
+        msg = " La version 0 n’existe pas dans " + dossier_enregistrement + \
+              ", impossible de supprimer une facture !"
+        print("msg : " + msg)
+        Outils.affiche_message(msg)
+        sys.exit("Erreur sur la version")
+
+    dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + suppression.version + "_" +
+                                         suppression.client_unique], plateforme, None)
+    DossierDestination(dossier_csv).ecrire(suppression.nom_fichier, dossier_source.lire(suppression.nom_fichier))
+
+    Resumes.suppression(
+        suppression, DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement))
+
+if ann_present:
+    annulation = Annulation(dossier_source)
+    dossier_enregistrement = Outils.chemin_dossier([annulation.chemin, annulation.annee,
+                                                    Outils.mois_string(annulation.mois)], plateforme, None)
+    if annulation.annule_version == '0':
+        msg = "Le numéro de version à annuler doit être supérieur ou égal à 1 !"
+        print("msg : " + msg)
+        Outils.affiche_message(msg)
+        sys.exit("Erreur sur la version")
+
+    existe = Outils.existe([dossier_enregistrement, "csv_" + annulation.annule_version + "_" +
+                            annulation.client_unique], plateforme)
+    if not existe:
+        msg = " La version " + annulation.annule_version + " à annuler pour le client " +\
+              annulation.client_unique + " n’existe pas !"
+        print("msg : " + msg)
+        Outils.affiche_message(msg)
+        sys.exit("Erreur sur la version")
+
+    if annulation.recharge_version == '0':
         existe = Outils.existe([dossier_enregistrement, "csv_0"], plateforme)
         if not existe:
-            msg = " La version 0 n’existe pas dans " + dossier_enregistrement + \
-                  ", impossible de supprimer une facture !"
+            msg = " La version 0 à recharger n’existe pas !"
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
-        dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + suppression.version + "_" +
-                                             suppression.client_unique], plateforme, None)
-        DossierDestination(dossier_csv).ecrire(suppression.nom_fichier, dossier_source.lire(suppression.nom_fichier))
+    else:
+        existe = Outils.existe([dossier_enregistrement, "csv_" + annulation.recharge_version + "_" +
+                                annulation.client_unique], plateforme)
+        if not existe:
+            msg = " La version " + annulation.annule_version + " à recharger pour le client " + \
+                  annulation.client_unique + " n’existe pas !"
+            print("msg : " + msg)
+            Outils.affiche_message(msg)
+            sys.exit("Erreur sur la version")
 
-        Resumes.suppression(suppression, DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement))
-else:
-    msg = "Ni supprfact.csv, ni paramedit.csv dans le répértoire, rien ne sera fait !"
-    print("msg : " + msg)
-    Outils.affiche_message(msg)
-    sys.exit("Erreur sur les fichiers")
+    dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + annulation.annule_version + "_" +
+                                         annulation.client_unique], plateforme, None)
+    DossierDestination(dossier_csv).ecrire(annulation.nom_fichier, dossier_source.lire(annulation.nom_fichier))
+    now = datetime.datetime.now()
+    Outils.renommer_dossier(
+        [dossier_enregistrement, "csv_" + annulation.annule_version + "_" + annulation.client_unique],
+        [dossier_enregistrement, "old_" + annulation.annule_version + "_" + annulation.client_unique + "_" +
+         now.strftime("%Y%m%d_%H%M")], plateforme)
 
+    if annulation.recharge_version == '0':
+        dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_0"], plateforme, None)
+    else:
+        dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + annulation.recharge_version + "_" +
+                                         annulation.client_unique], plateforme, None)
+    Resumes.annulation(annulation, DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement),
+                       DossierSource(dossier_csv))
 
 Outils.affiche_message("OK !!!")

@@ -55,21 +55,11 @@ class Resumes(object):
 
         ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".html"
         ticket_texte = dossier_source.string_lire(ticket_complet)
-        index = ticket_texte.find('<section id="' + edition.client_unique + '">')
-        if index > -1:
-            index2 = ticket_texte.find('</section>', index)
-            if index2 > -1:
-                texte = ticket_texte[:index] + html_sections + ticket_texte[(index2+10):]
-                texte = texte.replace("..", ".")
-                dossier_destination.string_ecrire(ticket_complet, texte)
-            else:
-                info = "Fin de section non trouvée"
-                print(info)
-                Outils.affiche_message(info)
-        else:
-            info = "Section attendue non trouvée"
-            print(info)
-            Outils.affiche_message(info)
+        index1, index2 = Resumes.section_position(ticket_texte, edition.client_unique)
+        if index1 is not None:
+            texte = ticket_texte[:index1] + html_sections + ticket_texte[(index2):]
+            texte = texte.replace("..", ".")
+            dossier_destination.string_ecrire(ticket_complet, texte)
 
     @staticmethod
     def suppression(suppression, dossier_source, dossier_destination):
@@ -92,52 +82,101 @@ class Resumes(object):
 
         ticket_complet = "ticket_" + str(suppression.annee) + "_" + Outils.mois_string(suppression.mois) + ".html"
         ticket_texte = dossier_source.string_lire(ticket_complet)
-        index = ticket_texte.find('<section id="' + suppression.client_unique + '">')
-        if index > -1:
-            index2 = ticket_texte.find('</section>', index)
-            if index2 > -1:
-                texte = ticket_texte[:index] + ticket_texte[(index2+10):]
-                texte = texte.replace("..", ".")
-                dossier_destination.string_ecrire(ticket_complet, texte)
-            else:
-                info = "Fin de section non trouvée"
-                print(info)
-                Outils.affiche_message(info)
-        else:
-            info = "Section attendue non trouvée"
-            print(info)
-            Outils.affiche_message(info)
+        index1, index2 = Resumes.section_position(ticket_texte, suppression.client_unique)
+        if index1 is not None:
+            ticket_texte = ticket_texte[:index1] + '<!--<section-old id="' + suppression.client_unique + \
+                           '"></section-old>-->' + ticket_texte[(index2):]
+            ticket_texte = ticket_texte.replace("..", ".")
 
-        index = ticket_texte.find('<select name="client"')
-        if index > -1:
-            index2 = ticket_texte.find('</select>', index)
-            if index2 > -1:
-                select_texte = ticket_texte[index:index2+9]
-                clients_liste = []
-                ind = select_texte.find('</option>')
-                while -1 < ind < len(select_texte):
-                    ind2 = select_texte.rfind('>', 0, ind)
-                    if ind2 > -1:
-                        part = select_texte[ind2+1:ind]
-                        if suppression.client_unique not in part:
-                            clients_liste.append(part)
-                    ind = select_texte.find('</option>', ind+5)
-                nouveau_select = r'''<select name="client" onchange="changeClient(this)">'''
-                for i in range(len(clients_liste)):
+        index1, index2, clients_liste = Resumes.select_clients(ticket_texte)
+        if index1 is not None:
+            nouveau_select = r'''<select name="client" onchange="changeClient(this)">'''
+            i = 0
+            for nom in clients_liste:
+                if suppression.client_unique not in nom:
                     nouveau_select += r'''<option value="''' + str(i) + r'''">''' + \
-                                      str(clients_liste[i]) + r'''</option>'''
-                nouveau_select += r'''</select>'''
-                texte = ticket_texte[:index] + nouveau_select + ticket_texte[(index2 + 9):]
-                texte = texte.replace("..", ".")
-                dossier_destination.string_ecrire(ticket_complet, texte)
-            else:
-                info = "Fin de select non trouvée"
-                print(info)
-                Outils.affiche_message(info)
+                                      str(nom) + r'''</option>'''
+                    i += 1
+            nouveau_select += r'''</select>'''
+            texte = ticket_texte[:index1] + nouveau_select + ticket_texte[(index2):]
+            texte = texte.replace("..", ".")
+            dossier_destination.string_ecrire(ticket_complet, texte)
+
+    @staticmethod
+    def annulation(annulation, dossier_source, dossier_destination, dossier_source_backup):
+        """
+        annulation de modification des résumés mensuels au niveau du client dont la facture est supprimée 
+        :param annulation: paramètres d'annulation
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
+        :param dossier_source: Une instance de la classe dossier.DossierSource pour récupérer les données à remettre
+        """
+
+        if annulation.recharge_version == '0':
+            suffixe = "_0"
         else:
-            info = "Select attendu non trouvée"
-            print(info)
-            Outils.affiche_message(info)
+            suffixe = "_" + annulation.recharge_version + "_" + annulation.client_unique
+
+        for i in range(len(Resumes.fichiers)):
+            fichier_backup = Resumes.fichiers[i] + "_" + str(annulation.annee) + "_" + \
+                              Outils.mois_string(annulation.mois) + suffixe + ".csv"
+            print("récupération dans " + Resumes.fichiers[i] + " : " + annulation.client_unique)
+            donnees_backup = Resumes.ouvrir_csv_seulement_client(
+                dossier_source_backup, fichier_backup, annulation.client_unique, Resumes.positions[i])
+
+            fichier_complet = Resumes.fichiers[i] + "_" + str(annulation.annee) + "_" + \
+                              Outils.mois_string(annulation.mois) + ".csv"
+            print("annulation dans " + Resumes.fichiers[i] + " : " + annulation.client_unique)
+            donnees_csv = Resumes.ouvrir_csv_sans_client(
+                dossier_source, fichier_complet, annulation.client_unique, Resumes.positions[i])
+            with dossier_destination.writer(fichier_complet) as fichier_writer:
+                for ligne in donnees_csv:
+                    fichier_writer.writerow(ligne)
+                for ligne in donnees_backup:
+                    fichier_writer.writerow(ligne)
+
+        ticket_backup = "ticket_" + str(annulation.annee) + "_" + Outils.mois_string(annulation.mois) + \
+                        suffixe + ".html"
+        ticket_backup_texte = dossier_source_backup.string_lire(ticket_backup)
+        index1, index2 = Resumes.section_position(ticket_backup_texte, annulation.client_unique)
+        partie = ""
+        if index1 is not None:
+            partie = ticket_backup_texte[index1:index2]
+            print(partie)
+
+        ticket_complet = "ticket_" + str(annulation.annee) + "_" + Outils.mois_string(
+            annulation.mois) + ".html"
+        ticket_texte = dossier_source.string_lire(ticket_complet)
+        index1, index2 = Resumes.section_position(ticket_texte, annulation.client_unique)
+        if index1 is not None:
+            texte = ticket_texte[:index1] + partie + ticket_texte[(index2):]
+            texte = texte.replace("..", ".")
+            dossier_destination.string_ecrire(ticket_complet, texte)
+        else:
+            index1, index2 = Resumes.section_position(ticket_texte, annulation.client_unique, True)
+            if index1 is not None:
+                ticket_texte = ticket_texte[:index1] + partie + ticket_texte[(index2):]
+                ticket_texte = ticket_texte.replace("..", ".")
+
+                index1, index2, clients_liste_backup = Resumes.select_clients(ticket_backup_texte)
+
+                index1, index2, clients_liste = Resumes.select_clients(ticket_texte)
+                if index1 is not None:
+                    nouveau_select = r'''<select name="client" onchange="changeClient(this)">'''
+                    i = 0
+                    for nom in clients_liste:
+                        if annulation.client_unique in clients_liste_backup[i]:
+                            nouveau_select += r'''<option value="''' + str(i) + r'''">''' + \
+                                              str(clients_liste_backup[i]) + r'''</option>'''
+                            i += 1
+                        if annulation.client_unique not in nom:
+                            nouveau_select += r'''<option value="''' + str(i) + r'''">''' + \
+                                              str(nom) + r'''</option>'''
+                            i += 1
+                    nouveau_select += r'''</select>'''
+                    texte = ticket_texte[:index1] + nouveau_select + ticket_texte[(index2):]
+                    texte = texte.replace("..", ".")
+                    dossier_destination.string_ecrire(ticket_complet, texte)
 
     @staticmethod
     def ouvrir_csv_sans_client(dossier_source, fichier, code_client, position_code):
@@ -160,3 +199,88 @@ class Resumes(object):
         except IOError as e:
             Outils.fatal(e, "impossible d'ouvrir le fichier : " + fichier)
         return donnees_csv
+
+    @staticmethod
+    def ouvrir_csv_seulement_client(dossier_source, fichier, code_client, position_code):
+        """
+        ouverture d'un csv comme string seulement pour les données d'un client donné
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param fichier: nom du fichier csv
+        :param code_client: code du client à prendre en compte
+        :param position_code: position colonne du code client dans le csv
+        :return: donnees du csv modifiées en tant que string
+        """
+        donnees_csv = []
+        try:
+            fichier_reader = dossier_source.reader(fichier)
+            for ligne in fichier_reader:
+                if ligne == -1:
+                    continue
+                if ligne[position_code] == code_client:
+                    donnees_csv.append(ligne)
+        except IOError as e:
+            Outils.fatal(e, "impossible d'ouvrir le fichier : " + fichier)
+        return donnees_csv
+
+    @staticmethod
+    def section_position(texte, code_client, est_old=False):
+        """
+        retrouve la section html concernant le client
+        :param texte: le texte html dans lequel on cherche
+        :param code_client: code du client dont on cherche la section
+        :param est_old: si la section a été supprimée
+        :return: le début de la section, et le début de la suite
+        """
+        if est_old:
+            index1 = texte.find('<!--<section-old id="' + code_client + '">')
+            index2 = texte.find('</section-old>-->', index1)
+            taille = 17
+        else:
+            index1 = texte.find('<section id="' + code_client + '">')
+            index2 = texte.find('</section>', index1)
+            taille = 10
+        if index1 > -1:
+            if index2 > -1:
+                return index1, index2 + taille
+            else:
+                info = "Fin de section non trouvée"
+                print(info)
+                Outils.affiche_message(info)
+                return None, None
+        else:
+            info = "Section attendue non trouvée"
+            print(info)
+            Outils.affiche_message(info)
+            return None, None
+
+    @staticmethod
+    def select_clients(texte):
+        """
+        récupère le select des clients du html
+        :param texte: le texte html dans lequel on cherche
+        :return: le début du select, et le début de la suite, la liste des clients dans le select
+        """
+        index1 = texte.find('<select name="client"')
+        if index1 > -1:
+            index2 = texte.find('</select>', index1)
+            if index2 > -1:
+                select_texte = texte[index1:index2+9]
+                clients_liste = []
+                ind = select_texte.find('</option>')
+                while -1 < ind < len(select_texte):
+                    ind2 = select_texte.rfind('>', 0, ind)
+                    if ind2 > -1:
+                        part = select_texte[ind2+1:ind]
+                        clients_liste.append(part)
+                    ind = select_texte.find('</option>', ind+5)
+                return index1, index2 + 9, clients_liste
+            else:
+                info = "Fin de select non trouvée"
+                print(info)
+                Outils.affiche_message(info)
+                return None, None, None
+        else:
+            info = "Select attendu non trouvée"
+            print(info)
+            Outils.affiche_message(info)
+            return None, None, None

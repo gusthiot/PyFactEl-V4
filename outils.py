@@ -223,11 +223,26 @@ class Outils(object):
             chemin += str(element) + Outils.separateur_os(plateforme)
         if not os.path.exists(chemin):
             os.makedirs(chemin)
-        if generaux == None:
+        if generaux is None:
             return Outils.eliminer_double_separateur(chemin)
         else:
             return Outils.eliminer_double_separateur(Outils.separateur_dossier(chemin, generaux))
 
+    @staticmethod
+    def renommer_dossier(ancienne_structure, nouvelle_structure, plateforme):
+        """
+        renomme un dossier
+        :param ancienne_structure: éléments de l'ancien nom de dossier
+        :param nouvelle_structure: éléments du nouveau nom de dossier
+        :param plateforme: OS utilisé
+        """
+        ancien_chemin = ""
+        for element in ancienne_structure:
+            ancien_chemin += str(element) + Outils.separateur_os(plateforme)
+        nouveau_chemin = ""
+        for element in nouvelle_structure:
+            nouveau_chemin += str(element) + Outils.separateur_os(plateforme)
+        os.rename(ancien_chemin, nouveau_chemin)
 
     @staticmethod
     def existe(structure, plateforme):
