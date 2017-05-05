@@ -16,7 +16,7 @@ class Detail(object):
         """
 
         nom = "detail_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + str(edition.version)
-        if edition.version != '0':
+        if edition.version > 0:
             nom += "_" + str(edition.client_unique)
         nom += ".csv"
 

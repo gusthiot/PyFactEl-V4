@@ -33,8 +33,15 @@ class Suppression(object):
             self.mois = int(donnees_csv[1][1])
         except ValueError as e:
             Outils.fatal(e, Suppression.libelle +
-                         "\nle mois et l'année doivent être des nombres")
+                         "\nle mois et l'année doivent être des nombres entiers")
+        try:
+            self.version = int(donnees_csv[2][1])
+        except ValueError as e:
+            Outils.fatal(e, Suppression.libelle +
+                         "\nla version doit être un nombre entier")
+        if self.version < 0:
+            Outils.fatal(ErreurConsistance(),
+                         Suppression.libelle + ": la version doit être positive ")
 
-        self.version = donnees_csv[2][1]
         self.client_unique = donnees_csv[3][1]
         self.chemin = donnees_csv[4][1]

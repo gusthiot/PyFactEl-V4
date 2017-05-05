@@ -18,7 +18,7 @@ class BilanComptes(object):
 
         nom = "bilan-comptes_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
               str(edition.version)
-        if edition.version != '0':
+        if edition.version > 0:
             nom += "_" + str(edition.client_unique)
         nom += ".csv"
 
@@ -58,8 +58,8 @@ class BilanComptes(object):
                 client = clients.donnees[code_client]
                 nature = generaux.nature_client_par_code_n(client['nature'])
                 reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
-                if edition.version != "0":
-                    reference += "-" + edition.version
+                if edition.version > 0:
+                    reference += "-" + str(edition.version)
 
                 comptes_utilises = Outils.comptes_in_somme(sommes.sommes_comptes[code_client], comptes)
                 for num_compte, id_compte in sorted(comptes_utilises.items()):

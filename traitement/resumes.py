@@ -57,7 +57,7 @@ class Resumes(object):
         ticket_texte = dossier_source.string_lire(ticket_complet)
         index1, index2 = Resumes.section_position(ticket_texte, edition.client_unique)
         if index1 is not None:
-            texte = ticket_texte[:index1] + html_sections + ticket_texte[(index2):]
+            texte = ticket_texte[:index1] + html_sections + ticket_texte[index2:]
             texte = texte.replace("..", ".")
             dossier_destination.string_ecrire(ticket_complet, texte)
 
@@ -85,7 +85,7 @@ class Resumes(object):
         index1, index2 = Resumes.section_position(ticket_texte, suppression.client_unique)
         if index1 is not None:
             ticket_texte = ticket_texte[:index1] + '<!--<section-old id="' + suppression.client_unique + \
-                           '"></section-old>-->' + ticket_texte[(index2):]
+                           '"></section-old>-->' + ticket_texte[index2:]
             ticket_texte = ticket_texte.replace("..", ".")
 
         index1, index2, clients_liste = Resumes.select_clients(ticket_texte)
@@ -98,7 +98,7 @@ class Resumes(object):
                                       str(nom) + r'''</option>'''
                     i += 1
             nouveau_select += r'''</select>'''
-            texte = ticket_texte[:index1] + nouveau_select + ticket_texte[(index2):]
+            texte = ticket_texte[:index1] + nouveau_select + ticket_texte[index2:]
             texte = texte.replace("..", ".")
             dossier_destination.string_ecrire(ticket_complet, texte)
 
@@ -109,13 +109,14 @@ class Resumes(object):
         :param annulation: paramètres d'annulation
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
-        :param dossier_source: Une instance de la classe dossier.DossierSource pour récupérer les données à remettre
+        :param dossier_source_backup: Une instance de la classe dossier.DossierSource pour récupérer les 
+                                        données à remettre
         """
 
-        if annulation.recharge_version == '0':
+        if annulation.recharge_version == 0:
             suffixe = "_0"
         else:
-            suffixe = "_" + annulation.recharge_version + "_" + annulation.client_unique
+            suffixe = "_" + str(annulation.recharge_version) + "_" + annulation.client_unique
 
         for i in range(len(Resumes.fichiers)):
             fichier_backup = Resumes.fichiers[i] + "_" + str(annulation.annee) + "_" + \
@@ -124,8 +125,8 @@ class Resumes(object):
             donnees_backup = Resumes.ouvrir_csv_seulement_client(
                 dossier_source_backup, fichier_backup, annulation.client_unique, Resumes.positions[i])
 
-            fichier_complet = Resumes.fichiers[i] + "_" + str(annulation.annee) + "_" + \
-                              Outils.mois_string(annulation.mois) + ".csv"
+            fichier_complet = Resumes.fichiers[i] + "_" + str(annulation.annee) + \
+                              "_" + Outils.mois_string(annulation.mois) + ".csv"
             print("annulation dans " + Resumes.fichiers[i] + " : " + annulation.client_unique)
             donnees_csv = Resumes.ouvrir_csv_sans_client(
                 dossier_source, fichier_complet, annulation.client_unique, Resumes.positions[i])
@@ -142,20 +143,19 @@ class Resumes(object):
         partie = ""
         if index1 is not None:
             partie = ticket_backup_texte[index1:index2]
-            print(partie)
 
         ticket_complet = "ticket_" + str(annulation.annee) + "_" + Outils.mois_string(
             annulation.mois) + ".html"
         ticket_texte = dossier_source.string_lire(ticket_complet)
         index1, index2 = Resumes.section_position(ticket_texte, annulation.client_unique)
         if index1 is not None:
-            texte = ticket_texte[:index1] + partie + ticket_texte[(index2):]
+            texte = ticket_texte[:index1] + partie + ticket_texte[index2:]
             texte = texte.replace("..", ".")
             dossier_destination.string_ecrire(ticket_complet, texte)
         else:
             index1, index2 = Resumes.section_position(ticket_texte, annulation.client_unique, True)
             if index1 is not None:
-                ticket_texte = ticket_texte[:index1] + partie + ticket_texte[(index2):]
+                ticket_texte = ticket_texte[:index1] + partie + ticket_texte[index2:]
                 ticket_texte = ticket_texte.replace("..", ".")
 
                 index1, index2, clients_liste_backup = Resumes.select_clients(ticket_backup_texte)
@@ -174,7 +174,7 @@ class Resumes(object):
                                               str(nom) + r'''</option>'''
                             i += 1
                     nouveau_select += r'''</select>'''
-                    texte = ticket_texte[:index1] + nouveau_select + ticket_texte[(index2):]
+                    texte = ticket_texte[:index1] + nouveau_select + ticket_texte[index2:]
                     texte = texte.replace("..", ".")
                     dossier_destination.string_ecrire(ticket_complet, texte)
 
@@ -280,7 +280,7 @@ class Resumes(object):
                 Outils.affiche_message(info)
                 return None, None, None
         else:
-            info = "Select attendu non trouvée"
+            info = "Select attendu non trouvé"
             print(info)
             Outils.affiche_message(info)
             return None, None, None

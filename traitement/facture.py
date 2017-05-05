@@ -79,8 +79,8 @@ class Facture(object):
                     genre = generaux.code_ext
                 nature = generaux.nature_client_par_code_n(client['nature'])
                 reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
-                if edition.version != "0":
-                    reference += "-" + edition.version
+                if edition.version > 0:
+                    reference += "-" + str(edition.version)
 
                 filtre = generaux.filtrer_article_nul_par_code_n(client['nature'])
     

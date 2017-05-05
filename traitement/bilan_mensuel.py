@@ -18,7 +18,7 @@ class BilanMensuel(object):
         """
 
         nom = "bilan_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + str(edition.version)
-        if edition.version != '0':
+        if edition.version > 0:
             nom += "_" + str(edition.client_unique)
         nom += ".csv"
 
@@ -62,8 +62,8 @@ class BilanMensuel(object):
             client = clients.donnees[code_client]
             nature = generaux.nature_client_par_code_n(client['nature'])
             reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
-            if edition.version != "0":
-                reference += "-" + edition.version
+            if edition.version > 0:
+                reference += "-" + str(edition.version)
             users, cptes = BilanMensuel.utilisateurs_et_comptes(acces, livraisons, code_client, comptes,
                                                                 reservations)
             nb_u = len(users)
@@ -85,13 +85,13 @@ class BilanMensuel(object):
     @staticmethod
     def utilisateurs_et_comptes(acces, livraisons, code_client, comptes, reservations):
         """
-        retourne la liste de tous les comptes et utilisateurs concernés pour les accès, les réservations et 
-        les livraisons pour un client donné
+        retourne la liste de tous les comptes et utilisateurs concernés pour les accès, les réservations et les 
+        livraisons pour un client donné
         :param acces: accès importés
         :param livraisons: livraisons importées
         :param code_client: client donné
-        :param comptes: comptes importés      
-        :param reservations: reservations importées
+        :param comptes: comptes importés
+        :param reservations: réservations importées
         :return: liste des comptes
         """
         cptes = []

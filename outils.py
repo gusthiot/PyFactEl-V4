@@ -245,6 +245,22 @@ class Outils(object):
         os.rename(ancien_chemin, nouveau_chemin)
 
     @staticmethod
+    def effacer_fichier(chemin):
+        """
+        efface un fichier
+        :param chemin: chemin du fichier
+        """
+        os.remove(chemin)
+
+    @staticmethod
+    def effacer_dossier(chemin):
+        """
+        efface un dossier
+        :param chemin: chemin du dossier
+        """
+        shutil.rmtree(chemin)
+
+    @staticmethod
     def existe(structure, plateforme):
         """
         vérifie si le dossier/fichier existe

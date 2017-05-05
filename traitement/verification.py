@@ -83,7 +83,7 @@ class Verification(object):
 
         clients_actifs = Verification.obtenir_clients_actifs(comptes_actifs, comptes)
 
-        if (edition.version != '0') and (len(clients_actifs) > 1):
+        if (edition.version > 0) and (len(clients_actifs) > 1):
             Outils.affiche_message("Si version différente de 0, un seul client autorisé")
             sys.exit("Trop de clients pour version > 0")
 

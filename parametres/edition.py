@@ -33,9 +33,15 @@ class Edition(object):
             self.mois = int(donnees_csv[1][1])
         except ValueError as e:
             Outils.fatal(e, Edition.libelle +
-                         "\nle mois et l'année doivent être des nombres")
-
-        self.version = donnees_csv[2][1]
+                         "\nle mois et l'année doivent être des nombres entiers")
+        try:
+            self.version = int(donnees_csv[2][1])
+        except ValueError as e:
+            Outils.fatal(e, Edition.libelle +
+                         "\nla version doit être un nombre entier")
+        if self.version < 0:
+            Outils.fatal(ErreurConsistance(),
+                         Edition.libelle + ": la version doit être positive ")
         self.client_unique = ""
         self.filigrane = donnees_csv[3][1]
 
