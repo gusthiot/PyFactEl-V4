@@ -121,13 +121,13 @@ class Resumes(object):
         for i in range(len(Resumes.fichiers)):
             fichier_backup = Resumes.fichiers[i] + "_" + str(annulation.annee) + "_" + \
                               Outils.mois_string(annulation.mois) + suffixe + ".csv"
-            print("récupération dans " + Resumes.fichiers[i] + " : " + annulation.client_unique)
+            # print("récupération dans " + Resumes.fichiers[i] + " : " + annulation.client_unique)
             donnees_backup = Resumes.ouvrir_csv_seulement_client(
                 dossier_source_backup, fichier_backup, annulation.client_unique, Resumes.positions[i])
 
             fichier_complet = Resumes.fichiers[i] + "_" + str(annulation.annee) + \
                               "_" + Outils.mois_string(annulation.mois) + ".csv"
-            print("annulation dans " + Resumes.fichiers[i] + " : " + annulation.client_unique)
+            # print("annulation dans " + Resumes.fichiers[i] + " : " + annulation.client_unique)
             donnees_csv = Resumes.ouvrir_csv_sans_client(
                 dossier_source, fichier_complet, annulation.client_unique, Resumes.positions[i])
             with dossier_destination.writer(fichier_complet) as fichier_writer:
@@ -245,12 +245,10 @@ class Resumes(object):
             else:
                 info = "Fin de section non trouvée"
                 print(info)
-                Outils.affiche_message(info)
                 return None, None
         else:
             info = "Section attendue non trouvée"
             print(info)
-            Outils.affiche_message(info)
             return None, None
 
     @staticmethod
@@ -277,10 +275,8 @@ class Resumes(object):
             else:
                 info = "Fin de select non trouvée"
                 print(info)
-                Outils.affiche_message(info)
                 return None, None, None
         else:
             info = "Select attendu non trouvé"
             print(info)
-            Outils.affiche_message(info)
             return None, None, None
