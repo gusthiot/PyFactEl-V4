@@ -57,8 +57,7 @@ class Facture(object):
                                      "Date de livraison", "Centre financier", "", "Fonds à créditer", "", "",
                                      "Code opération", "", "", "", "Texte libre du poste", "Nom"])
 
-            contenu = ""
-            combo_list = []
+            combo_list = {}
 
             for code_client in sorted(sommes.sommes_clients.keys()):
                 poste = 0
@@ -98,8 +97,6 @@ class Facture(object):
                     code_sap_traduit = self.prod2qual.traduire_code_client(code_sap)
                 else:
                     code_sap_traduit = code_sap
-
-                combo_list.append(code_client + " " + client['abrev_labo'])
                 dico_contenu = {'code': code_client, 'abrev': client['abrev_labo'],
                                 'nom': client['nom_labo'], 'dest': client['dest'], 'ref': client['ref'],
                                 'ref_fact': reference, 'texte': generaux.entete}
@@ -186,9 +183,8 @@ class Facture(object):
                 contenu_client += r'''<td><a href="''' + dossier_annexe_technique + r'''" target="new">
                     ''' + nom_annexe_technique + r'''</a></td></tr></table>'''
                 contenu_client += "</section>"
-                contenu += contenu_client
-        self.creer_html(contenu, destination, combo_list, edition)
-        return contenu
+                combo_list[client['abrev_labo'] + " ("+ code_client + ")"] = contenu_client
+        self.creer_html(destination, combo_list, edition)
 
     @staticmethod
     def ligne_tableau(article, poste, net, rabais, consommateur, edition):
@@ -247,13 +243,12 @@ class Facture(object):
                 generaux.fonds, "", "", code_op, "", "", "", article.texte_sap,
                 Latex.echappe_caracteres(consommateur)]
 
-    def creer_html(self, contenu, destination, combo_list, edition):
+    def creer_html(self, destination, combo_list, edition):
         """
         crée une page html autour d'une liste de sections
         
-        :param contenu: liste de section
         :param destination:  Une instance de la classe dossier.DossierDestination
-        :param combo_list: liste des clients
+        :param combo_list: liste des clients et leurs sections
         :param edition: paramètres d'édition
         """
         if self.prod2qual:
@@ -302,16 +297,18 @@ class Facture(object):
                 <div id="combo">
                 <select name="client" onchange="changeClient(this)">
                 '''
-
-            for i in range(len(combo_list)):
-                html += r'''<option value="''' + str(i) + r'''">''' + str(combo_list[i]) + r'''</option>'''
+            i = 0
+            for k, v in sorted(combo_list.items()):
+                html += r'''<option value="''' + str(i) + r'''">''' + str(k) + r'''</option>'''
+                i += 1
             html += r'''
                 </select>
                 </div>
                 <div class="reveal">
                 <div class="slides">
                 '''
-            html += contenu
+            for k, v in sorted(combo_list.items()):
+                html += v
             html += r'''</div></div>
                     <script src="../js/reveal.js"></script>
                     <script>
