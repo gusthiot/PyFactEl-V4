@@ -31,6 +31,7 @@ class Facture(object):
         :param lien_annexes_techniques: lien au dossier contenant les annexes techniques
         :param annexes: dossier contenant les annexes
         :param annexes_techniques: dossier contenant les annexes techniques
+        :return: données du combolist et des sections
         """
 
         if sommes.calculees == 0:
@@ -185,6 +186,7 @@ class Facture(object):
                 contenu_client += "</section>"
                 combo_list[client['abrev_labo'] + " ("+ code_client + ")"] = contenu_client
         self.creer_html(destination, combo_list, edition)
+        return combo_list
 
     @staticmethod
     def ligne_tableau(article, poste, net, rabais, consommateur, edition):

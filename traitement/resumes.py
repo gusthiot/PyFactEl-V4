@@ -26,14 +26,15 @@ class Resumes(object):
         dossier_destination.string_ecrire(ticket_complet + ".html", ticket_texte)
 
     @staticmethod
-    def mise_a_jour(edition, dossier_source, dossier_destination, maj, html_sections):
+    def mise_a_jour(edition, clients, dossier_source, dossier_destination, maj, f_html_sections):
         """
         modification des résumés mensuels au niveau du client dont la facture est modifiée 
         :param edition: paramètres d'édition
+        :param clients: clients importés
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
         :param maj: données modifiées pour le client pour les différents fichiers
-        :param html_sections: section html modifiée pour le client
+        :param f_html_sections: section html modifiée pour le client
         """
         if len(maj) != len(Resumes.fichiers):
             info = "Résumés : erreur taille tableau"
@@ -43,7 +44,6 @@ class Resumes(object):
         for i in range(len(Resumes.fichiers)):
             fichier_complet = Resumes.fichiers[i] + "_" + str(edition.annee) + "_" + \
                               Outils.mois_string(edition.mois) + ".csv"
-            print("modification " + Resumes.fichiers[i] + " : " + edition.client_unique)
             donnees_csv = Resumes.ouvrir_csv_sans_client(
                 dossier_source, fichier_complet, edition.client_unique, Resumes.positions[i])
             with dossier_destination.writer(fichier_complet) as fichier_writer:
@@ -53,12 +53,62 @@ class Resumes(object):
                     fichier_writer.writerow(ligne)
 
         ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".html"
-        ticket_texte = dossier_source.string_lire(ticket_complet)
-        index1, index2 = Resumes.section_position(ticket_texte, edition.client_unique)
-        if index1 is not None:
-            texte = ticket_texte[:index1] + html_sections + ticket_texte[index2:]
-            texte = texte.replace("..", ".")
-            dossier_destination.string_ecrire(ticket_complet, texte)
+        section = list(f_html_sections.values())[0]
+        nom_client = clients.donnees[edition.client_unique]['abrev_labo'] + " (" + edition.client_unique + ")"
+        Resumes.maj_ticket(dossier_source, dossier_destination, ticket_complet, section, edition.client_unique,
+                           nom_client)
+
+    @staticmethod
+    def maj_ticket(dossier_source, dossier_destination, nom_fichier, section, code, nom_client):
+        """
+        mise à jour (ou en cas d'annulation) du ticket html concernant le client modifié
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
+        :param nom_fichier: nom de fichier du ticket résumé
+        :param section: section du client à mettre à jour
+        :param code: code du client à mettre à jour
+        :param nom_client: nom pour le menu du client
+        """
+        ticket_texte = dossier_source.string_lire(nom_fichier)
+        index1, index2, clients_liste = Resumes.select_clients(ticket_texte)
+        client_present = False
+        for nom in clients_liste:
+            if code in nom:
+                client_present = True
+                break
+
+        if client_present:
+            index1, index2 = Resumes.section_position(ticket_texte, code)
+            if index1 is not None:
+                texte = ticket_texte[:index1] + section + ticket_texte[index2:]
+                texte = texte.replace("..", ".")
+                dossier_destination.string_ecrire(nom_fichier, texte)
+        else:
+            clients_liste.append(nom_client)
+            clients_liste = sorted(clients_liste)
+            position = -1
+            if index1 is not None:
+                nouveau_select = r'''<select name="client" onchange="changeClient(this)">'''
+                i = 0
+                for nom in clients_liste:
+                    if code in nom:
+                        position = i
+                    nouveau_select += r'''<option value="''' + str(i) + r'''">''' + str(nom) + r'''</option>'''
+                    i += 1
+                nouveau_select += r'''</select>'''
+                texte = ticket_texte[:index1] + nouveau_select + ticket_texte[index2:]
+
+                if position > -1:
+                    index1 = clients_liste[position+1].find('(')
+                    if index1 > -1:
+                        index2 = clients_liste[position+1].find(')', index1)
+                        if index2 > -1:
+                            client_suivant = clients_liste[position+1][(index1+1):index2]
+                            index1, index2 = Resumes.section_position(texte, client_suivant)
+                            if index1 is not None:
+                                texte = texte[:index1] + section + texte[index1:]
+                                texte = texte.replace("..", ".")
+                                dossier_destination.string_ecrire(nom_fichier, texte)
 
     @staticmethod
     def suppression(suppression, dossier_source, dossier_destination):
@@ -72,7 +122,6 @@ class Resumes(object):
         for i in range(len(Resumes.fichiers)):
             fichier_complet = Resumes.fichiers[i] + "_" + str(suppression.annee) + "_" + \
                               Outils.mois_string(suppression.mois) + ".csv"
-            print("suppression dans " + Resumes.fichiers[i] + " : " + suppression.client_unique)
             donnees_csv = Resumes.ouvrir_csv_sans_client(
                 dossier_source, fichier_complet, suppression.client_unique, Resumes.positions[i])
             with dossier_destination.writer(fichier_complet) as fichier_writer:
@@ -83,8 +132,7 @@ class Resumes(object):
         ticket_texte = dossier_source.string_lire(ticket_complet)
         index1, index2 = Resumes.section_position(ticket_texte, suppression.client_unique)
         if index1 is not None:
-            ticket_texte = ticket_texte[:index1] + '<!--<section-old id="' + suppression.client_unique + \
-                           '"></section-old>-->' + ticket_texte[index2:]
+            ticket_texte = ticket_texte[:index1] + ticket_texte[index2:]
             ticket_texte = ticket_texte.replace("..", ".")
 
         index1, index2, clients_liste = Resumes.select_clients(ticket_texte)
@@ -119,14 +167,12 @@ class Resumes(object):
 
         for i in range(len(Resumes.fichiers)):
             fichier_backup = Resumes.fichiers[i] + "_" + str(annulation.annee) + "_" + \
-                              Outils.mois_string(annulation.mois) + suffixe + ".csv"
-            # print("récupération dans " + Resumes.fichiers[i] + " : " + annulation.client_unique)
+                             Outils.mois_string(annulation.mois) + suffixe + ".csv"
             donnees_backup = Resumes.ouvrir_csv_seulement_client(
                 dossier_source_backup, fichier_backup, annulation.client_unique, Resumes.positions[i])
 
-            fichier_complet = Resumes.fichiers[i] + "_" + str(annulation.annee) + \
-                              "_" + Outils.mois_string(annulation.mois) + ".csv"
-            # print("annulation dans " + Resumes.fichiers[i] + " : " + annulation.client_unique)
+            fichier_complet = Resumes.fichiers[i] + "_" + str(annulation.annee) + "_" + \
+                              Outils.mois_string(annulation.mois) + ".csv"
             donnees_csv = Resumes.ouvrir_csv_sans_client(
                 dossier_source, fichier_complet, annulation.client_unique, Resumes.positions[i])
             with dossier_destination.writer(fichier_complet) as fichier_writer:
@@ -139,43 +185,21 @@ class Resumes(object):
                         suffixe + ".html"
         ticket_backup_texte = dossier_source_backup.string_lire(ticket_backup)
         index1, index2 = Resumes.section_position(ticket_backup_texte, annulation.client_unique)
-        partie = ""
+        section = ""
         if index1 is not None:
-            partie = ticket_backup_texte[index1:index2]
+            section = ticket_backup_texte[index1:index2]
 
+        nom_client = ""
+        index1, index2, clients_liste_backup = Resumes.select_clients(ticket_backup_texte)
+        for nom in clients_liste_backup:
+            if annulation.client_unique in nom:
+                nom_client = nom
+                break
         ticket_complet = "ticket_" + str(annulation.annee) + "_" + Outils.mois_string(
             annulation.mois) + ".html"
-        ticket_texte = dossier_source.string_lire(ticket_complet)
-        index1, index2 = Resumes.section_position(ticket_texte, annulation.client_unique)
-        if index1 is not None:
-            texte = ticket_texte[:index1] + partie + ticket_texte[index2:]
-            texte = texte.replace("..", ".")
-            dossier_destination.string_ecrire(ticket_complet, texte)
-        else:
-            index1, index2 = Resumes.section_position(ticket_texte, annulation.client_unique, True)
-            if index1 is not None:
-                ticket_texte = ticket_texte[:index1] + partie + ticket_texte[index2:]
-                ticket_texte = ticket_texte.replace("..", ".")
 
-                index1, index2, clients_liste_backup = Resumes.select_clients(ticket_backup_texte)
-
-                index1, index2, clients_liste = Resumes.select_clients(ticket_texte)
-                if index1 is not None:
-                    nouveau_select = r'''<select name="client" onchange="changeClient(this)">'''
-                    i = 0
-                    for nom in clients_liste:
-                        if annulation.client_unique in clients_liste_backup[i]:
-                            nouveau_select += r'''<option value="''' + str(i) + r'''">''' + \
-                                              str(clients_liste_backup[i]) + r'''</option>'''
-                            i += 1
-                        if annulation.client_unique not in nom:
-                            nouveau_select += r'''<option value="''' + str(i) + r'''">''' + \
-                                              str(nom) + r'''</option>'''
-                            i += 1
-                    nouveau_select += r'''</select>'''
-                    texte = ticket_texte[:index1] + nouveau_select + ticket_texte[index2:]
-                    texte = texte.replace("..", ".")
-                    dossier_destination.string_ecrire(ticket_complet, texte)
+        Resumes.maj_ticket(dossier_source, dossier_destination, ticket_complet, section, annulation.client_unique,
+                           nom_client)
 
     @staticmethod
     def ouvrir_csv_sans_client(dossier_source, fichier, code_client, position_code):
@@ -222,22 +246,16 @@ class Resumes(object):
         return donnees_csv
 
     @staticmethod
-    def section_position(texte, code_client, est_old=False):
+    def section_position(texte, code_client):
         """
         retrouve la section html concernant le client
         :param texte: le texte html dans lequel on cherche
         :param code_client: code du client dont on cherche la section
-        :param est_old: si la section a été supprimée
         :return: le début de la section, et le début de la suite
         """
-        if est_old:
-            index1 = texte.find('<!--<section-old id="' + code_client + '">')
-            index2 = texte.find('</section-old>-->', index1)
-            taille = 17
-        else:
-            index1 = texte.find('<section id="' + code_client + '">')
-            index2 = texte.find('</section>', index1)
-            taille = 10
+        index1 = texte.find('<section id="' + code_client + '">')
+        index2 = texte.find('</section>', index1)
+        taille = 10
         if index1 > -1:
             if index2 > -1:
                 return index1, index2 + taille

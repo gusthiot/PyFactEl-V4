@@ -196,7 +196,7 @@ if pg_present:
             Resumes.base(edition, DossierSource(dossier_csv), DossierDestination(dossier_enregistrement))
         elif Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)):
             maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, res_lignes]
-            Resumes.mise_a_jour(edition, DossierSource(dossier_enregistrement),
+            Resumes.mise_a_jour(edition, clients, DossierSource(dossier_enregistrement),
                                 DossierDestination(dossier_enregistrement), maj, f_html_sections)
 
 if sup_present:
@@ -273,7 +273,8 @@ if ann_present:
 
         DossierDestination(chemin).ecrire(annulation.nom_fichier, dossier_source.lire(annulation.nom_fichier))
         now = datetime.datetime.now()
-        Outils.renommer_dossier(chemin,
+        Outils.renommer_dossier([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
+                                annulation.client_unique],
             [dossier_enregistrement, "old_" + str(annulation.annule_version) + "_" + annulation.client_unique + "_" +
              now.strftime("%Y%m%d_%H%M")], plateforme)
 
