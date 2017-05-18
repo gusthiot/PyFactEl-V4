@@ -127,7 +127,7 @@ if pg_present:
 
     if edition.version == 0:
         if existe:
-            msg = "Le répertoire " + dossier_enregistrement + " existe déjà !"
+            msg = "Le répertoire " + str(dossier_enregistrement) + " existe déjà !"
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur le répértoire")
@@ -137,7 +137,7 @@ if pg_present:
         dossier_csv = Outils.chemin([dossier_enregistrement, "csv_" + str(edition.version) + "_" +
                                 edition.client_unique], plateforme)
         if Outils.existe(dossier_csv, True):
-            msg = "La version " + str(edition.version) + " du client " + edition.client_unique + " existe déjà !"
+            msg = "La version " + str(edition.version) + " du client " + str(edition.client_unique) + " existe déjà !"
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur le répértoire")
@@ -219,13 +219,13 @@ if sup_present:
     dossier_csv = Outils.chemin([dossier_enregistrement, "csv_" + str(suppression.version) + "_" +
                             suppression.client_unique], plateforme)
     if Outils.existe(dossier_csv):
-        msg = "La version " + str(suppression.version) + " du client " + suppression.client_unique + " existe déjà !"
+        msg = "La version " + str(suppression.version) + " du client " + str(suppression.client_unique) + " existe déjà !"
         print("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur la version")
 
     if not Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)):
-        msg = " La version 0 n’existe pas dans " + dossier_enregistrement + \
+        msg = " La version 0 n’existe pas dans " + str(dossier_enregistrement) + \
               ", impossible de supprimer une facture !"
         print("msg : " + msg)
         Outils.affiche_message(msg)
@@ -254,11 +254,9 @@ if ann_present:
     else:
         chemin = Outils.chemin([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
                                 annulation.client_unique], plateforme)
-        chemin_r = Outils.chemin([dossier_enregistrement, "csv_" + str(annulation.recharge_version) + "_" +
-                                  annulation.client_unique], plateforme)
         if not Outils.existe(chemin):
             msg = " La version " + str(annulation.annule_version) + " à annuler pour le client " +\
-                  annulation.client_unique + " n’existe pas !"
+                  str(annulation.client_unique) + " n’existe pas !"
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
@@ -267,36 +265,34 @@ if ann_present:
                                           annulation.client_unique, "copernic.csv"], plateforme)
         if Outils.existe(chemin_copernic):
             msg = "La version " + str(annulation.annule_version) + " à annuler pour le client " + \
-                  annulation.client_unique + " a déjà été émise et ne peut plus être annulée !"
+                  str(annulation.client_unique) + " a déjà été émise et ne peut plus être annulée !"
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
 
         if annulation.recharge_version == 0:
-            if not Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)):
+            dossier_csv = Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)
+            if not Outils.existe(dossier_csv):
                 msg = " La version 0 à recharger n’existe pas !"
                 print("msg : " + msg)
                 Outils.affiche_message(msg)
                 sys.exit("Erreur sur la version")
         else:
-            if not Outils.existe(chemin_r):
+            dossier_csv = Outils.chemin([dossier_enregistrement, "csv_" + str(annulation.recharge_version) + "_" +
+                                         annulation.client_unique], plateforme)
+            if not Outils.existe(dossier_csv):
                 msg = " La version " + str(annulation.recharge_version) + " à recharger pour le client " + \
-                      annulation.client_unique + " n’existe pas !"
+                      str(annulation.client_unique) + " n’existe pas !"
                 print("msg : " + msg)
                 Outils.affiche_message(msg)
                 sys.exit("Erreur sur la version")
 
-        dossier_csv = Outils.existe(chemin, True)
-        DossierDestination(dossier_csv).ecrire(annulation.nom_fichier, dossier_source.lire(annulation.nom_fichier))
+        DossierDestination(chemin).ecrire(annulation.nom_fichier, dossier_source.lire(annulation.nom_fichier))
         now = datetime.datetime.now()
         Outils.renommer_dossier(chemin,
             [dossier_enregistrement, "old_" + str(annulation.annule_version) + "_" + annulation.client_unique + "_" +
              now.strftime("%Y%m%d_%H%M")], plateforme)
 
-        if annulation.recharge_version == 0:
-            dossier_csv = Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)
-        else:
-            dossier_csv = Outils.chemin(chemin_r)
         Resumes.annulation(annulation, DossierSource(dossier_enregistrement),
                            DossierDestination(dossier_enregistrement), DossierSource(dossier_csv))
 
