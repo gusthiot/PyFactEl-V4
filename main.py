@@ -65,31 +65,31 @@ ann_present = Outils.existe(Outils.chemin([dossier_data, Annulation.nom_fichier]
 
 if pg_present and sup_present and not ann_present:
         msg = "Deux fichiers bruts incompatibles dans le répertoire : supprfact.csv et paramedit.csv"
-        print("msg : " + msg)
+        Outils.myprint("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur les fichiers")
 
 if pg_present and ann_present and not sup_present:
         msg = "Deux fichiers bruts incompatibles dans le répertoire : paramedit.csv et annulversion.csv"
-        print("msg : " + msg)
+        Outils.myprint("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur les fichiers")
 
 if ann_present and sup_present and not pg_present:
     msg = "Deux fichiers bruts incompatibles dans le répertoire : supprfact.csv et annulversion.csv"
-    print("msg : " + msg)
+    Outils.myprint("msg : " + msg)
     Outils.affiche_message(msg)
     sys.exit("Erreur sur les fichiers")
 
 if ann_present and sup_present and pg_present:
     msg = "Trois fichiers bruts incompatibles dans le répertoire : supprfact.csv, annulversion.csv et paramedit.csv"
-    print("msg : " + msg)
+    Outils.myprint("msg : " + msg)
     Outils.affiche_message(msg)
     sys.exit("Erreur sur les fichiers")
 
 if not ann_present and not sup_present and not pg_present:
     msg = "Ni supprfact.csv, ni paramedit.csv, ni annulversion.csv dans le répértoire, rien ne sera fait !"
-    print("msg : " + msg)
+    Outils.myprint("msg : " + msg)
     Outils.affiche_message(msg)
     sys.exit("Erreur sur les fichiers")
 
@@ -128,7 +128,7 @@ if pg_present:
     if edition.version == 0:
         if existe:
             msg = "Le répertoire " + str(dossier_enregistrement) + " existe déjà !"
-            print("msg : " + msg)
+            Outils.myprint("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur le répértoire")
         dossier_csv = Outils.chemin([dossier_enregistrement, "csv_0"], plateforme, generaux)
@@ -138,7 +138,7 @@ if pg_present:
                                 edition.client_unique], plateforme)
         if Outils.existe(dossier_csv, True):
             msg = "La version " + str(edition.version) + " du client " + str(edition.client_unique) + " existe déjà !"
-            print("msg : " + msg)
+            Outils.myprint("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur le répértoire")
     dossier_destination = DossierDestination(dossier_csv)
@@ -212,7 +212,7 @@ if sup_present:
                                                     Outils.mois_string(suppression.mois)], plateforme)
     if suppression.version == 0:
         msg = "Le numéro de version doit être supérieur ou égal à 1 !"
-        print("msg : " + msg)
+        Outils.myprint("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur la version")
 
@@ -220,14 +220,14 @@ if sup_present:
                             suppression.client_unique], plateforme)
     if Outils.existe(dossier_csv):
         msg = "La version " + str(suppression.version) + " du client " + str(suppression.client_unique) + " existe déjà !"
-        print("msg : " + msg)
+        Outils.myprint("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur la version")
 
     if not Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)):
         msg = " La version 0 n’existe pas dans " + str(dossier_enregistrement) + \
               ", impossible de supprimer une facture !"
-        print("msg : " + msg)
+        Outils.myprint("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur la version")
 
@@ -257,7 +257,7 @@ if ann_present:
         if not Outils.existe(chemin):
             msg = " La version " + str(annulation.annule_version) + " à annuler pour le client " +\
                   str(annulation.client_unique) + " n’existe pas !"
-            print("msg : " + msg)
+            Outils.myprint("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
 
@@ -266,7 +266,7 @@ if ann_present:
         if Outils.existe(chemin_copernic):
             msg = "La version " + str(annulation.annule_version) + " à annuler pour le client " + \
                   str(annulation.client_unique) + " a déjà été émise et ne peut plus être annulée !"
-            print("msg : " + msg)
+            Outils.myprint("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
 
@@ -274,7 +274,7 @@ if ann_present:
             dossier_csv = Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)
             if not Outils.existe(dossier_csv):
                 msg = " La version 0 à recharger n’existe pas !"
-                print("msg : " + msg)
+                Outils.myprint("msg : " + msg)
                 Outils.affiche_message(msg)
                 sys.exit("Erreur sur la version")
         else:
@@ -283,7 +283,7 @@ if ann_present:
             if not Outils.existe(dossier_csv):
                 msg = " La version " + str(annulation.recharge_version) + " à recharger pour le client " + \
                       str(annulation.client_unique) + " n’existe pas !"
-                print("msg : " + msg)
+                Outils.myprint("msg : " + msg)
                 Outils.affiche_message(msg)
                 sys.exit("Erreur sur la version")
 
