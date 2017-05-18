@@ -59,9 +59,9 @@ else:
     dossier_data = Outils.choisir_dossier(plateforme)
 dossier_source = DossierSource(dossier_data)
 
-pg_present = Outils.existe([dossier_data, Generaux.nom_fichier], plateforme)
-sup_present = Outils.existe([dossier_data, Suppression.nom_fichier], plateforme)
-ann_present = Outils.existe([dossier_data, Annulation.nom_fichier], plateforme)
+pg_present = Outils.existe(Outils.chemin([dossier_data, Generaux.nom_fichier], plateforme))
+sup_present = Outils.existe(Outils.chemin([dossier_data, Suppression.nom_fichier], plateforme))
+ann_present = Outils.existe(Outils.chemin([dossier_data, Annulation.nom_fichier], plateforme))
 
 if pg_present and sup_present and not ann_present:
         msg = "Deux fichiers bruts incompatibles dans le répertoire : supprfact.csv et paramedit.csv"
@@ -119,9 +119,9 @@ if pg_present:
                                            livraisons, machines, prestations, reservations, couts, users) > 0:
         sys.exit("Erreur dans la cohérence")
 
-    existe = Outils.existe([generaux.chemin, edition.annee, Outils.mois_string(edition.mois)], plateforme)
-    dossier_enregistrement = Outils.chemin_dossier([generaux.chemin, edition.annee,
-                                                    Outils.mois_string(edition.mois)], plateforme, generaux)
+    dossier_enregistrement = Outils.chemin([generaux.chemin, edition.annee, Outils.mois_string(edition.mois)],
+                                           plateforme, generaux)
+    existe = Outils.existe(dossier_enregistrement, True)
     dossier_lien = Outils.lien_dossier([generaux.lien, edition.annee, Outils.mois_string(edition.mois)],
                                        plateforme, generaux)
 
@@ -131,17 +131,16 @@ if pg_present:
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur le répértoire")
-        dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_0"], plateforme, generaux)
+        dossier_csv = Outils.chemin([dossier_enregistrement, "csv_0"], plateforme, generaux)
+        Outils.existe(dossier_csv, True)
     else:
-        existe = Outils.existe([dossier_enregistrement, "csv_" + str(edition.version) + "_" +
+        dossier_csv = Outils.chemin([dossier_enregistrement, "csv_" + str(edition.version) + "_" +
                                 edition.client_unique], plateforme)
-        if existe:
+        if Outils.existe(dossier_csv, True):
             msg = "La version " + str(edition.version) + " du client " + edition.client_unique + " existe déjà !"
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur le répértoire")
-        dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + str(edition.version) + "_" +
-                                             edition.client_unique], plateforme, generaux)
     dossier_destination = DossierDestination(dossier_csv)
 
     livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
@@ -152,11 +151,12 @@ if pg_present:
     sommes.calculer_toutes(livraisons, reservations, acces, clients, machines)
 
     annexes = "annexes"
-    dossier_annexes = Outils.chemin_dossier([dossier_enregistrement, annexes], plateforme, generaux)
+    dossier_annexes = Outils.chemin([dossier_enregistrement, annexes], plateforme, generaux)
+    Outils.existe(dossier_annexes, True)
     lien_annexes = Outils.lien_dossier([dossier_lien, annexes], plateforme, generaux)
     annexes_techniques = "annexes_techniques"
-    dossier_annexes_techniques = Outils.chemin_dossier([dossier_enregistrement, annexes_techniques], plateforme,
-                                                       generaux)
+    dossier_annexes_techniques = Outils.chemin([dossier_enregistrement, annexes_techniques], plateforme, generaux)
+    Outils.existe(dossier_annexes_techniques, True)
     lien_annexes_techniques = Outils.lien_dossier([dossier_lien, annexes_techniques], plateforme, generaux)
 
     Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
@@ -201,39 +201,38 @@ if pg_present:
     if edition.filigrane == "":
         if edition.version == 0:
             Resumes.base(edition, DossierSource(dossier_csv), DossierDestination(dossier_enregistrement))
-        elif Outils.existe([dossier_enregistrement, "csv_0"], plateforme):
+        elif Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)):
             maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, res_lignes]
             Resumes.mise_a_jour(edition, DossierSource(dossier_enregistrement),
                                 DossierDestination(dossier_enregistrement), maj, f_html_sections)
 
 if sup_present:
     suppression = Suppression(dossier_source)
-    dossier_enregistrement = Outils.chemin_dossier([suppression.chemin, suppression.annee,
-                                                    Outils.mois_string(suppression.mois)], plateforme, None)
+    dossier_enregistrement = Outils.chemin([suppression.chemin, suppression.annee,
+                                                    Outils.mois_string(suppression.mois)], plateforme)
     if suppression.version == 0:
         msg = "Le numéro de version doit être supérieur ou égal à 1 !"
         print("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur la version")
 
-    existe = Outils.existe([dossier_enregistrement, "csv_" + str(suppression.version) + "_" +
+    dossier_csv = Outils.chemin([dossier_enregistrement, "csv_" + str(suppression.version) + "_" +
                             suppression.client_unique], plateforme)
-    if existe:
+    if Outils.existe(dossier_csv):
         msg = "La version " + str(suppression.version) + " du client " + suppression.client_unique + " existe déjà !"
         print("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur la version")
 
-    existe = Outils.existe([dossier_enregistrement, "csv_0"], plateforme)
-    if not existe:
+    if not Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)):
         msg = " La version 0 n’existe pas dans " + dossier_enregistrement + \
               ", impossible de supprimer une facture !"
         print("msg : " + msg)
         Outils.affiche_message(msg)
         sys.exit("Erreur sur la version")
 
-    dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + str(suppression.version) + "_" +
-                                         suppression.client_unique], plateforme, None)
+    Outils.existe(dossier_csv, True)
+
     DossierDestination(dossier_csv).ecrire(suppression.nom_fichier, dossier_source.lire(suppression.nom_fichier))
 
     Resumes.suppression(
@@ -241,30 +240,32 @@ if sup_present:
 
 if ann_present:
     annulation = Annulation(dossier_source)
-    dossier_enregistrement = Outils.chemin_dossier([annulation.chemin, annulation.annee,
-                                                    Outils.mois_string(annulation.mois)], plateforme, None)
+    dossier_enregistrement = Outils.chemin([annulation.chemin, annulation.annee,
+                                                    Outils.mois_string(annulation.mois)], plateforme)
     if annulation.annule_version == 0:
-        copernic_present = Outils.existe([dossier_enregistrement, "csv_0", "copernic.csv"], plateforme)
-        if copernic_present:
+        chemin_copernic = Outils.chemin([dossier_enregistrement, "csv_0", "copernic.csv"], plateforme)
+        if Outils.existe(chemin_copernic):
             msg = "La version 0 a déjà été émise et ne peut plus être annulée !"
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
         else:
-            Outils.effacer_dossier(Outils.chemin_dossier([annulation.chemin, annulation.annee], plateforme, None))
+            Outils.effacer_dossier(Outils.chemin([annulation.chemin, annulation.annee], plateforme))
     else:
-        existe = Outils.existe([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
+        chemin = Outils.chemin([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
                                 annulation.client_unique], plateforme)
-        if not existe:
+        chemin_r = Outils.chemin([dossier_enregistrement, "csv_" + str(annulation.recharge_version) + "_" +
+                                  annulation.client_unique], plateforme)
+        if not Outils.existe(chemin):
             msg = " La version " + str(annulation.annule_version) + " à annuler pour le client " +\
                   annulation.client_unique + " n’existe pas !"
             print("msg : " + msg)
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
 
-        copernic_present = Outils.existe([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
+        chemin_copernic = Outils.chemin([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
                                           annulation.client_unique, "copernic.csv"], plateforme)
-        if copernic_present:
+        if Outils.existe(chemin_copernic):
             msg = "La version " + str(annulation.annule_version) + " à annuler pour le client " + \
                   annulation.client_unique + " a déjà été émise et ne peut plus être annulée !"
             print("msg : " + msg)
@@ -272,36 +273,30 @@ if ann_present:
             sys.exit("Erreur sur la version")
 
         if annulation.recharge_version == 0:
-            existe = Outils.existe([dossier_enregistrement, "csv_0"], plateforme)
-            if not existe:
+            if not Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)):
                 msg = " La version 0 à recharger n’existe pas !"
                 print("msg : " + msg)
                 Outils.affiche_message(msg)
                 sys.exit("Erreur sur la version")
         else:
-            existe = Outils.existe([dossier_enregistrement, "csv_" + str(annulation.recharge_version) + "_" +
-                                    annulation.client_unique], plateforme)
-            if not existe:
-                msg = " La version " + str(annulation.annule_version) + " à recharger pour le client " + \
+            if not Outils.existe(chemin_r):
+                msg = " La version " + str(annulation.recharge_version) + " à recharger pour le client " + \
                       annulation.client_unique + " n’existe pas !"
                 print("msg : " + msg)
                 Outils.affiche_message(msg)
                 sys.exit("Erreur sur la version")
 
-        dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
-                                             annulation.client_unique], plateforme, None)
+        dossier_csv = Outils.existe(chemin, True)
         DossierDestination(dossier_csv).ecrire(annulation.nom_fichier, dossier_source.lire(annulation.nom_fichier))
         now = datetime.datetime.now()
-        Outils.renommer_dossier(
-            [dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" + annulation.client_unique],
+        Outils.renommer_dossier(chemin,
             [dossier_enregistrement, "old_" + str(annulation.annule_version) + "_" + annulation.client_unique + "_" +
              now.strftime("%Y%m%d_%H%M")], plateforme)
 
         if annulation.recharge_version == 0:
-            dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_0"], plateforme, None)
+            dossier_csv = Outils.chemin([dossier_enregistrement, "csv_0"], plateforme)
         else:
-            dossier_csv = Outils.chemin_dossier([dossier_enregistrement, "csv_" + str(annulation.recharge_version) +
-                                                 "_" + annulation.client_unique], plateforme, None)
+            dossier_csv = Outils.chemin(chemin_r)
         Resumes.annulation(annulation, DossierSource(dossier_enregistrement),
                            DossierDestination(dossier_enregistrement), DossierSource(dossier_csv))
 

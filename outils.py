@@ -210,19 +210,22 @@ class Outils(object):
         return texte.replace("//", "/").replace("\\" + "\\", "\\")
 
     @staticmethod
-    def chemin_dossier(structure, plateforme, generaux):
+    def chemin(structure, plateforme, generaux=None):
         """
-        construit le chemin pour enregistrer les données
+        construit le chemin pour dossier/fichier
         :param structure: éléments du chemin
         :param plateforme:OS utilisé
         :param generaux: paramètres généraux
-        :return: chemin logique complet pour dossier
+        :return: chemin logique complet pour dossier/fichier
         """
         chemin = ""
+        first = True
         for element in structure:
-            chemin += str(element) + Outils.separateur_os(plateforme)
-        if not os.path.exists(chemin):
-            os.makedirs(chemin)
+            if not first:
+                chemin += Outils.separateur_os(plateforme)
+            else:
+                first = False
+            chemin += str(element)
         if generaux is None:
             return Outils.eliminer_double_separateur(chemin)
         else:
@@ -261,24 +264,18 @@ class Outils(object):
         shutil.rmtree(chemin)
 
     @staticmethod
-    def existe(structure, plateforme):
+    def existe(chemin, creation=False):
         """
         vérifie si le dossier/fichier existe
-        :param structure: éléments du chemin
-        :param plateforme:OS utilisé
+        :param chemin: chemin du dossier/fichier
+        :param creation: création de l'oobjet s'il n'existe pas
         :return: True si le dossier/fichier existe, False sinon
         """
-        chemin = ""
         existe = True
-        first = True
-        for element in structure:
-            if not first:
-                chemin += Outils.separateur_os(plateforme)
-            else:
-                first = False
-            chemin += str(element)
         if not os.path.exists(chemin):
             existe = False
+            if creation:
+                os.makedirs(chemin)
         return existe
 
     @staticmethod
