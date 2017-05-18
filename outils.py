@@ -13,11 +13,6 @@ class Outils(object):
     """
     Classe contenant diverses méthodes utiles
     """
-
-    @staticmethod
-    def myprint(texte):
-        print(texte.encode('utf-8'))
-
     @staticmethod
     def copier_dossier(source, dossier, destination):
         """

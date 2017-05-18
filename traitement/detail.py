@@ -47,7 +47,6 @@ class Detail(object):
         """
         if sommes.calculees == 0:
             info = "Vous devez d'abord faire toutes les sommes avant de pouvoir créer le détail des coûts"
-            print(info)
             Outils.affiche_message(info)
             return None
 

@@ -24,7 +24,6 @@ class Livraison(Fichier):
         """
         if self.verifie_coherence == 0:
             info = self.libelle + ". vous devez vérifier la cohérence avant de pouvoir obtenir les comptes"
-            print(info)
             Outils.affiche_message(info)
             return []
         return self.comptes
@@ -40,7 +39,6 @@ class Livraison(Fichier):
         """
         if self.verifie_date == 0:
             info = self.libelle + ". vous devez vérifier la date avant de vérifier la cohérence"
-            print(info)
             Outils.affiche_message(info)
             return 1
 
@@ -88,7 +86,6 @@ class Livraison(Fichier):
 
         if msg != "":
             msg = self.libelle + "\n" + msg
-            print("msg : " + msg)
             Outils.affiche_message(msg)
             return 1
         return 0
@@ -104,7 +101,6 @@ class Livraison(Fichier):
         """
         if verification.a_verifier != 0:
             info = self.libelle + ". vous devez faire les vérifications avant de calculer les montants"
-            print(info)
             Outils.affiche_message(info)
             return
 
@@ -169,7 +165,6 @@ class Livraison(Fichier):
         if prestations.verifie_coherence == 0:
             info = self.libelle + ". vous devez vérifier la cohérence des prestations avant de pouvvoir sélectionner " \
                                   "les livraisons par catégorie"
-            print(info)
             Outils.affiche_message(info)
             return {}
 

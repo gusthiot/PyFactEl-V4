@@ -36,7 +36,6 @@ class Compte(Fichier):
         """
         if self.verifie_date == 0:
             info = self.libelle + ". vous devez vérifier la date avant de vérifier la cohérence"
-            print(info)
             Outils.affiche_message(info)
             return 1
 
@@ -52,7 +51,6 @@ class Compte(Fichier):
         for donnee in self.donnees:
             if donnee['code_client'] == "":
                 if donnee['id_compte'] in comptes_actifs:
-                    print("code client du compte vide")
                     msg += "le code client de la ligne " + str(ligne) + " ne peut être vide si le compte est utilisé\n"
                 continue
 
@@ -74,7 +72,6 @@ class Compte(Fichier):
 
         if msg != "":
             msg = self.libelle + "\n" + msg
-            print("msg : " + msg)
             Outils.affiche_message(msg)
             return 1
         return 0

@@ -37,7 +37,6 @@ class Resumes(object):
         """
         if len(maj) != len(Resumes.fichiers):
             info = "Résumés : erreur taille tableau"
-            print(info)
             Outils.affiche_message(info)
             return
 

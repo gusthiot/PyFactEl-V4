@@ -81,7 +81,6 @@ class Annexes(object):
 
         if sommes.calculees == 0:
             info = "Vous devez d'abord faire toutes les sommes avant de pouvoir créer les annexes"
-            print(info)
             Outils.affiche_message(info)
             return
 

@@ -51,7 +51,6 @@ class BilanMensuel(object):
         """
         if sommes.calculees == 0:
             info = "Vous devez d'abord faire toutes les sommes avant de pouvoir créer le bilan mensuel"
-            print(info)
             Outils.affiche_message(info)
             return None
 

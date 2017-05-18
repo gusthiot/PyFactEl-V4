@@ -41,7 +41,6 @@ class Fichier(object):
         num = len(self.cles)
         if len(ligne) != num:
             info = self.libelle + ": nombre de colonnes incorrect : " + str(len(ligne)) + ", attendu : " + str(num)
-            print(info)
             Outils.affiche_message(info)
             sys.exit("Erreur de consistance")
         donnees_ligne = {}
@@ -75,7 +74,6 @@ class Fichier(object):
 
         if msg != "":
             msg = self.libelle + "\n" + msg
-            print("msg : " + msg)
             Outils.affiche_message(msg)
             return 1
         return 0

@@ -38,7 +38,6 @@ class Prestation(Fichier):
         """
         if self.verifie_date == 0:
             info = self.libelle + ". vous devez vérifier la date avant de vérifier la cohérence"
-            print(info)
             Outils.affiche_message(info)
             return 1
 
@@ -97,7 +96,6 @@ class Prestation(Fichier):
 
         if msg != "":
             msg = self.libelle + "\n" + msg
-            print("msg : " + msg)
             Outils.affiche_message(msg)
             return 1
         return 0
