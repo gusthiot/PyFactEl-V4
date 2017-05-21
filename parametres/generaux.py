@@ -39,8 +39,8 @@ class Generaux(object):
                     Outils.fatal(ErreurConsistance(),
                                  "Clé inconnue dans %s: %s" % (self.nom_fichier, cle))
                 if cle != "texte_sap":
-                    while "" in ligne:
-                        ligne.remove("")
+                    while ligne[-1] == "":
+                        del ligne[-1]
                 self._donnees[cle] = ligne
         except IOError as e:
             Outils.fatal(e, "impossible d'ouvrir le fichier : "+Generaux.nom_fichier)
@@ -90,7 +90,7 @@ class Generaux(object):
                 (len(self._donnees['code_d']) != len(self._donnees['eligible_U3'])) or \
                 (len(self._donnees['code_d']) != len(self._donnees['type_rabais'])) or \
                 (len(self._donnees['code_d']) != len(self._donnees['texte_sap'])):
-            erreurs += "le nombre de colonees doit être le même pour le code D, le code SAP, la quantité, l'unité, " \
+            erreurs += "le nombre de colonnes doit être le même pour le code D, le code SAP, la quantité, l'unité, " \
                        "le type de prix, le type de rabais, le texte SAP, l'intitulé long, l'intitulé court, " \
                        "l'éligible U1, l'éligible U2 et l'éligible U3\n"
 

@@ -110,7 +110,7 @@ if pg_present:
                                       prestations, reservations, couts, users) > 0:
         sys.exit("Erreur dans les dates")
 
-    if verification.verification_cohérence(generaux, edition, acces, clients, coefmachines, coefprests, comptes,
+    if verification.verification_coherence(generaux, edition, acces, clients, coefmachines, coefprests, comptes,
                                            livraisons, machines, prestations, reservations, couts, users) > 0:
         sys.exit("Erreur dans la cohérence")
 

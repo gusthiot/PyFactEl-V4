@@ -46,7 +46,7 @@ class Verification(object):
         self.a_verifier = 1
         return verif
 
-    def verification_cohérence(self, generaux, edition, acces, clients, coefmachines, coefprests, comptes, livraisons,
+    def verification_coherence(self, generaux, edition, acces, clients, coefmachines, coefprests, comptes, livraisons,
                                machines, prestations, reservations, couts, users):
         """
         vérifie la cohérence des données importées
