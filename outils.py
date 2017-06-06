@@ -76,22 +76,26 @@ class Outils(object):
         else:
             sys.exit(4)            
 
-    @staticmethod
-    def affiche_message_conditionnel(message):
+    @classmethod
+    def affiche_message_conditionnel(cls, titre, message):
         """
         affiche une petite boite de dialogue avec un message et 2 boutons OUI/NON, le NON arrête le programme
+        :param titre: titre à afficher
         :param message: message à afficher
         """
-        fenetre = Tk()
-        fenetre.title("Message conditionnel")
-        texte = ScrolledText(fenetre)
-        texte.insert(END, message)
-        texte.pack()
-        button = Button(fenetre, text='OUI', command=fenetre.destroy)
-        button.pack(side="left")
-        button = Button(fenetre, text='NON', command=sys.exit)
-        button.pack(side="right")
-        mainloop()
+        if cls.interface_graphique():
+            fenetre = Tk()
+            fenetre.title(titre)
+            texte = ScrolledText(fenetre)
+            texte.insert(END, message)
+            texte.pack()
+            button = Button(fenetre, text='OUI', command=fenetre.destroy)
+            button.pack(side="left")
+            button = Button(fenetre, text='NON', command=sys.exit)
+            button.pack(side="right")
+            mainloop()
+        else:
+            sys.exit("message conditionnel non-autorisé en mode sans graphique")
 
     @staticmethod
     def choisir_dossier(plateforme):
@@ -252,6 +256,9 @@ class Outils(object):
         efface un fichier
         :param chemin: chemin du fichier
         """
+        titre = "Effacer un fichier"
+        message = "Voulez-vous vraiment effacer le fichier ? : " + chemin
+        Outils.affiche_message_conditionnel(titre, message)
         os.remove(chemin)
 
     @staticmethod
@@ -260,6 +267,9 @@ class Outils(object):
         efface un dossier
         :param chemin: chemin du dossier
         """
+        titre = "Effacer un dossier et son contenu"
+        message = "Voulez-vous vraiment effacer le dossier (et son contenu) ? : " + chemin
+        Outils.affiche_message_conditionnel(titre, message)
         shutil.rmtree(chemin)
 
     @staticmethod
