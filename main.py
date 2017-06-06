@@ -238,7 +238,8 @@ if ann_present:
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
         else:
-            Outils.effacer_dossier(Outils.chemin([annulation.chemin, annulation.annee], plateforme))
+            Outils.effacer_dossier(Outils.chemin([annulation.chemin, annulation.annee,
+                                                  Outils.mois_string(annulation.mois)], plateforme))
     else:
         chemin = Outils.chemin([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
                                 annulation.client_unique], plateforme)
