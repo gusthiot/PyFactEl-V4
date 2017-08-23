@@ -126,7 +126,7 @@ class Recapitulatifs(object):
 
             ligne = [edition.annee, edition.mois, "Code Client CMi", "Abrev. Labo", "Id-User", "Nom User",
                      "Prénom User", "Id-Machine", "Nom Machine", "Date et Heure début de slot",
-                     "Durée du slot réservé HP", "Durée du slot réservé HC", "Slot supprimé", "Durée ouvrée",
+                     "Durée du slot réservé HP", "Durée du slot réservé HC", "Durée ouvrée",
                      "Date et Heure de réservation", "Date et Heure de suppression"]
             fichier_writer.writerow(ligne)
 
@@ -151,7 +151,7 @@ class Recapitulatifs(object):
             machine = machines.donnees[donnee['id_machine']]
             ligne = [edition.annee, edition.mois, donnee['code_client'], client['abrev_labo'],
                      donnee['id_user'], user['nom'], user['prenom'], donnee['id_machine'], machine['nom'],
-                     donnee['date_debut'], donnee['duree_hp'], donnee['duree_hc'], donnee['si_supprime'],
+                     donnee['date_debut'], donnee['duree_hp'], donnee['duree_hc'],
                      donnee['duree_ouvree'], donnee['date_reservation'], donnee['date_suppression']]
             lignes.append(ligne)
         return lignes

@@ -1484,7 +1484,7 @@ class Annexes(object):
                                             heure = ""
 
                                         sup = ""
-                                        if res['si_supprime'] == "OUI":
+                                        if res['date_suppression'] != "":
                                             sup = "Supprimé le : " + res['date_suppression']
                                         dico_pos = {'date': date, 'heure': heure, 'sup': Latex.echappe_caracteres(sup),
                                                     'hp': Outils.format_heure(res['duree_fact_hp']),
