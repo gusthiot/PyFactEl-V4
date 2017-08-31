@@ -24,8 +24,8 @@ class Detail(object):
 
             ligne = ["Année", "Mois", "Code Client CMi", "Code Client SAP", "Abrev. Labo", "type client",
                      "nature client", "Id-Compte", "Numéro de compte", "Intitulé compte", "Code Type Compte", "code_d",
-                     "Id-categ-cout", "Intitulé catégorie coût", "U1", "U2", "U3", "MO", "intitule_court",
-                     "N. prestation", "Intitulé", "Montant", "Rabais"]
+                     "Id-categ-cout", "Intitulé catégorie coût", "Durée machines (min)", "Durée main d'oeuvre (min)",
+                     "U1", "U2", "U3", "MO", "intitule_court", "N. prestation", "Intitulé", "Montant", "Rabais"]
             fichier_writer.writerow(ligne)
 
             for ligne in lignes:
@@ -68,14 +68,15 @@ class Detail(object):
                     if code_client in acces.sommes and id_compte in acces.sommes[code_client]['categories']:
                         som_cats = acces.sommes[code_client]['categories'][id_compte]
                         for id_cout, som_cat in sorted(som_cats.items()):
-                            ligne = base_compte + ['M', id_cout, couts.donnees[id_cout]['intitule'],
-                                                   Outils.format_2_dec(som_cat['mu1']),
+                            duree = som_cat['duree_hp'] + som_cat['duree_hc']
+                            ligne = base_compte + ['M', id_cout, couts.donnees[id_cout]['intitule'], duree,
+                                                   som_cat['mo'], Outils.format_2_dec(som_cat['mu1']),
                                                    Outils.format_2_dec(som_cat['mu2']),
                                                    Outils.format_2_dec(som_cat['mu3']),
                                                    Outils.format_2_dec(som_cat['mmo']), "", "", "", "", ""]
                             lignes.append(ligne)
 
-                        ligne = base_compte + ['M', 'Arrondi', "",
+                        ligne = base_compte + ['M', 'Arrondi', "", "", "",
                                                Outils.format_2_dec(sclo[id_compte]['mu1_d']),
                                                Outils.format_2_dec(sclo[id_compte]['mu2_d']),
                                                Outils.format_2_dec(sclo[id_compte]['mu3_d']),
@@ -94,13 +95,13 @@ class Detail(object):
                                     continue
 
                                 for no_prestation, sip in sorted(somme[article.code_d].items()):
-                                    ligne = base_compte + [article.code_d, "", "", "", "", "", "",
+                                    ligne = base_compte + [article.code_d, "", "", "", "", "", "", "", "",
                                                            article.intitule_court, no_prestation, sip['nom'],
                                                            Outils.format_2_dec(sip['montantx']),
                                                            Outils.format_2_dec(sip['rabais'])]
                                     lignes.append(ligne)
 
-                                ligne = base_compte + [article.code_d, "", "", "", "", "", "",
+                                ligne = base_compte + [article.code_d, "", "", "", "", "", "", "", "",
                                                        'Arrondi', "", "",
                                                        Outils.format_2_dec(
                                                            sclo[id_compte]['sommes_cat_m_x_d'][article.code_d]),

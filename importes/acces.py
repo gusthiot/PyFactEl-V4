@@ -196,11 +196,14 @@ class Acces(Fichier):
                     sco[id_machine]['dhi'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['du_hc'], 2)
 
                     if id_cout not in scat:
-                        scat[id_cout] = {'mu1': 0, 'mu2': 0, 'mu3': 0, 'mmo': 0}
+                        scat[id_cout] = {'mu1': 0, 'mu2': 0, 'mu3': 0, 'mmo': 0, 'duree_hp': 0, 'duree_hc': 0, 'mo': 0}
                     scat[id_cout]['mu1'] += sco[id_machine]['mu1']
                     scat[id_cout]['mu2'] += sco[id_machine]['mu2']
                     scat[id_cout]['mu3'] += sco[id_machine]['mu3']
                     scat[id_cout]['mmo'] += sco[id_machine]['mmo']
+                    scat[id_cout]['duree_hp'] += sco[id_machine]['duree_hp']
+                    scat[id_cout]['duree_hc'] += sco[id_machine]['duree_hc']
+                    scat[id_cout]['mo'] += sco[id_machine]['mo']
 
     def acces_pour_compte(self, id_compte, code_client):
         """
