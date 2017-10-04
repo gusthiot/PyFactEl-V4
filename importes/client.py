@@ -74,15 +74,15 @@ class Client(Fichier):
                 msg += "le format de l'e-mail '" + donnee['email'] + "' de la ligne " + str(ligne) +\
                     " n'est pas correct\n"
 
-            donnee['emb'] = coefmachines.donnees[donnee['nature']]['emolument']
+            if donnee['nature'] != "":
+                donnee['emb'] = coefmachines.donnees[donnee['nature']]['emolument']
+                av_hc = generaux.avantage_hc_par_code_n(donnee['nature'])
 
-            av_hc = generaux.avantage_hc_par_code_n(donnee['nature'])
-
-            donnee['rh'] = 1
-            donnee['bh'] = 0
-            if av_hc == 'BONUS':
-                donnee['bh'] = 1
-                donnee['rh'] = 0
+                donnee['rh'] = 1
+                donnee['bh'] = 0
+                if av_hc == 'BONUS':
+                    donnee['bh'] = 1
+                    donnee['rh'] = 0
 
             del donnee['annee']
             del donnee['mois']
