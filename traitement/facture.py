@@ -142,38 +142,40 @@ class Facture(object):
     
                 inc = 1
 
-                comptes_utilises = Outils.comptes_in_somme(sommes.sommes_comptes[code_client], comptes)
+                if code_client in sommes.sommes_comptes:
+                    sclo = sommes.sommes_comptes[code_client]
+                    comptes_utilises = Outils.comptes_in_somme(sclo, comptes)
 
-                for num_compte, id_compte in sorted(comptes_utilises.items()):
-                    sco = sommes.sommes_comptes[code_client][id_compte]
-                    compte = comptes.donnees[id_compte]
-                    if sco['c1'] > 0 and not (filtre == "OUI" and sco['c2'] == 0):
-                        poste = inc*10
-                        if sco['somme_j_mm'] > 0 and not (filtre == "OUI" and sco['mj'] == 0):
-                            fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[2], poste,
-                                                                       sco['somme_j_mm'], sco['somme_j_mr'], op_centre,
-                                                                       compte['numero'] + " - " + compte['intitule'],
-                                                                       edition))
-                            contenu_client += self.ligne_tableau(generaux.articles[2], poste, sco['somme_j_mm'],
-                                                                 sco['somme_j_mr'],
-                                                                 compte['numero'] + " - " + compte['intitule'], edition)
-                            poste += 1
-
-                        for article in generaux.articles_d3:
-                            categorie = article.code_d
-                            if sco['sommes_cat_m'][categorie] > 0 and not (filtre == "OUI"
-                                                                           and sco['tot_cat'][article.code_d] == 0):
-                                fichier_writer.writerow(self.ligne_facture(generaux, article, poste,
-                                                                           sco['sommes_cat_m'][categorie],
-                                                                           sco['sommes_cat_r'][categorie], op_centre,
-                                                                           compte['numero'] + " - " +
-                                                                           compte['intitule'], edition))
-                                contenu_client += self.ligne_tableau(article, poste, sco['sommes_cat_m'][categorie],
-                                                                     sco['sommes_cat_r'][categorie],
-                                                                     compte['numero'] + " - " + compte['intitule'],
-                                                                     edition)
+                    for num_compte, id_compte in sorted(comptes_utilises.items()):
+                        sco = sclo[id_compte]
+                        compte = comptes.donnees[id_compte]
+                        if sco['c1'] > 0 and not (filtre == "OUI" and sco['c2'] == 0):
+                            poste = inc*10
+                            if sco['somme_j_mm'] > 0 and not (filtre == "OUI" and sco['mj'] == 0):
+                                fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[2], poste,
+                                                                           sco['somme_j_mm'], sco['somme_j_mr'], op_centre,
+                                                                           compte['numero'] + " - " + compte['intitule'],
+                                                                           edition))
+                                contenu_client += self.ligne_tableau(generaux.articles[2], poste, sco['somme_j_mm'],
+                                                                     sco['somme_j_mr'],
+                                                                     compte['numero'] + " - " + compte['intitule'], edition)
                                 poste += 1
-                        inc += 1
+
+                            for article in generaux.articles_d3:
+                                categorie = article.code_d
+                                if sco['sommes_cat_m'][categorie] > 0 and not (filtre == "OUI"
+                                                                               and sco['tot_cat'][article.code_d] == 0):
+                                    fichier_writer.writerow(self.ligne_facture(generaux, article, poste,
+                                                                               sco['sommes_cat_m'][categorie],
+                                                                               sco['sommes_cat_r'][categorie], op_centre,
+                                                                               compte['numero'] + " - " +
+                                                                               compte['intitule'], edition))
+                                    contenu_client += self.ligne_tableau(article, poste, sco['sommes_cat_m'][categorie],
+                                                                         sco['sommes_cat_r'][categorie],
+                                                                         compte['numero'] + " - " + compte['intitule'],
+                                                                         edition)
+                                    poste += 1
+                            inc += 1
                 contenu_client += r'''
                     <tr><td colspan="8" id="toright">Net amount [CHF] : </td><td id="toright">
                     ''' + "%.2f" % scl['somme_t'] + r'''</td></tr>
