@@ -179,7 +179,7 @@ if pg_present:
     det_lignes = Detail.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, couts)
     Detail.detail(dossier_destination, edition, det_lignes)
 
-    cae_lignes = Recapitulatifs.cae_lignes(edition, acces, comptes, clients, users, machines)
+    cae_lignes = Recapitulatifs.cae_lignes(edition, acces, comptes, clients, users, machines, couts)
     Recapitulatifs.cae(dossier_destination, edition, cae_lignes)
     lvr_lignes = Recapitulatifs.lvr_lignes(edition, livraisons, comptes, clients, users, prestations)
     Recapitulatifs.lvr(dossier_destination, edition, lvr_lignes)

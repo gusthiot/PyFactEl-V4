@@ -24,15 +24,16 @@ class Recapitulatifs(object):
 
             ligne = [edition.annee, edition.mois, "Id-Compte", "Numéro de compte", "Intitulé compte",
                      "Code Type Compte", "Code Client CMi", "Abrev. Labo", "Id-User", "Nom User", "Prénom User",
-                     "Id-Machine", "Nom Machine", "Date et Heure login", "Durée machine HP", "Durée machine HC",
-                     "Durée opérateur", "Id-Opérateur", "Prénom Nom opérateur", "Remarque opérateur", "Remarque staff"]
+                     "Id-Machine", "Nom Machine", "Id-Categ-cout", "Intitulé catégorie coût","Date et Heure login",
+                     "Durée machine HP", "Durée machine HC", "Durée opérateur", "Id-Opérateur", "Prénom Nom opérateur",
+                     "Remarque opérateur", "Remarque staff"]
             fichier_writer.writerow(ligne)
 
             for ligne in lignes:
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def cae_lignes(edition, acces, comptes, clients, users, machines):
+    def cae_lignes(edition, acces, comptes, clients, users, machines, couts):
         """
         génération des lignes de données du récapitulatif des accès machines
         :param edition: paramètres d'édition
@@ -41,6 +42,7 @@ class Recapitulatifs(object):
         :param clients: clients importés
         :param users: users importés
         :param machines: machines importées
+        :param couts: catégories coûts importées
         :return: lignes de données du récapitulatif
         """
         lignes = []
@@ -49,11 +51,13 @@ class Recapitulatifs(object):
             client = clients.donnees[compte['code_client']]
             user = users.donnees[donnee['id_user']]
             machine = machines.donnees[donnee['id_machine']]
+            id_cout = machine['id_cout']
             ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
                      compte['type'], compte['code_client'], client['abrev_labo'], donnee['id_user'], user['nom'],
-                     user['prenom'], donnee['id_machine'], machine['nom'], donnee['date_login'],
-                     donnee['duree_machine_hp'], donnee['duree_machine_hc'], donnee['duree_operateur'],
-                     donnee['id_op'], donnee['nom_op'], donnee['remarque_op'], donnee['remarque_staff']]
+                     user['prenom'], donnee['id_machine'], machine['nom'], machine['id_cout'],
+                     couts.donnees[id_cout]['intitule'], donnee['date_login'], donnee['duree_machine_hp'],
+                     donnee['duree_machine_hc'], donnee['duree_operateur'], donnee['id_op'], donnee['nom_op'],
+                     donnee['remarque_op'], donnee['remarque_staff']]
             lignes.append(ligne)
         return lignes
 
