@@ -2,21 +2,21 @@ from importes import Fichier
 from outils import Outils
 
 
-class CoefMachine(Fichier):
+class Emolument(Fichier):
     """
-    Classe pour l'importation des données de Coefficients Machines
+    Classe pour l'importation des données de Emoluments
     """
 
-    nom_fichier = "coeffmachine.csv"
-    cles = ['annee', 'mois', 'nature', 'emolument', 'tarif_u', 'coef_a', 'coef_mo']
-    libelle = "Coefficients Machines"
+    nom_fichier = "emolument.csv"
+    cles = ['annee', 'mois', 'nature', 'emolument']
+    libelle = "Emoluments"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def est_coherent(self, generaux):
         """
-        vérifie que les données du fichier importé sont cohérentes (si couple catégorie - classe de tarif est unique),
+        vérifie que les données du fichier importé sont cohérentes,
         et efface les colonnes mois et année
         :param generaux: paramètres généraux
         :return: 1 s'il y a une erreur, 0 sinon
@@ -47,16 +47,7 @@ class CoefMachine(Fichier):
                     msg += "la nature '" + donnee['nature'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
-            if donnee['tarif_u'] == "":
-                msg += "le tarif U de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['tarif_u'] not in ['U1', 'U2', 'U3']:
-                msg += "le tarif U de la ligne " + str(ligne) + " n'est pas parmi [U1, U2, U3]\n"
-
             donnee['emolument'], info = Outils.est_un_nombre(donnee['emolument'], "l'émolument", ligne)
-            msg += info
-            donnee['coef_a'], info = Outils.est_un_nombre(donnee['coef_a'], "le coefficient A", ligne)
-            msg += info
-            donnee['coef_mo'], info = Outils.est_un_nombre(donnee['coef_mo'], "le coefficient MO", ligne)
             msg += info
 
             del donnee['annee']

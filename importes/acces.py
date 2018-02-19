@@ -95,11 +95,11 @@ class Acces(Fichier):
             return 1
         return 0
 
-    def calcul_montants(self, machines, coefmachines, clients, verification, couts, comptes):
+    def calcul_montants(self, machines, categprix, clients, verification, couts, comptes):
         """
         calcule les sous-totaux nécessaires
         :param machines: machines importées
-        :param coefmachines: coefficients machines importés et vérifiés
+        :param categprix: catégories prix importés et vérifiés
         :param clients: clients importés et vérifiés
         :param verification: pour vérifier si les dates et les cohérences sont correctes
         :param couts: catégories coûts importées
@@ -120,7 +120,7 @@ class Acces(Fichier):
             code_client = comptes.donnees[id_compte]['code_client']
             machine = machines.donnees[id_machine]
             client = clients.donnees[code_client]
-            coefmachine = coefmachines.donnees[client['nature']]
+            prix = categprix.donnees[client['nature'] + machine['id_cout']]
 
             if code_client not in self.sommes:
                 self.sommes[code_client] = {'comptes': {}, 'machines': {}}
@@ -129,12 +129,10 @@ class Acces(Fichier):
                 scl[id_compte] = {}
             sco = scl[id_compte]
 
-            alpha_u = couts.donnees[machine['id_cout']][coefmachine['tarif_u']] * coefmachine['coef_a']
-
             if id_machine not in sco:
-                pum = round(alpha_u, 2)
-                puo = round(couts.donnees[machine['id_cout']]['MO'] * coefmachine['coef_mo'], 2)
-                du_hc = round(alpha_u * machine['tx_rabais_hc'] / 100, 2)
+                pum = round(prix['prix_h_mach_p'], 2)
+                puo = round(prix['prix_h_mo_o'], 2)
+                du_hc = round(prix['prix_h_mach_p'] * machine['tx_rabais_hc'] / 100, 2)
                 sco[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'mo': 0, 'users': {},
                                    'du_hc': du_hc, 'pum': pum, 'puo': puo}
             sco[id_machine]['duree_hp'] += donnee['duree_machine_hp']
@@ -153,8 +151,8 @@ class Acces(Fichier):
 
             scma = self.sommes[code_client]['machines']
             if id_machine not in scma:
-                pur_hp = round(alpha_u * machine['tx_penalite_hp'] / 100, 2)
-                pur_hc = round(alpha_u * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
+                pur_hp = round(prix['prix_h_mach_p'] * machine['tx_penalite_hp'] / 100, 2)
+                pur_hc = round(prix['prix_h_mach_p'] * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
                 scma[id_machine] = {'duree_hp': 0, 'duree_hc': 0,  'pur_hp': pur_hp, 'pur_hc': pur_hc, 'users': {}}
             scma[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             scma[id_machine]['duree_hc'] += donnee['duree_machine_hc']

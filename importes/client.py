@@ -27,11 +27,11 @@ class Client(Fichier):
             return []
         return self.codes
 
-    def est_coherent(self, coefmachines, generaux):
+    def est_coherent(self, emoluments, generaux):
         """
         vérifie que les données du fichier importé sont cohérentes (code client unique,
         classe tarif présente dans coefficients, type de labo dans paramètres), et efface les colonnes mois et année
-        :param coefmachines: coefficients machines importés
+        :param emoluments: émoluments importés
         :param generaux: paramètres généraux
         :return: 1 s'il y a une erreur, 0 sinon
         """
@@ -75,7 +75,7 @@ class Client(Fichier):
                     " n'est pas correct\n"
 
             if donnee['nature'] != "":
-                donnee['emb'] = coefmachines.donnees[donnee['nature']]['emolument']
+                donnee['emb'] = emoluments.donnees[donnee['nature']]['emolument']
                 av_hc = generaux.avantage_hc_par_code_n(donnee['nature'])
 
                 donnee['rh'] = 1

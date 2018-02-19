@@ -18,8 +18,9 @@ from docopt import docopt
 
 from importes import (Client,
                       Acces,
-                      CoefMachine,
+                      Emolument,
                       CoefPrest,
+                      CategPrix,
                       Compte,
                       Livraison,
                       Machine,
@@ -94,7 +95,8 @@ if pg_present:
 
     acces = Acces(dossier_source)
     clients = Client(dossier_source)
-    coefmachines = CoefMachine(dossier_source)
+    emoluments = Emolument(dossier_source)
+    categprix = CategPrix(dossier_source)
     coefprests = CoefPrest(dossier_source)
     comptes = Compte(dossier_source)
     livraisons = Livraison(dossier_source)
@@ -106,12 +108,12 @@ if pg_present:
 
     verification = Verification()
 
-    if verification.verification_date(edition, acces, clients, coefmachines, coefprests, comptes, livraisons, machines,
-                                      prestations, reservations, couts, users) > 0:
+    if verification.verification_date(edition, acces, clients, emoluments, coefprests, comptes, users, livraisons,
+                                      machines, prestations, reservations, couts, categprix) > 0:
         sys.exit("Erreur dans les dates")
 
-    if verification.verification_coherence(generaux, edition, acces, clients, coefmachines, coefprests, comptes,
-                                           livraisons, machines, prestations, reservations, couts, users) > 0:
+    if verification.verification_coherence(generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
+                                           livraisons, machines, prestations, reservations, couts, categprix) > 0:
         sys.exit("Erreur dans la cohérence")
 
     dossier_enregistrement = Outils.chemin([generaux.chemin, edition.annee, Outils.mois_string(edition.mois)],
@@ -137,8 +139,8 @@ if pg_present:
     dossier_destination = DossierDestination(dossier_csv)
 
     livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
-    reservations.calcul_montants(machines, coefmachines, clients, verification, couts)
-    acces.calcul_montants(machines, coefmachines, clients, verification, couts, comptes)
+    reservations.calcul_montants(machines, categprix, clients, verification, couts)
+    acces.calcul_montants(machines, categprix, clients, verification, couts, comptes)
 
     sommes = Sommes(verification, generaux)
     sommes.calculer_toutes(livraisons, reservations, acces, clients, machines)
@@ -186,7 +188,7 @@ if pg_present:
     res_lignes = Recapitulatifs.res_lignes(edition, reservations, clients, users, machines)
     Recapitulatifs.res(dossier_destination, edition, res_lignes)
 
-    for fichier in [acces.nom_fichier, clients.nom_fichier, coefmachines.nom_fichier, coefprests.nom_fichier,
+    for fichier in [acces.nom_fichier, clients.nom_fichier, emoluments.nom_fichier, coefprests.nom_fichier,
                     comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
                     reservations.nom_fichier, couts.nom_fichier, users.nom_fichier, generaux.nom_fichier,
                     edition.nom_fichier]:

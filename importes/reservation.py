@@ -80,11 +80,11 @@ class Reservation(Fichier):
             return 1
         return 0
 
-    def calcul_montants(self, machines, coefmachines, clients, verification, couts):
+    def calcul_montants(self, machines, categprix, clients, verification, couts):
         """
         calcule les sous-totaux nécessaires
         :param machines: machines importées et vérifiées
-        :param coefmachines: coefficients machines importés et vérifiés
+        :param categprix: catégories prix importés et vérifiés
         :param clients: clients importés et vérifiés
         :param verification: pour vérifier si les dates et les cohérences sont correctes
         :param couts: catégories coûts importées
@@ -102,7 +102,7 @@ class Reservation(Fichier):
             id_user = donnee['id_user']
             machine = machines.donnees[id_machine]
             client = clients.donnees[code_client]
-            coefmachine = coefmachines.donnees[client['nature']]
+            prix = categprix.donnees[client['nature'] + machine['id_cout']]
             duree_fact_hp, duree_fact_hc = Rabais.rabais_reservation(machine['delai_sans_frais'],
                                                                      donnee['duree_ouvree'],
                                                                      donnee['duree_hp'],
@@ -113,9 +113,8 @@ class Reservation(Fichier):
 
             tx_hp = machine['tx_occ_eff_hp']
             tx_hc = machine['tx_occ_eff_hc']
-            alpha_u = couts.donnees[machine['id_cout']][coefmachine['tarif_u']] * coefmachine['coef_a']
-            pu_hp = round(alpha_u * machine['tx_penalite_hp'] / 100, 2)
-            pu_hc = round(alpha_u * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
+            pu_hp = round(prix['prix_h_mach_p'] * machine['tx_penalite_hp'] / 100, 2)
+            pu_hc = round(prix['prix_h_mach_p'] * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
             ok_hp = False
             ok_hc = False
             if duree_fact_hp > 0 and pu_hp > 0 and tx_hp > 0:

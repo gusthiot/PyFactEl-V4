@@ -13,28 +13,30 @@ class Verification(object):
         """
         self.a_verifier = 2
 
-    def verification_date(self, edition, acces, clients, coefmachines, coefprests, comptes, livraisons, machines,
-                          prestations, reservations, couts, users):
+    def verification_date(self, edition, acces, clients, emoluments, coefprests, comptes, users, livraisons, machines,
+                          prestations, reservations, couts, categprix):
         """
         vérifie les dates de toutes les données importées
         :param edition: paramètres d'édition
         :param acces: accès importés
         :param clients: clients importés
-        :param coefmachines: coefficients machines importés
+        :param emoluments: émoluments importés
         :param coefprests: coefficients prestations importés
         :param comptes: comptes importés
+        :param users: users importés
         :param livraisons: livraisons importées
         :param machines: machines importées
         :param prestations: prestations importées
         :param reservations: réservations importées
         :param couts: catégories couts importées
-        :param users: users importés
+        :param categprix: catégories prix importées
         :return: 0 si ok, sinon le nombre d'échecs à la vérification
         """
         verif = 0
         verif += acces.verification_date(edition.annee, edition.mois)
         verif += clients.verification_date(edition.annee, edition.mois)
-        verif += coefmachines.verification_date(edition.annee, edition.mois)
+        verif += emoluments.verification_date(edition.annee, edition.mois)
+        verif += categprix.verification_date(edition.annee, edition.mois)
         verif += coefprests.verification_date(edition.annee, edition.mois)
         verif += comptes.verification_date(edition.annee, edition.mois)
         verif += livraisons.verification_date(edition.annee, edition.mois)
@@ -46,23 +48,24 @@ class Verification(object):
         self.a_verifier = 1
         return verif
 
-    def verification_coherence(self, generaux, edition, acces, clients, coefmachines, coefprests, comptes, livraisons,
-                               machines, prestations, reservations, couts, users):
+    def verification_coherence(self, generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
+                               livraisons, machines, prestations, reservations, couts, categprix):
         """
         vérifie la cohérence des données importées
         :param generaux: paramètres généraux
         :param edition: paramètres d'édition
         :param acces: accès importés
         :param clients: clients importés
-        :param coefmachines: coefficients machines importés
+        :param emoluments: émoluments importés
         :param coefprests: coefficients prestations importés
         :param comptes: comptes importés
+        :param users: users importés
         :param livraisons: livraisons importées
         :param machines: machines importées
         :param prestations: prestations importées
         :param reservations: réservations importées
         :param couts: catégories couts importées
-        :param users: users importés
+        :param categprix: catégories prix importées
         :return: 0 si ok, sinon le nombre d'échecs à la vérification
         """
         verif = 0
@@ -72,9 +75,10 @@ class Verification(object):
         verif += users.est_coherent()
         verif += machines.est_coherent(couts)
         verif += prestations.est_coherent(generaux, coefprests)
-        verif += coefmachines.est_coherent(generaux)
+        verif += emoluments.est_coherent(generaux)
+        verif += categprix.est_coherent(generaux, couts)
         verif += coefprests.est_coherent(generaux)
-        verif += clients.est_coherent(coefmachines, generaux)
+        verif += clients.est_coherent(emoluments, generaux)
         verif += reservations.est_coherent(clients, machines, users)
 
         comptes_actifs = Verification.obtenir_comptes_actifs(acces, livraisons)
