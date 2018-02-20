@@ -191,7 +191,7 @@ if pg_present:
     for fichier in [acces.nom_fichier, clients.nom_fichier, emoluments.nom_fichier, coefprests.nom_fichier,
                     comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
                     reservations.nom_fichier, couts.nom_fichier, users.nom_fichier, generaux.nom_fichier,
-                    edition.nom_fichier]:
+                    edition.nom_fichier, categprix.nom_fichier]:
         dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
     if edition.filigrane == "":
         if edition.version == 0:
