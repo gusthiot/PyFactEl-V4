@@ -8,7 +8,7 @@ class Prestation(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_prestation', 'no_prestation', 'designation', 'categorie', 'unite_prest', 'prix_unit',
-            'val_moy_achat', 'cout_unit', 'prix_rev_unit']
+            'categ_stock', 'affiliation', 'prix_rev_unit']
     nom_fichier = "prestation.csv"
     libelle = "Prestations"
 
@@ -27,6 +27,22 @@ class Prestation(Fichier):
                 if prestation['id_prestation'] == id_prestation:
                     return 1
         return 0
+
+    def prestation_de_num(self, num):
+        """
+        récupère la prestation d'un numéro
+        :param num: numéro de prestation
+        :return: données de la prestation ou None
+        """
+        if self.verifie_coherence == 1:
+            for cle, prestation in self.donnees.items():
+                if prestation['no_prestation'] == num:
+                    return prestation
+        else:
+            for prestation in self.donnees:
+                if prestation['no_prestation'] == num:
+                    return prestation
+        return None
 
     def est_coherent(self, generaux, coefprests):
         """
@@ -72,11 +88,6 @@ class Prestation(Fichier):
                        " n'est pas référencée dans les coefficients\n"
 
             donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire", ligne)
-            msg += info
-            donnee['val_moy_achat'], info = Outils.est_un_nombre(donnee['val_moy_achat'], "la valeur moyenne d'achat",
-                                                                 ligne)
-            msg += info
-            donnee['cout_unit'], info = Outils.est_un_nombre(donnee['cout_unit'], "le coût unitaire", ligne)
             msg += info
             num, info = Outils.est_un_nombre(donnee['no_prestation'], "le numéro prestation", ligne)
             donnee['no_prestation'] = int(num)

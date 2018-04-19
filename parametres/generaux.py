@@ -14,9 +14,9 @@ class Generaux(object):
 
     nom_fichier = "paramgen.csv"
     libelle = "Paramètres Généraux"
-    cles_obligatoires = ['origine', 'code_int', 'code_ext', 'commerciale', 'canal', 'secteur', 'devise', 'financier',
-                         'fonds', 'entete', 'poste_emolument', 'poste_reservation',  'lien', 'chemin', 'code_t',
-                         'code_n', 'nature_client', 'avantage_HC', 'annexe_cout', 'filtrer_article_nul',
+    cles_obligatoires = ['centre', 'origine', 'code_int', 'code_ext', 'commerciale', 'canal', 'secteur', 'devise',
+                         'financier', 'fonds', 'entete', 'poste_emolument', 'poste_reservation',  'lien', 'chemin',
+                         'code_t', 'code_n', 'nature_client', 'avantage_HC', 'annexe_cout', 'filtrer_article_nul',
                          'code_d', 'code_sap', 'quantite', 'unite', 'type_prix', 'type_rabais', 'texte_sap',
                          'intitule_long', 'intitule_court', 'eligible_U1', 'eligible_U2', 'eligible_U3', 'modes',
                          'min_fact_rese']
@@ -94,6 +94,9 @@ class Generaux(object):
                        "le type de prix, le type de rabais, le texte SAP, l'intitulé long, l'intitulé court, " \
                        "l'éligible U1, l'éligible U2 et l'éligible U3\n"
 
+        if len(self._donnees['centre'][1]) > 70:
+            erreurs += "le string du paramètre centre est trop long"
+
         if erreurs != "":
             Outils.fatal(ErreurConsistance(), self.libelle + "\n" + erreurs)
 
@@ -169,5 +172,5 @@ ajoute_accesseur_pour_valeur_unique(Generaux, "centre_financier", "financier")
 for champ_valeur_unique in ('fonds', 'entete', 'chemin', 'lien', 'min_fact_rese',
                             'poste_emolument', 'devise', 'canal', 'secteur',
                             'origine', 'commerciale', 'poste_reservation',
-                            'code_int', 'code_ext', 'code_t'):
+                            'code_int', 'code_ext', 'code_t', 'centre'):
     ajoute_accesseur_pour_valeur_unique(Generaux, champ_valeur_unique)

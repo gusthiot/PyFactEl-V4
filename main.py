@@ -178,7 +178,8 @@ if pg_present:
     BilanMensuel.bilan(dossier_destination, edition, generaux, bm_lignes)
     bc_lignes = BilanComptes.creation_lignes(edition, sommes, clients, generaux, comptes)
     BilanComptes.bilan(dossier_destination, edition, generaux, bc_lignes)
-    det_lignes = Detail.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, couts)
+    det_lignes = Detail.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, couts,
+                                        prestations)
     Detail.detail(dossier_destination, edition, det_lignes)
 
     cae_lignes = Recapitulatifs.cae_lignes(edition, acces, comptes, clients, users, machines, couts)

@@ -25,14 +25,15 @@ class Detail(object):
             ligne = ["Année", "Mois", "Code Client CMi", "Code Client SAP", "Abrev. Labo", "type client",
                      "nature client", "Id-Compte", "Numéro de compte", "Intitulé compte", "Code Type Compte", "code_d",
                      "Id-categ-cout", "Intitulé catégorie coût", "Durée machines (min)", "Durée main d'oeuvre (min)",
-                     "U1", "U2", "U3", "MO", "intitule_court", "N. prestation", "Intitulé", "Montant", "Rabais"]
+                     "U1", "U2", "U3", "MO", "intitule_court", "N. prestation", "Intitulé", "Montant", "Rabais",
+                     "Catégorie Stock", "Affiliation"]
             fichier_writer.writerow(ligne)
 
             for ligne in lignes:
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, couts):
+    def creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, couts, prestations):
         """
         génération des lignes de données du détail
         :param edition: paramètres d'édition
@@ -43,6 +44,7 @@ class Detail(object):
         :param livraisons: livraisons importées
         :param comptes: comptes importés
         :param couts: catégories coûts importées
+        :param prestations: prestations importées
         :return: lignes de données du détail
         """
         if sommes.calculees == 0:
@@ -73,14 +75,15 @@ class Detail(object):
                                                    som_cat['mo'], Outils.format_2_dec(som_cat['mu1']),
                                                    Outils.format_2_dec(som_cat['mu2']),
                                                    Outils.format_2_dec(som_cat['mu3']),
-                                                   Outils.format_2_dec(som_cat['mmo']), "", "", "", "", ""]
+                                                   Outils.format_2_dec(som_cat['mmo']), "", "", "", "", "", "", ""]
                             lignes.append(ligne)
 
                         ligne = base_compte + ['M', 'Arrondi', "", "", "",
                                                Outils.format_2_dec(sclo[id_compte]['mu1_d']),
                                                Outils.format_2_dec(sclo[id_compte]['mu2_d']),
                                                Outils.format_2_dec(sclo[id_compte]['mu3_d']),
-                                               Outils.format_2_dec(sclo[id_compte]['mmo_d']), "", "", "", "", ""]
+                                               Outils.format_2_dec(sclo[id_compte]['mmo_d']), "", "", "", "", "", "",
+                                               ""]
                         lignes.append(ligne)
 
                     if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
@@ -95,10 +98,11 @@ class Detail(object):
                                     continue
 
                                 for no_prestation, sip in sorted(somme[article.code_d].items()):
+                                    prestation = prestations.prestation_de_num(no_prestation)
                                     ligne = base_compte + [article.code_d, "", "", "", "", "", "", "", "",
                                                            article.intitule_court, no_prestation, sip['nom'],
                                                            Outils.format_2_dec(sip['montantx']),
-                                                           Outils.format_2_dec(sip['rabais'])]
+                                                           Outils.format_2_dec(sip['rabais']), prestation['categ_stock'], prestation['affiliation']]
                                     lignes.append(ligne)
 
                                 ligne = base_compte + [article.code_d, "", "", "", "", "", "", "", "",
@@ -106,7 +110,7 @@ class Detail(object):
                                                        Outils.format_2_dec(
                                                            sclo[id_compte]['sommes_cat_m_x_d'][article.code_d]),
                                                        Outils.format_2_dec(
-                                                           sclo[id_compte]['sommes_cat_r_d'][article.code_d])]
+                                                           sclo[id_compte]['sommes_cat_r_d'][article.code_d]), "", ""]
                                 lignes.append(ligne)
 
         return lignes

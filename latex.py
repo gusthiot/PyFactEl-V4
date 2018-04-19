@@ -19,11 +19,12 @@ class Latex(object):
         :return: texte échappé
         """
 
-        p = re.compile("[^ a-zA-Z0-9_'Éèéêëâàäïûùüçöô.:,;\-%#&$/|]")
+        p = re.compile("[^ a-zA-Z0-9_'Éèéêëâàäïûùüçöô.:,;\-%#&@\\\\$/|()\[\]\{\}]")
         texte = p.sub('', texte)
 
-        caracteres = ['%', '$', '_', '&', '#']
-        latex_c = ['\%', '\$', '\_', '\&', '\#']
+        texte = texte.replace('\\', '\\textbackslash')
+        caracteres = ['%', '$', '_', '&', '#', '{', '}']
+        latex_c = ['\%', '\$', '\_', '\&', '\#', '\{', '\}']
         for pos in range(0, len(caracteres)):
             texte = texte.replace(caracteres[pos], latex_c[pos])
 

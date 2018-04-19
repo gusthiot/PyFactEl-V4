@@ -139,6 +139,7 @@ class Annexes(object):
 
             contenu += r'''
                 \begin{titlepage}
+                \textsc{''' + Latex.echappe_caracteres(generaux.centre) + r'''}
                 \vspace*{8cm}
                 \begin{adjustwidth}{5cm}{}
                 \Large\textsc{''' + garde + r'''}\newline
@@ -228,13 +229,16 @@ class Annexes(object):
                 intitule_compte = Latex.echappe_caracteres(compte['numero'] + " - " + compte['intitule'])
 
                 titre2 = "Récapitulatif du compte : " + intitule_compte
-                contenu_compte_annexe2 += Annexes.section(code_client, client, edition, reference, titre2, nombre_2)
+                contenu_compte_annexe2 += Annexes.section(code_client, client, edition, generaux, reference, titre2,
+                                                          nombre_2)
 
                 titre4 = "Annexe détaillée du compte : " + intitule_compte
-                contenu_compte_annexe4 += Annexes.section(code_client, client, edition, reference, titre4, nombre_4)
+                contenu_compte_annexe4 += Annexes.section(code_client, client, edition, generaux, reference, titre4,
+                                                          nombre_4)
 
                 titre5 = "Justificatif des coûts d'utilisation du compte : " + intitule_compte
-                contenu_compte_annexe5 += Annexes.section(code_client, client, edition, reference, titre5, nombre_5)
+                contenu_compte_annexe5 += Annexes.section(code_client, client, edition, generaux, reference, titre5,
+                                                          nombre_5)
 
                 # ## ligne 1.1
 
@@ -951,8 +955,8 @@ class Annexes(object):
 
         # ## Annexe 1
 
-        contenu += Annexes.titre_annexe(code_client, client, edition, reference, "Récapitulatif", "I")
-        contenu += Annexes.section(code_client, client, edition, reference, "Récapitulatif", "I")
+        contenu += Annexes.titre_annexe(code_client, client, edition, generaux, reference, "Récapitulatif", "I")
+        contenu += Annexes.section(code_client, client, edition, generaux, reference, "Récapitulatif", "I")
 
         # ## 1.1
 
@@ -1247,7 +1251,7 @@ class Annexes(object):
         # ## Annexe 2
 
         if contenu_compte_annexe2 != "":
-            contenu += Annexes.titre_annexe(code_client, client, edition, reference, titre_2, nombre_2)
+            contenu += Annexes.titre_annexe(code_client, client, edition, generaux, reference, titre_2, nombre_2)
             contenu += contenu_compte_annexe2
 
         # ## Annexe 3
@@ -1305,9 +1309,9 @@ class Annexes(object):
                                                 ''' % dico_compte
 
         if code_client in reservations.sommes or contenu_machuts != "":
-            contenu += Annexes.titre_annexe(code_client, client, edition, reference,
+            contenu += Annexes.titre_annexe(code_client, client, edition, generaux, reference,
                                             "Annexe détaillée des pénalités de réservation", "III")
-            contenu += Annexes.section(code_client, client, edition, reference,
+            contenu += Annexes.section(code_client, client, edition, generaux, reference,
                                        "Annexe détaillée des pénalités de réservation", "III")
 
             # ## 3.1
@@ -1501,31 +1505,32 @@ class Annexes(object):
                     table vide (pas de réservation machines)''')
 
         else:
-            contenu += Annexes.titre_annexe(code_client, client, edition, reference,
+            contenu += Annexes.titre_annexe(code_client, client, edition, generaux, reference,
                                             r'''Annexe détaillée des pénalités de réservation} \newline\newline
                                              \textit{Annexe vide : pas de pénalités de réservation  ''', "III")
 
         # ## Annexe 4
 
         if contenu_compte_annexe4 != "":
-            contenu += Annexes.titre_annexe(code_client, client, edition, reference, titre_4, nombre_4)
+            contenu += Annexes.titre_annexe(code_client, client, edition, generaux, reference, titre_4, nombre_4)
             contenu += contenu_compte_annexe4
 
         # ## Annexe 5
 
         if an_couts == "OUI" and contenu_compte_annexe5 != "":
-            contenu += Annexes.titre_annexe(code_client, client, edition, reference, titre_5, nombre_5)
+            contenu += Annexes.titre_annexe(code_client, client, edition, generaux, reference, titre_5, nombre_5)
             contenu += contenu_compte_annexe5
 
         return contenu
 
     @staticmethod
-    def titre_annexe(code_client, client, edition, reference, titre, nombre):
+    def titre_annexe(code_client, client, edition, generaux, reference, titre, nombre):
         """
         création d'un titre d'annexe
         :param code_client: code du client concerné
         :param client: données du client concerné
         :param edition: paramètres d'édition
+        :param generaux: paramètres généraux
         :param reference: référence de la facture
         :param titre: titre de l'annexe
         :param nombre: numéro de l'annexe
@@ -1533,13 +1538,16 @@ class Annexes(object):
         """
         dic_titre = {'code': code_client, 'code_sap': Latex.echappe_caracteres(client['code_sap']),
                      'nom': Latex.echappe_caracteres(client['abrev_labo']),
-                     'date': edition.mois_txt + " " + str(edition.annee),
-                     'ref': reference, 'titre': titre, 'nombre': nombre}
+                     'date': edition.mois_txt + " " + str(edition.annee), 'ref': reference, 'titre': titre,
+                     'nombre': nombre, 'centre': Latex.echappe_caracteres(generaux.centre)}
 
         contenu = r'''
             \clearpage
             \begin{titlepage}
+            \begin{adjustwidth}{0cm}{}
+            %(centre)s \newline
             %(ref)s \hspace*{4cm} Client %(code)s - %(code_sap)s - %(nom)s - %(date)s
+            \end{adjustwidth}
             \vspace*{8cm}
             \begin{adjustwidth}{5cm}{}
             \Large\textsc{Annexe %(nombre)s} \newline\newline
@@ -1551,12 +1559,13 @@ class Annexes(object):
         return contenu
 
     @staticmethod
-    def section(code_client, client, edition, reference, titre, nombre):
+    def section(code_client, client, edition, generaux, reference, titre, nombre):
         """
         création d'un début de section non-visible
         :param code_client: code du client concerné
         :param client: données du client concerné
         :param edition: paramètres d'édition
+        :param generaux: paramètres généraux
         :param reference: référence de la facture
         :param titre: titre de la section
         :param nombre: numéro d'annexe de la section
@@ -1564,11 +1573,11 @@ class Annexes(object):
         """
         dic_section = {'code': code_client, 'code_sap': Latex.echappe_caracteres(client['code_sap']),
                        'nom': Latex.echappe_caracteres(client['abrev_labo']),
-                       'date': edition.mois_txt + " " + str(edition.annee),
-                       'ref': reference, 'titre': titre, 'nombre': nombre}
+                       'date': edition.mois_txt + " " + str(edition.annee), 'ref': reference,
+                       'titre': titre, 'nombre': nombre, 'centre': Latex.echappe_caracteres(generaux.centre)}
 
         section = r'''
-            \fakesection{%(ref)s \hspace*{4cm} Client %(code)s - %(code_sap)s - %(nom)s - %(date)s}{Annexe %(nombre)s
+            \fakesection{%(centre)s \newline %(ref)s \hspace*{4cm} Client %(code)s - %(code_sap)s - %(nom)s - %(date)s}{Annexe %(nombre)s
             - %(titre)s}
             ''' % dic_section
 
