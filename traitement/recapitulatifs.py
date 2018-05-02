@@ -23,7 +23,7 @@ class Recapitulatifs(object):
         with dossier_destination.writer(nom) as fichier_writer:
 
             ligne = [edition.annee, edition.mois, "Id-Compte", "Numéro de compte", "Intitulé compte",
-                     "Code Type Compte", "Code Client CMi", "Abrev. Labo", "Id-User", "Nom User", "Prénom User",
+                     "Code Type Compte", "Code Client Facture", "Abrev. Labo", "Id-User", "Nom User", "Prénom User",
                      "Id-Machine", "Nom Machine", "Id-Categ-cout", "Intitulé catégorie coût","Date et Heure login",
                      "Durée machine HP", "Durée machine HC", "Durée opérateur", "Id-Opérateur", "Prénom Nom opérateur",
                      "Remarque opérateur", "Remarque staff"]
@@ -77,7 +77,7 @@ class Recapitulatifs(object):
         with dossier_destination.writer(nom) as fichier_writer:
 
             ligne = [edition.annee, edition.mois, "Id-Compte", "Numéro de compte", "Intitulé compte",
-                     "Code Type Compte", "Code Client CMi", "Abrev. Labo", "Id-User", "Nom User", "Prénom User",
+                     "Code Type Compte", "Code Client Facture", "Abrev. Labo", "Id-User", "Nom User", "Prénom User",
                      "Id-Prestation", "Numéro de prestation", "Désignation prestation", "Date de livraison",
                      "Quantité livrée", "Unité de livraison", "Rabais [CHF]", "Responsable", "ID-Livraison",
                      "Date et Heure de la commande", "Date et Heure de la prise en charge", "Remarque"]
@@ -128,7 +128,7 @@ class Recapitulatifs(object):
 
         with dossier_destination.writer(nom) as fichier_writer:
 
-            ligne = [edition.annee, edition.mois, "Code Client CMi", "Abrev. Labo", "Id-User", "Nom User",
+            ligne = [edition.annee, edition.mois, "Code Client Facture", "Abrev. Labo", "Id-User", "Nom User",
                      "Prénom User", "Id-Machine", "Nom Machine", "Date et Heure début de slot",
                      "Durée du slot réservé HP", "Durée du slot réservé HC", "Durée ouvrée",
                      "Date et Heure de réservation", "Date et Heure de suppression"]

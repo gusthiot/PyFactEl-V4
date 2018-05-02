@@ -269,7 +269,7 @@ class Facture(object):
                 <html xmlns="http://www.w3.org/1999/xhtml">
                 <head>
                 <meta content="text/html; charset=cp1252" http-equiv="content-type" />
-                <meta content="CMi" name="author" />
+                <meta content="EPFL" name="author" />
                 <style>
                 #entete {
                     margin-left: 600px;

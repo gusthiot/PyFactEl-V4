@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 from outils import Outils
+from PyPDF2 import PdfFileMerger
 
 
 class Latex(object):
@@ -31,11 +32,12 @@ class Latex(object):
         return texte
 
     @staticmethod
-    def creer_latex_pdf(nom_fichier, contenu, nom_dossier=""):
+    def creer_latex_pdf(nom_fichier, contenu, annexes, nom_dossier=""):
         """
         création d'un pdf à partir d'un contenu latex
         :param nom_fichier: nom du pdf final
         :param contenu: contenu latex
+        :param annexes: pages à concaténer à la fin
         :param nom_dossier: nom du dossier dans lequel enregistrer le pdf
         """
         with open(nom_fichier + ".tex", 'w') as f:
@@ -53,12 +55,28 @@ class Latex(object):
         os.unlink(nom_fichier + '.log')
         os.unlink(nom_fichier + '.aux')
 
+        if annexes is not None and len(annexes) > 0:
+            fichier = nom_fichier + ".pdf"
+            pdfs = [fichier]
+            for pos, chemins in sorted(annexes.items()):
+                for chemin in chemins:
+                    pdfs.append(chemin)
+            merger = PdfFileMerger()
+
+            for pdf in pdfs:
+                merger.append(pdf)
+            merger.write('temp.pdf')
+            os.unlink(nom_fichier + '.pdf')
+            shutil.copy('temp.pdf', nom_fichier + ".pdf")
+            os.unlink('temp.pdf')
+
         if nom_dossier != '':
             try:
                 shutil.copy(nom_fichier + ".pdf", nom_dossier)
                 os.unlink(nom_fichier + '.pdf')
             except IOError:
                 Outils.affiche_message("Le pdf " + nom_fichier + " est resté ouvert et ne sera pas mis à jour")
+
 
     @staticmethod
     def long_tableau(contenu, structure, legende):

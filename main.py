@@ -32,6 +32,7 @@ from importes import (Client,
                       DossierDestination)
 from outils import Outils
 from parametres import (Edition,
+                        DocPdf,
                         Suppression,
                         Annulation,
                         Generaux)
@@ -93,6 +94,11 @@ if pg_present:
     edition = Edition(dossier_source)
     generaux = Generaux(dossier_source)
 
+    if Outils.existe(Outils.chemin([dossier_data, DocPdf.nom_fichier], plateforme)):
+        docpdf = DocPdf(dossier_source)
+    else:
+        docpdf = None
+
     acces = Acces(dossier_source)
     clients = Client(dossier_source)
     emoluments = Emolument(dossier_source)
@@ -113,7 +119,8 @@ if pg_present:
         sys.exit("Erreur dans les dates")
 
     if verification.verification_coherence(generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
-                                           livraisons, machines, prestations, reservations, couts, categprix) > 0:
+                                           livraisons, machines, prestations, reservations, couts, categprix,
+                                           docpdf) > 0:
         sys.exit("Erreur dans la cohérence")
 
     dossier_enregistrement = Outils.chemin([generaux.chemin, edition.annee, Outils.mois_string(edition.mois)],
@@ -169,9 +176,9 @@ if pg_present:
 
     if Latex.possibles():
         Annexes.annexes_techniques(sommes, clients, edition, livraisons, acces, machines, reservations, comptes,
-                                   dossier_annexes_techniques, plateforme, generaux, users, couts)
+                                   dossier_annexes_techniques, plateforme, generaux, users, couts, docpdf)
         Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, dossier_annexes,
-                        plateforme, generaux, users, couts)
+                        plateforme, generaux, users, couts, docpdf)
 
     bm_lignes = BilanMensuel.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes,
                                              reservations)
@@ -194,6 +201,9 @@ if pg_present:
                     reservations.nom_fichier, couts.nom_fichier, users.nom_fichier, generaux.nom_fichier,
                     edition.nom_fichier, categprix.nom_fichier]:
         dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
+    if docpdf is not None:
+        dossier_destination.ecrire(docpdf.nom_fichier, dossier_source.lire(docpdf.nom_fichier))
+
     if edition.filigrane == "":
         if edition.version == 0:
             Resumes.base(edition, DossierSource(dossier_csv), DossierDestination(dossier_enregistrement))

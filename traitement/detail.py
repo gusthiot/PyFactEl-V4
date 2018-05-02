@@ -22,7 +22,7 @@ class Detail(object):
 
         with dossier_destination.writer(nom) as fichier_writer:
 
-            ligne = ["Année", "Mois", "Code Client CMi", "Code Client SAP", "Abrev. Labo", "type client",
+            ligne = ["Année", "Mois", "Code Client Facture", "Code Client SAP", "Abrev. Labo", "type client",
                      "nature client", "Id-Compte", "Numéro de compte", "Intitulé compte", "Code Type Compte", "code_d",
                      "Id-categ-cout", "Intitulé catégorie coût", "Durée machines (min)", "Durée main d'oeuvre (min)",
                      "U1", "U2", "U3", "MO", "intitule_court", "N. prestation", "Intitulé", "Montant", "Rabais",

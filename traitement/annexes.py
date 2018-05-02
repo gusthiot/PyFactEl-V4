@@ -9,7 +9,7 @@ class Annexes(object):
     """
     @staticmethod
     def annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, dossier_annexe,
-                plateforme, generaux, users, couts):
+                plateforme, generaux, users, couts, docpdf):
         """
         création des annexes de facture
         :param sommes: sommes calculées
@@ -25,16 +25,17 @@ class Annexes(object):
         :param generaux: paramètres généraux
         :param users: users importés
         :param couts: catégories coûts importées
+        :param docpdf: paramètres d'ajout de document pdf
         """
         prefixe = "annexe_"
         garde = r'''Annexes factures \newline Billing Appendices'''
 
         Annexes.creation_annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes,
-                                 dossier_annexe, plateforme, prefixe, generaux, garde, users, couts)
+                                 dossier_annexe, plateforme, prefixe, generaux, garde, users, couts, docpdf)
 
     @staticmethod
     def annexes_techniques(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, dossier_annexe,
-                           plateforme, generaux, users, couts):
+                           plateforme, generaux, users, couts, docpdf):
         """
         création des annexes techniques
         :param sommes: sommes calculées
@@ -50,16 +51,17 @@ class Annexes(object):
         :param generaux: paramètres généraux
         :param users: users importés
         :param couts: catégories coûts importées
+        :param docpdf: paramètres d'ajout de document pdf
         """
         prefixe = "annexeT_"
         garde = r'''Annexes techniques \newline Technical Appendices'''
 
         Annexes.creation_annexes(sommes, clients, edition, livraisons, acces, machines, reservations,  comptes,
-                                 dossier_annexe, plateforme, prefixe, generaux, garde, users, couts)
+                                 dossier_annexe, plateforme, prefixe, generaux, garde, users, couts, docpdf)
 
     @staticmethod
     def creation_annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, dossier_annexe,
-                         plateforme, prefixe, generaux, garde, users, couts):
+                         plateforme, prefixe, generaux, garde, users, couts, docpdf):
         """
         création des annexes techniques
         :param sommes: sommes calculées
@@ -77,6 +79,7 @@ class Annexes(object):
         :param garde: titre page de garde
         :param users: users importés
         :param couts: catégories coûts importées
+        :param docpdf: paramètres d'ajout de document pdf
         """
 
         if sommes.calculees == 0:
@@ -161,7 +164,15 @@ class Annexes(object):
             nom = prefixe + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_"
             nom += str(edition.version) + "_" + code_client
 
-            Latex.creer_latex_pdf(nom, contenu, dossier_annexe)
+            if docpdf is not None:
+                if 'T' in prefixe:
+                    type = 'annexe_tech'
+                else:
+                    type = 'annexe_fact'
+                pdfs = docpdf.pdfs_pour_client(client, type)
+            else:
+                pdfs = None
+            Latex.creer_latex_pdf(nom, contenu, pdfs, dossier_annexe)
 
     @staticmethod
     def contenu_client(sommes, clients, code_client, edition, livraisons, acces, machines, reservations, comptes,
@@ -240,7 +251,7 @@ class Annexes(object):
                 contenu_compte_annexe5 += Annexes.section(code_client, client, edition, generaux, reference, titre5,
                                                           nombre_5)
 
-                # ## ligne 1.1
+                # ## ligne Prix XF - Table Client Récap Postes de la facture
 
                 if sco['c1'] > 0 and not (filtre == "OUI" and sco['c2'] == 0):
                     poste = inc_fact * 10
@@ -274,7 +285,7 @@ class Annexes(object):
 
                     inc_fact += 1
 
-                # ## ligne 1.5
+                # ## ligne Prix XA/J - Table Client Récap Articles/Compte
 
                 total = sco['mj']
                 dico_recap_compte = {'compte': intitule_compte, 'type': compte['type'], 'procede': Outils.format_2_dec(sco['mj'])}
@@ -292,7 +303,7 @@ class Annexes(object):
                         ''' % dico_recap_compte
                     contenu_recap_compte += ligne
 
-                # ## 1.6
+                # ## ligne Prix CAE X/J - Table Client Récap Procédés/Compte
 
                 rhj = client['rh'] * sco['somme_j_dhi']
                 dico_procedes_compte = {'intitule': intitule_compte, 'type': compte['type'],
@@ -307,7 +318,7 @@ class Annexes(object):
                     \hline
                     ''' % dico_procedes_compte
 
-                # ## ligne 1.7
+                # ## ligne Prix LVR X/D/J - Table Client Récap Prestations livr./code D/Compte
 
                 if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
                     for article in generaux.articles_d3:
@@ -330,7 +341,7 @@ class Annexes(object):
                             \hline
                             ''' % dico_prestations_client
 
-                # ## ligne 1.8
+                # ## ligne Prix Bonus X/J - Table Client Récap Bonus/Compte
 
                 if code_client in acces.sommes and id_compte in acces.sommes[code_client]['comptes']:
                     bhj = client['bh'] * sco['somme_j_dhi']
@@ -340,10 +351,10 @@ class Annexes(object):
                         \hline
                         ''' % dico_bonus_compte
 
-                # ## 2.1
+                # ## Prix JA - Table Compte Récap Articles
 
                 structure_recap_poste = r'''{|l|r|r|r|}'''
-                legende_recap_poste = r'''Table II.1 - Récapitulatif du compte'''
+                legende_recap_poste = r'''Table II.1 - Récapitulatif des articles du compte'''
 
                 dico_recap_poste = {'mm': Outils.format_2_dec(sco['somme_j_mm']),
                                     'mr': Outils.format_2_dec(sco['somme_j_mr']),
@@ -386,7 +397,7 @@ class Annexes(object):
 
                 contenu_compte_annexe2 += Latex.tableau(contenu_recap_poste, structure_recap_poste, legende_recap_poste)
 
-                # ## 2.2
+                # ## Prix CAE J/M - Table Compte Récap Procédés/Machine
 
                 if code_client in acces.sommes and id_compte in acces.sommes[code_client]['comptes']:
                     structure_utilise_compte = r'''{|l|c|c|c|r|r|r|r|r|}'''
@@ -454,11 +465,11 @@ class Annexes(object):
                                         \hline
                                         ''' % dico_machine
 
-                    dico_tot = {'maij_d': Outils.format_2_dec(sco['somme_j_mai_d']),
-                                'moij_d': Outils.format_2_dec(sco['somme_j_moi_d']),
+                    dico_tot = {'maij_d': Outils.format_2_dec(sco['somme_j_mach_mai_d']),
+                                'moij_d': Outils.format_2_dec(sco['somme_j_mach_moi_d']),
                                 'dhij_d': Outils.format_2_dec(sco['somme_j_dhi_d']),
-                                'maij': Outils.format_2_dec(sco['somme_j_mai']),
-                                'moij': Outils.format_2_dec(sco['somme_j_moi']),
+                                'maij': Outils.format_2_dec(sco['somme_j_mach_mai']),
+                                'moij': Outils.format_2_dec(sco['somme_j_mach_moi']),
                                 'dhij': Outils.format_2_dec(sco['somme_j_dhi']),
                                 'rabais': Outils.format_2_dec(sco['somme_j_mr']),
                                 'bonus': Outils.format_2_dec(sco['somme_j_mb'])}
@@ -475,7 +486,7 @@ class Annexes(object):
                     contenu_compte_annexe2 += Latex.tableau_vide(r'''Table II.2 - Procédés (machine + main d'oeuvre) :
                         table vide (pas d’utilisation machines)''')
 
-                # ## 2.3
+                # ## Prix LVR J/D - Table Compte Récap Prestations livrées/code D
 
                 if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
                     somme = livraisons.sommes[code_client][id_compte]
@@ -527,9 +538,98 @@ class Annexes(object):
                     contenu_compte_annexe2 += Latex.tableau_vide(r'''Table II.3 - Prestations livrées :
                         table vide (pas de prestations livrées)''')
 
-                # ## 4.1
-
                 if code_client in acces.sommes and id_compte in acces.sommes[code_client]['comptes']:
+
+                    # ## Prix CAE J/K - Table Compte Récap Procédés/Catégorie Machine
+
+                    structure_cats_compte = r'''{|l|c|c|r|r|r|r|}'''
+                    legende_cats_compte = r'''Table II.4 - Procédés (Machine + Main d'œuvre)'''
+                    contenu_cats_compte = r'''
+                        \cline{2-7}
+                        \multicolumn{1}{l|}{}
+                        & \multicolumn{2}{c|}{Temps [hh:mm]} & \multicolumn{2}{c|}{PU [CHF/h]}  &
+                         \multicolumn{2}{c|}{Montant [CHF]} \\
+                        \hline
+                        \textbf{''' + intitule_compte + r'''} & Mach. & Oper. & \multicolumn{1}{c|}{Mach.} &
+                         \multicolumn{1}{c|}{Oper.} & \multicolumn{1}{c|}{Mach.} & \multicolumn{1}{c|}{Oper.}  \\
+                        \hline
+                        '''
+
+                    som_cat = acces.sommes[code_client]['categories'][id_compte]
+
+                    for id_cout, cats in sorted(som_cat.items()):
+                        dico_cat = {'intitule': Latex.echappe_caracteres(couts.donnees[id_cout]['intitule']),
+                                    'duree': Outils.format_heure(som_cat[id_cout]['duree']),
+                                    'mo': Outils.format_heure(som_cat[id_cout]['mo']),
+                                    'pum': Outils.format_2_dec(som_cat[id_cout]['pum']),
+                                    'puo': Outils.format_2_dec(som_cat[id_cout]['puo']),
+                                    'mai': Outils.format_2_dec(som_cat[id_cout]['mai']),
+                                    'moi': Outils.format_2_dec(som_cat[id_cout]['moi'])}
+                        contenu_cats_compte += r'''
+                            %(intitule)s & %(duree)s & %(mo)s & %(pum)s & %(puo)s & %(mai)s & %(moi)s  \\
+                            \hline
+                            ''' % dico_cat
+
+                    dico_cat = {'mai_d': Outils.format_2_dec(sco['somme_j_mai_d']),
+                                'moi_d': Outils.format_2_dec(sco['somme_j_moi_d']),
+                                'maij': Outils.format_2_dec(sco['somme_j_mai']),
+                                'moij': Outils.format_2_dec(sco['somme_j_moi'])}
+
+                    contenu_cats_compte += r'''
+                        \multicolumn{5}{|r|}{Arrondi} & %(mai_d)s & %(moi_d)s \\
+                        \hline
+                        \multicolumn{5}{|r|}{Total} & %(maij)s & %(moij)s \\
+                        \hline
+                        ''' % dico_cat
+
+                    contenu_compte_annexe2 += Latex.tableau(contenu_cats_compte, structure_cats_compte,
+                                                            legende_cats_compte)
+
+                    # ## Prix Avtg J/M - Table Compte Avantage HC (Rabais ou Bonus) par Machine
+
+                    structure_avant_compte = r'''{|l|l|c|r|}'''
+                    legende_avant_compte = r'''Table II.5 - 
+                        ''' + av_hc + r''' d’utilisation de machines en heures creuses'''
+
+                    contenu_avant_compte = r'''
+                         \cline{3-4}
+                        \multicolumn{2}{l|}{}
+                        & Temps Mach. & Déduc. HC \\
+                        \hline
+                        \multicolumn{2}{|l|}{\textbf{''' + intitule_compte + r'''}} & [hh:mm] & 
+                        \multicolumn{1}{c|}{''' + av_hc + r'''}  \\
+                        \hline
+                        '''
+                    somme = acces.sommes[code_client]['comptes'][id_compte]
+
+                    machines_utilisees = Outils.machines_in_somme(somme, machines)
+
+                    for id_cout, mics in sorted(machines_utilisees.items()):
+                        for nom, id_machine in sorted(mics.items()):
+                            if somme[id_machine]['duree_hc'] > 0:
+                                dico_machine = {'machine': Latex.echappe_caracteres(nom),
+                                                'temps': Outils.format_heure(somme[id_machine]['duree_hc']),
+                                                'deduction': Outils.format_2_dec(somme[id_machine]['dhi'])}
+
+                                contenu_avant_compte += r'''
+                                    %(machine)s & HC & %(temps)s & %(deduction)s \\
+                                    \hline
+                                    ''' % dico_machine
+
+                    dico_machine = {'dhi_d': Outils.format_2_dec(sco['somme_j_dhi_d']),
+                                'dhij': Outils.format_2_dec(sco['somme_j_dhi'])}
+
+                    contenu_avant_compte += r'''
+                        \multicolumn{3}{|r|}{Arrondi} & %(dhi_d)s \\
+                        \hline
+                        \multicolumn{3}{|r|}{Total} & %(dhij)s \\
+                        \hline
+                        ''' % dico_machine
+
+                    contenu_compte_annexe2 += Latex.tableau(contenu_avant_compte, structure_avant_compte,
+                                                            legende_avant_compte)
+
+                    # ## Tps CAE J/K/M/U - Table Compte Détail Temps CAE/Catégorie Machine/Machine/User
 
                     structure_machuts_compte = r'''{|l|l|l|c|c|c|}'''
                     legende_machuts_compte = r'''Table IV.1 - Détails des utilisations machines'''
@@ -544,10 +644,21 @@ class Annexes(object):
                         '''
 
                     somme = acces.sommes[code_client]['comptes'][id_compte]
+                    som_cat = acces.sommes[code_client]['categories'][id_compte]
 
                     machines_utilisees = Outils.machines_in_somme(somme, machines)
 
                     for id_cout, mics in sorted(machines_utilisees.items()):
+                        dico_cat = {'hp': Outils.format_heure(som_cat[id_cout]['duree_hp']),
+                                    'hc': Outils.format_heure(som_cat[id_cout]['duree_hc']),
+                                    'mo': Outils.format_heure(som_cat[id_cout]['mo'])}
+                        contenu_machuts_compte += r'''
+                            \multicolumn{3}{|l|}
+                            {\textbf{''' + Latex.echappe_caracteres(couts.donnees[id_cout]['intitule']) + r'''}} &
+                             \hspace{5mm} %(hp)s & \hspace{5mm} %(hc)s &
+                             \hspace{5mm} %(mo)s \\
+                            \hline''' % dico_cat
+
                         for nom_machine, id_machine in sorted(mics.items()):
 
                             dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
@@ -555,8 +666,8 @@ class Annexes(object):
                                             'hc': Outils.format_heure(somme[id_machine]['duree_hc']),
                                             'mo': Outils.format_heure(somme[id_machine]['mo'])}
                             contenu_machuts_compte += r'''
-                                \multicolumn{3}{|l|}{\textbf{%(machine)s}} & \hspace{5mm} %(hp)s & \hspace{5mm} %(hc)s &
-                                 \hspace{5mm} %(mo)s \\
+                                \multicolumn{3}{|l|}{\hspace{2mm} \textbf{%(machine)s}} & \hspace{3mm} %(hp)s & \hspace{3mm} %(hc)s &
+                                 \hspace{3mm} %(mo)s \\
                                 \hline
                                 ''' % dico_machine
 
@@ -615,7 +726,7 @@ class Annexes(object):
                     contenu_compte_annexe4 += Latex.tableau_vide(r'''Table IV.1 - Détails des utilisations machines :
                         table vide (pas d’utilisation machines)''')
 
-                # ## 4.2
+                # ## Qté LVR J/D/U - Table Compte Détail Quantités livrées/Prestation (code D)/User
 
                 if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
                     somme = livraisons.sommes[code_client][id_compte]
@@ -698,7 +809,7 @@ class Annexes(object):
                                                                  structure_prestations_compte,
                                                                  legende_prestations_compte)
 
-                # ## 5.1
+                # ## Coût JA - Table Compte Récap  Articles
 
                 structure_eligibles_compte = r'''{|l|r|r|r|}'''
                 legende_eligibles_compte = r'''Table V.1 - Coûts d'utilisation '''
@@ -761,7 +872,7 @@ class Annexes(object):
                 contenu_compte_annexe5 += Latex.tableau(contenu_eligibles_compte, structure_eligibles_compte,
                                                         legende_eligibles_compte)
 
-                # ## 5.2
+                # ## Coût CAE J/K - Table Compte Récap Procédés/Catégorie Machine
 
                 if code_client in acces.sommes and id_compte in acces.sommes[code_client]['categories']:
                     structure_coutmachines_compte = r'''{|l|r|r|r|r|}'''
@@ -814,7 +925,7 @@ class Annexes(object):
                     contenu_compte_annexe5 += Latex.tableau_vide(r'''Table V.2 - Coûts d'utilisation des machines et
                         main d'oeuvre : table vide (pas d’utilisation machines)''')
 
-                # ## 5.3
+                # ## Coût CAE J/K/M - Table Compte Récap Coûts Procédés/Catégorie Machine/Machine
 
                 if code_client in acces.sommes and id_compte in acces.sommes[code_client]['comptes']:
                     structure_coutcats_compte = r'''{|l|c|c|r|r|r|r|r|r|r|r|}'''
@@ -827,7 +938,6 @@ class Annexes(object):
                     machines_utilisees = Outils.machines_in_somme(somme, machines)
 
                     for id_cout, mics in sorted(machines_utilisees.items()):
-
                         if contenu_coutcats_compte != "":
                             contenu_coutcats_compte += r'''
                                 \multicolumn{7}{c}{} \\
@@ -882,7 +992,7 @@ class Annexes(object):
                     contenu_compte_annexe5 += Latex.tableau_vide(r'''Table V.3 - Coûts d'utilisation des machines et
                         main d'oeuvre par catégorie : table vide (pas d’utilisation machines)''')
 
-                # ## 5.4
+                # ## Coût LVR J/D - Table Compte Récap Coûts Prestations livrées/code D
 
                 contenu_coutprests_compte = ""
                 structure_coutprests_compte = r'''{|l|r|c|r|r|r|r|}'''
@@ -958,7 +1068,7 @@ class Annexes(object):
         contenu += Annexes.titre_annexe(code_client, client, edition, generaux, reference, "Récapitulatif", "I")
         contenu += Annexes.section(code_client, client, edition, generaux, reference, "Récapitulatif", "I")
 
-        # ## 1.1
+        # ## Prix XF - Table Client Récap Postes de la facture
 
         brut = scl['rm'] + scl['somme_t_mm'] + scl['em']
         for cat, tt in scl['sommes_cat_m'].items():
@@ -1000,10 +1110,10 @@ class Annexes(object):
             contenu += Latex.tableau_vide(r'''Table I.1 - Récapitulatif des postes de la facture :
                 table vide (aucun article facturable)''')
 
-        # ## 1.2
+        # ## Prix XA - Table Client Récap Articles
 
         structure_recap_poste_cl = r'''{|l|r|r|r|}'''
-        legende_recap_poste_cl = r'''Table I.2 - Récapitulatif des postes'''
+        legende_recap_poste_cl = r'''Table I.2 - Récapitulatif des articles'''
 
         dico_recap_poste_cl = {'emom': Outils.format_2_dec(scl['em']), 'emor': Outils.format_2_dec(scl['er']),
                                'emo': Outils.format_2_dec(scl['e']), 'resm': Outils.format_2_dec(scl['rm']),
@@ -1044,7 +1154,7 @@ class Annexes(object):
 
         contenu += Latex.tableau(contenu_recap_poste_cl, structure_recap_poste_cl, legende_recap_poste_cl)
 
-        # ## 1.3
+        # ## Prix XE - Table Client Emolument
 
         structure_emolument = r'''{|r|r|r|r|}'''
         legende_emolument = r'''Table I.3 - Émolument mensuel'''
@@ -1065,7 +1175,7 @@ class Annexes(object):
 
         contenu += Latex.tableau(contenu_emolument, structure_emolument, legende_emolument)
 
-        # ## 1.4
+        # ## Prix XR - Table Client Récap Pénalités Réservations
 
         if code_client in reservations.sommes:
             structure_frais_client = r'''{|l|c|c|r|r|}'''
@@ -1123,7 +1233,7 @@ class Annexes(object):
             contenu += Latex.tableau_vide(r'''Table I.4 - Pénalités de réservation :
                 table vide (pas de pénalités de réservation)''')
 
-        # ## 1.5
+        # ## Prix XA/J - Table Client Récap Articles/Compte
 
         legende_recap = r'''Table I.5 - Récapitulatif des comptes'''
 
@@ -1157,7 +1267,7 @@ class Annexes(object):
 
         contenu += Latex.long_tableau(contenu_recap, structure_recap, legende_recap)
 
-        # ## 1.6
+        # ## Prix CAE X/J - Table Client Récap Procédés/Compte
 
         if code_client in acces.sommes:
             structure_procedes_client = r'''{|l|l|r|r|r|r|r|r|}'''
@@ -1191,7 +1301,7 @@ class Annexes(object):
             contenu += Latex.tableau_vide(r'''Table I.6 - Récapitulatif des procédés :
                 table vide (pas d'utilisations machines)''')
 
-        # ## 1.7
+        # ## Prix LVR X/D/J - Table Client Récap Prestations livr./code D/Compte
 
         if code_client in livraisons.sommes:
             structure_prestations_client_recap = r'''{|l|r|r|r|}'''
@@ -1221,7 +1331,7 @@ class Annexes(object):
             contenu += Latex.tableau_vide(r'''Table I.7 - Récapitulatif des prestations livrées :
                 table vide (pas de prestations livrées)''')
 
-        # ## 1.8
+        # ## Prix Bonus X/J - Table Client Récap Bonus/Compte
 
         if av_hc == "BONUS":
             if code_client in acces.sommes:
@@ -1256,7 +1366,7 @@ class Annexes(object):
 
         # ## Annexe 3
 
-        # ## contenu 3.2
+        # ## contenu Tps_M CAE X/M/U - Table Client Récap Temps mach avec pénalités /Machine/User
 
         contenu_machuts = ""
         if code_client in acces.sommes:
@@ -1314,7 +1424,7 @@ class Annexes(object):
             contenu += Annexes.section(code_client, client, edition, generaux, reference,
                                        "Annexe détaillée des pénalités de réservation", "III")
 
-            # ## 3.1
+            # ## Tps Penares X/M/U - Table Client Durées Pénalités réserv./Machine/User
 
             if code_client in reservations.sommes:
                 structure_stats_client = r'''{|l|c|c|c|c|c|c|}'''
@@ -1415,7 +1525,7 @@ class Annexes(object):
                 contenu += Latex.tableau_vide(r'''Table III.1 - Statistiques des réservations et des utilisations
                     machines : table vide (pas de pénalités de réservation)''')
 
-            # ## 3.2
+            # ## Tps_M CAE X/M/U - Table Client Récap Temps mach avec pénalités /Machine/User
 
             if code_client in acces.sommes and contenu_machuts != "":
                 structure_machuts_client = r'''{|l|c|c|}'''
@@ -1432,7 +1542,7 @@ class Annexes(object):
                 contenu += Latex.tableau_vide(r'''Table III.2 - Récapitulatif des utilisations machines par
                     utilisateur : table vide (pas d’utilisation machines)''')
 
-            # ## 3.3
+            # ## Tps RES X/M/U - Table Client Détail Temps Réservations/Machine/User
 
             if code_client in reservations.sommes:
                 structure_reserve_client = r'''{|c|c|c|c|c|}'''

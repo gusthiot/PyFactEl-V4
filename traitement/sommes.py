@@ -8,11 +8,12 @@ class Sommes(object):
     Classe contenant les méthodes pour le calcul des sommes par compte, catégorie et client
     """
 
-    cles_somme_compte = ['somme_j_mai', 'maij_d', 'somme_j_moi', 'moij_d', 'somme_j_dhi',
-                         'dhij_d', 'somme_j_mm', 'somme_j_mr', 'somme_j_mb', 'mj', 'c1', 'c2', 'res', 'mu1', 'mu2',
-                         'mu3', 'mmo', 'mu1_d', 'mu2_d', 'mu3_d', 'mmo_d']
+    cles_somme_compte = ['somme_j_mai', 'somme_j_mai_d', 'somme_j_moi', 'somme_j_moi_d', 'somme_j_dhi', 'somme_j_dhi_d',
+                         'somme_j_mach_mai', 'somme_j_mach_mai_d', 'somme_j_mach_moi', 'somme_j_mach_moi_d',
+                         'somme_j_mm', 'somme_j_mr', 'somme_j_mb', 'c1', 'c2',
+                         'mu1', 'mu2', 'mu3', 'mmo', 'mu1_d', 'mu2_d', 'mu3_d', 'mmo_d']
 
-    cles_somme_client = ['mat', 'mot', 'dst', 'dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'em',
+    cles_somme_client = ['mat', 'mot', 'dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'em',
                          'er', 'e', 'res', 'rm', 'rm_d', 'rr', 'r']
 
     def __init__(self, verification, generaux):
@@ -102,9 +103,14 @@ class Sommes(object):
                         somme['mu2'] += som['mu2']
                         somme['mu3'] += som['mu3']
                         somme['mmo'] += som['mmo']
-                        somme['somme_j_mai'] += som['mai_hp'] + som['mai_hc']
-                        somme['somme_j_moi'] += som['moi']
+                        somme['somme_j_mach_mai'] += som['mai_hp'] + som['mai_hc']
+                        somme['somme_j_mach_moi'] += som['moi']
                         somme['somme_j_dhi'] += som['dhi']
+                ac_cat_som = acces.sommes[code_client]['categories']
+                if id_compte in ac_cat_som:
+                    for id_cout, cat_som in ac_cat_som[id_compte].items():
+                        somme['somme_j_mai'] += cat_som['mai']
+                        somme['somme_j_moi'] += cat_som['moi']
 
         for code_client in livraisons.sommes:
             if code_client not in spco:
@@ -129,9 +135,17 @@ class Sommes(object):
                 somme['somme_j_mai_d'] = maij - somme['somme_j_mai']
                 somme['somme_j_mai'] = maij
 
+                maij_mach = round(2 * somme['somme_j_mach_mai'], 1) / 2
+                somme['somme_j_mach_mai_d'] = maij_mach - somme['somme_j_mach_mai']
+                somme['somme_j_mach_mai'] = maij_mach
+
                 moij = round(2 * somme['somme_j_moi'], 1) / 2
                 somme['somme_j_moi_d'] = moij - somme['somme_j_moi']
                 somme['somme_j_moi'] = moij
+
+                moij_mach = round(2 * somme['somme_j_mach_moi'], 1) / 2
+                somme['somme_j_mach_moi_d'] = moij_mach - somme['somme_j_mach_moi']
+                somme['somme_j_mach_moi'] = moij_mach
 
                 dhij = round(2 * somme['somme_j_dhi'], 1) / 2
                 somme['somme_j_dhi_d'] = dhij - somme['somme_j_dhi']
