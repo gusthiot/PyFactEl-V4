@@ -175,10 +175,8 @@ if pg_present:
                               lien_annexes_techniques, annexes, annexes_techniques)
 
     if Latex.possibles():
-        Annexes.annexes_techniques(sommes, clients, edition, livraisons, acces, machines, reservations, comptes,
-                                   dossier_annexes_techniques, plateforme, generaux, users, couts, docpdf)
         Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, dossier_annexes,
-                        plateforme, generaux, users, couts, docpdf)
+                        dossier_annexes_techniques, plateforme, generaux, users, couts, docpdf)
 
     bm_lignes = BilanMensuel.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes,
                                              reservations)
