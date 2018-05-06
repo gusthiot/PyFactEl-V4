@@ -46,7 +46,9 @@ class Annexes(object):
                 \usepackage{dcolumn}
                 \usepackage{changepage}
                 \usepackage[scriptsize]{caption}
-                \usepackage{fancyhdr}
+                \usepackage{fancyhdr}\usepackage{float}
+                \restylefloat{table}
+
                 '''
 
             if edition.filigrane != "":

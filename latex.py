@@ -105,7 +105,7 @@ class Latex(object):
         :return: tableau latex
         """
         return r'''
-            \begin{table}[!ht]
+            \begin{table}[H]
             \tiny
             \centering
             \begin{tabular}''' + structure + contenu + r'''\end{tabular}
@@ -121,7 +121,7 @@ class Latex(object):
         :return: tableau avec juste la légende
         """
         return r'''
-            \begin{table}[!ht]
+            \begin{table}[H]
             \tiny
             \centering
             \caption*{''' + legende + r'''}
