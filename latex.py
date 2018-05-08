@@ -1,6 +1,7 @@
 import re
 import os
 import shutil
+import sys
 import subprocess
 from outils import Outils
 from PyPDF2 import PdfFileMerger
@@ -77,7 +78,6 @@ class Latex(object):
             except IOError:
                 Outils.affiche_message("Le pdf " + nom_fichier + " est resté ouvert et ne sera pas mis à jour")
 
-
     @staticmethod
     def long_tableau(contenu, structure, legende):
         """
@@ -129,10 +129,9 @@ class Latex(object):
             '''
 
     @staticmethod
-    def entete(plateforme):
+    def entete():
         """
         création de l'entête de fichier latex en fonction de l'OS
-        :param plateforme: OS utilisé
         :return: le contenu de l'entête
         """
         debut = r'''\documentclass[a4paper,10pt]{article}
@@ -142,11 +141,11 @@ class Latex(object):
             \usepackage{microtype}
             \DisableLigatures{encoding = *, family = * }
             '''
-        if plateforme == "win32":
+        if sys.platform == "win32":
             debut += r'''
                 \usepackage[cp1252]{inputenc}
                 '''
-        elif plateforme == "darwin":
+        elif sys.platform == "darwin":
             debut += r'''\usepackage[appelmac]{inputenc}'''
         else:
             debut += r'''\usepackage[utf8]{inputenc}'''

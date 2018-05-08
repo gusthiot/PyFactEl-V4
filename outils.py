@@ -5,6 +5,7 @@ import shutil
 import errno
 import os
 import platform
+import sys
 
 from erreurs import ErreurConsistance
 
@@ -98,10 +99,9 @@ class Outils(object):
             sys.exit("message conditionnel non-autorisé en mode sans graphique")
 
     @staticmethod
-    def choisir_dossier(plateforme):
+    def choisir_dossier():
         """
         affiche une interface permettant de choisir un dossier
-        :param plateforme: OS utilisé
         :return: la position du dossier sélectionné
         """
         fenetre = Tk()
@@ -112,7 +112,7 @@ class Outils(object):
         if dossier == "":
             Outils.affiche_message("Aucun dossier choisi")
             sys.exit("Aucun dossier choisi")
-        return dossier + Outils.separateur_os(plateforme)
+        return dossier + Outils.separateur_os()
 
     @staticmethod
     def format_heure(nombre):
@@ -148,13 +148,12 @@ class Outils(object):
             return str(mois)
 
     @staticmethod
-    def separateur_os(plateforme):
+    def separateur_os():
         """
         retourne le séparateur de chemin logique en fonction de l'OS (si windows ou pas)
-        :param plateforme: OS utilisé
         :return: séparateur, string
         """
-        if plateforme == "win32":
+        if sys.platform == "win32":
             return "\\"
         else:
             return "/"
@@ -188,7 +187,7 @@ class Outils(object):
                 Outils.affiche_message("'/' et '\\' présents dans le lien des paramètres généraux !!! ")
             texte = texte.replace("/", "\\")
             """
-            if "\\" != Outils.separateur_os(plateforme):
+            if "\\" != Outils.separateur_os():
                 Outils.affiche_message_conditionnel("Le chemin d'enregistrement n'utilise pas le même séparateur que "
                                                     "l'os sur lequel tourne le logiciel. Voulez-vous tout de même "
                                                     "continuer ?")
@@ -196,7 +195,7 @@ class Outils(object):
         else:
             texte = texte.replace("\\", "/")
             """
-            if "/" != Outils.separateur_os(plateforme):
+            if "/" != Outils.separateur_os():
                 Outils.affiche_message_conditionnel("Le chemin d'enregistrement n'utilise pas le même séparateur que "
                                                     "l'os sur lequel tourne le logiciel. Voulez-vous tout de même "
                                                     "continuer ?")
@@ -213,11 +212,10 @@ class Outils(object):
         return texte.replace("//", "/").replace("\\" + "\\", "\\")
 
     @staticmethod
-    def chemin(structure, plateforme, generaux=None):
+    def chemin(structure, generaux=None):
         """
         construit le chemin pour dossier/fichier
         :param structure: éléments du chemin
-        :param plateforme:OS utilisé
         :param generaux: paramètres généraux
         :return: chemin logique complet pour dossier/fichier
         """
@@ -225,7 +223,7 @@ class Outils(object):
         first = True
         for element in structure:
             if not first:
-                chemin += Outils.separateur_os(plateforme)
+                chemin += Outils.separateur_os()
             else:
                 first = False
             chemin += str(element)
@@ -235,19 +233,18 @@ class Outils(object):
             return Outils.eliminer_double_separateur(Outils.separateur_dossier(chemin, generaux))
 
     @staticmethod
-    def renommer_dossier(ancienne_structure, nouvelle_structure, plateforme):
+    def renommer_dossier(ancienne_structure, nouvelle_structure):
         """
         renomme un dossier
         :param ancienne_structure: éléments de l'ancien nom de dossier
         :param nouvelle_structure: éléments du nouveau nom de dossier
-        :param plateforme: OS utilisé
         """
         ancien_chemin = ""
         for element in ancienne_structure:
-            ancien_chemin += str(element) + Outils.separateur_os(plateforme)
+            ancien_chemin += str(element) + Outils.separateur_os()
         nouveau_chemin = ""
         for element in nouvelle_structure:
-            nouveau_chemin += str(element) + Outils.separateur_os(plateforme)
+            nouveau_chemin += str(element) + Outils.separateur_os()
         os.rename(ancien_chemin, nouveau_chemin)
 
     @staticmethod
@@ -288,17 +285,16 @@ class Outils(object):
         return existe
 
     @staticmethod
-    def lien_dossier(structure, plateforme, generaux):
+    def lien_dossier(structure, generaux):
         """
         construit le chemin pour enregistrer les données sans vérifier son existence
         :param structure: éléments du chemin
-        :param plateforme: OS utilisé
         :param generaux: paramètres généraux
         :return:chemin logique complet pour dossier
         """
         chemin = ""
         for element in structure:
-            chemin += str(element) + Outils.separateur_os(plateforme)
+            chemin += str(element) + Outils.separateur_os()
         return Outils.eliminer_double_separateur(Outils.separateur_lien(chemin, generaux))
 
     @staticmethod

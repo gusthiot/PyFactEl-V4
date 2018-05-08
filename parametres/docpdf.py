@@ -72,8 +72,6 @@ class DocPdf(object):
                 pdfs[donnee['position']].append(donnee['chemin'])
         return pdfs
 
-
-
     def est_coherent(self, generaux, clients):
         """
         vérifie que les données du fichier importé sont cohérentes
@@ -117,7 +115,7 @@ class DocPdf(object):
             if donnee['code'] != "" and donnee['code'] not in clients.obtenir_codes():
                 msg += "le code client '" + donnee['code'] + "' de la ligne " + str(ligne) + " n'est pas référencé\n"
 
-            donnee['chemin'] = Outils.chemin([self._chemin, donnee['nom']+".pdf"], sys.platform)
+            donnee['chemin'] = Outils.chemin([self._chemin, donnee['nom']+".pdf"])
             if not Outils.existe(donnee['chemin']):
                 msg += "le fichier PDF '" + donnee['nom'] + "' de la ligne " + str(ligne) + " n'existe pas\n"
 
