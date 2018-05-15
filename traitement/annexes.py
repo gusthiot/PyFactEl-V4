@@ -290,7 +290,7 @@ class Annexes(object):
             else:
                 contenu_fact += Annexes.titre_annexe(code_client, client, edition, generaux, reference,
                                                      r'''Annexe détaillée des pénalités de réservation} \newline\newline
-                                                      \textit{Annexe vide : pas de pénalités de réservation  ''', "III")
+                                                      \textit{Annexe vide : pas de pénalités de réservation  ''', "IV")
 
             # ## Annexe 5
 

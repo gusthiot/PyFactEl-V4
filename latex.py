@@ -67,20 +67,20 @@ class Latex(object):
                 merger = PdfFileMerger()
 
                 for pdf in pdfs:
-                    merger.append(pdf)
+                    merger.append(open(pdf, 'rb'))
+                    # merger.append(pdf)
+
                 merger.write('concatene.pdf')
+                merger.close()
                 shutil.copy('concatene.pdf', nom_fichier + ".pdf")
                 os.unlink('concatene.pdf')
             else:
                 shutil.copy(nom_temporaire + '.pdf', nom_fichier + ".pdf")
 
             if nom_dossier != '':
-                # try:
                 shutil.copy(nom_fichier + ".pdf", nom_dossier)
                 os.unlink(nom_fichier + '.pdf')
                 os.unlink(nom_temporaire + '.pdf')
-                #except IOError:
-                #    Outils.affiche_message("Le pdf " + nom_fichier + " est resté ouvert et ne sera pas mis à jour")
         except OSError as err:
             Outils.affiche_message("OSError: {0}".format(err))
         except IOError as err:
