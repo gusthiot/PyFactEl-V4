@@ -78,8 +78,10 @@ class Latex(object):
                 os.unlink(nom_fichier + '.pdf')
                 #except IOError:
                 #    Outils.affiche_message("Le pdf " + nom_fichier + " est resté ouvert et ne sera pas mis à jour")
-        except (IOError, OSError) as err:
-            print("Error: {0}".format(err))
+        except OSError as err:
+            Outils.affiche_message("OSError: {0}".format(err))
+        except IOError as err:
+            Outils.affiche_message("IOError: {0}".format(err))
 
     @staticmethod
     def long_tableau(contenu, structure, legende):
