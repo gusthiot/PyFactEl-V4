@@ -41,24 +41,25 @@ class Latex(object):
         :param annexes: pages à concaténer à la fin
         :param nom_dossier: nom du dossier dans lequel enregistrer le pdf
         """
-        with open(nom_fichier + ".tex", 'w') as f:
+        nom_temporaire = "temporaire"
+        with open(nom_temporaire + ".tex", 'w') as f:
             f.write(contenu)
 
-        proc = subprocess.Popen(['pdflatex', nom_fichier + ".tex"])
+        proc = subprocess.Popen(['pdflatex', nom_temporaire + ".tex"])
         proc.communicate()
 
         # 2 fois pour que les longtable soient réguliers (courant de relancer latex)
 
-        proc = subprocess.Popen(['pdflatex', nom_fichier + ".tex"])
+        proc = subprocess.Popen(['pdflatex', nom_temporaire + ".tex"])
         proc.communicate()
 
         try:
-            os.unlink(nom_fichier + '.tex')
-            os.unlink(nom_fichier + '.log')
-            os.unlink(nom_fichier + '.aux')
+            os.unlink(nom_temporaire + '.tex')
+            os.unlink(nom_temporaire + '.log')
+            os.unlink(nom_temporaire + '.aux')
 
             if annexes is not None and len(annexes) > 0:
-                fichier = nom_fichier + ".pdf"
+                fichier = nom_temporaire + ".pdf"
                 pdfs = [fichier]
                 for pos, chemins in sorted(annexes.items()):
                     for chemin in chemins:
@@ -67,15 +68,17 @@ class Latex(object):
 
                 for pdf in pdfs:
                     merger.append(pdf)
-                merger.write('temp.pdf')
-                os.unlink(nom_fichier + '.pdf')
-                shutil.copy('temp.pdf', nom_fichier + ".pdf")
-                os.unlink('temp.pdf')
+                merger.write('concatene.pdf')
+                shutil.copy('concatene.pdf', nom_fichier + ".pdf")
+                os.unlink('concatene.pdf')
+            else:
+                shutil.copy(nom_temporaire + '.pdf', nom_fichier + ".pdf")
 
             if nom_dossier != '':
                 # try:
                 shutil.copy(nom_fichier + ".pdf", nom_dossier)
                 os.unlink(nom_fichier + '.pdf')
+                os.unlink(nom_temporaire + '.pdf')
                 #except IOError:
                 #    Outils.affiche_message("Le pdf " + nom_fichier + " est resté ouvert et ne sera pas mis à jour")
         except OSError as err:
