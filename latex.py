@@ -52,31 +52,34 @@ class Latex(object):
         proc = subprocess.Popen(['pdflatex', nom_fichier + ".tex"])
         proc.communicate()
 
-        os.unlink(nom_fichier + '.tex')
-        os.unlink(nom_fichier + '.log')
-        os.unlink(nom_fichier + '.aux')
+        try:
+            os.unlink(nom_fichier + '.tex')
+            os.unlink(nom_fichier + '.log')
+            os.unlink(nom_fichier + '.aux')
 
-        if annexes is not None and len(annexes) > 0:
-            fichier = nom_fichier + ".pdf"
-            pdfs = [fichier]
-            for pos, chemins in sorted(annexes.items()):
-                for chemin in chemins:
-                    pdfs.append(chemin)
-            merger = PdfFileMerger()
+            if annexes is not None and len(annexes) > 0:
+                fichier = nom_fichier + ".pdf"
+                pdfs = [fichier]
+                for pos, chemins in sorted(annexes.items()):
+                    for chemin in chemins:
+                        pdfs.append(chemin)
+                merger = PdfFileMerger()
 
-            for pdf in pdfs:
-                merger.append(pdf)
-            merger.write('temp.pdf')
-            os.unlink(nom_fichier + '.pdf')
-            shutil.copy('temp.pdf', nom_fichier + ".pdf")
-            os.unlink('temp.pdf')
+                for pdf in pdfs:
+                    merger.append(pdf)
+                merger.write('temp.pdf')
+                os.unlink(nom_fichier + '.pdf')
+                shutil.copy('temp.pdf', nom_fichier + ".pdf")
+                os.unlink('temp.pdf')
 
-        if nom_dossier != '':
-            try:
+            if nom_dossier != '':
+                # try:
                 shutil.copy(nom_fichier + ".pdf", nom_dossier)
                 os.unlink(nom_fichier + '.pdf')
-            except IOError:
-                Outils.affiche_message("Le pdf " + nom_fichier + " est resté ouvert et ne sera pas mis à jour")
+                #except IOError:
+                #    Outils.affiche_message("Le pdf " + nom_fichier + " est resté ouvert et ne sera pas mis à jour")
+        except (IOError, OSError) as err:
+            print("Error: {0}".format(err))
 
     @staticmethod
     def long_tableau(contenu, structure, legende):

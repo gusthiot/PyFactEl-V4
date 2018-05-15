@@ -1229,8 +1229,8 @@ class TablesAnnexes(object):
             \hline
             ''' % dico
 
-            contenu += r'''\multicolumn{3}{|r|}{Total} & ''' + Outils.format_2_dec(total) + r'''\\
-            \hline
-            '''
+        contenu += r'''\multicolumn{3}{|r|}{Total} & ''' + Outils.format_2_dec(total) + r'''\\
+        \hline
+        '''
 
         return Latex.tableau(contenu, structure, legende)
