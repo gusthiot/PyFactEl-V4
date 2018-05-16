@@ -466,7 +466,7 @@ class TablesAnnexes(object):
     def table_prix_xaj(table, scl, generaux, contenu_prix_xaj):
         # ## Prix XA/J - Table Client Récap Articles/Compte
         structure = r'''{|l|l|r|r|'''
-        legende = table + r''' - Récapitulatif des comptes'''
+        legende = table + r''' - Récapitulatif des projets'''
 
         contenu = r'''
             \hline
@@ -1194,7 +1194,7 @@ class TablesAnnexes(object):
     def table_prix_ja(table, sco, generaux):
                 # ## Prix JA - Table Compte Récap Articles
         structure = r'''{|l|r|r|r|}'''
-        legende = table + r''' - Récapitulatif des articles du compte'''
+        legende = table + r''' - Récapitulatif des articles du projet'''
 
         dico = {'mm': Outils.format_2_dec(sco['somme_j_mm']), 'mr': Outils.format_2_dec(sco['somme_j_mr']),
                 'maij': Outils.format_2_dec(sco['somme_j_mai']), 'mj': Outils.format_2_dec(sco['mj']),

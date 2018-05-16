@@ -55,9 +55,9 @@ class Annexes(object):
             for article in generaux.articles_d3:
                 contenu_prix_lvr_xdj_tab[article.code_d] = ""
 
-            titre_3 = "Annexe détaillée par compte"
+            titre_3 = "Annexe détaillée par projet"
             nombre_3 = "III"
-            titre_2 = "Récapitulatifs par compte"
+            titre_2 = "Récapitulatifs par projet"
             nombre_2 = "II"
             contenu_annexe2_fact = ""
             contenu_annexe2_tech = ""
@@ -190,17 +190,16 @@ class Annexes(object):
                     contenu_annexe2_fact += TablesAnnexes.table_prix_lvr_jd("Table II.3", code_client, id_compte,
                                                                             intitule_compte, sco, livraisons.sommes,
                                                                             generaux)
-                    contenu_annexe2_fact += TablesAnnexes.table_prix_avtg_jm("Table II.4", code_client, id_compte,
+                    contenu_annexe2_tech += TablesAnnexes.table_prix_avtg_jm("Table II.4", code_client, id_compte,
                                                                              intitule_compte, sco, acces.sommes,
                                                                              machines, av_hc)
-                    if an_couts == "OUI":
-                        contenu_annexe2_fact += TablesAnnexes.table_cout_cae_jk("Table II.5", code_client,
-                                                                                id_compte, intitule_compte, sco,
-                                                                                acces.sommes, couts)
-                    contenu_annexe2_tech += TablesAnnexes.table_prix_cae_jm("Table II.6", code_client, id_compte,
+                    contenu_annexe2_tech += TablesAnnexes.table_prix_cae_jm("Table II.5", code_client, id_compte,
                                                                             intitule_compte, sco, acces.sommes,
                                                                             machines, av_hc)
                     if an_couts == "OUI":
+                        contenu_annexe2_tech += TablesAnnexes.table_cout_cae_jk("Table II.6", code_client,
+                                                                                id_compte, intitule_compte, sco,
+                                                                                acces.sommes, couts)
                         contenu_annexe2_tech += TablesAnnexes.table_cout_ja("Table II.7", code_client, id_compte,
                                                                             generaux, sco, livraisons.sommes)
                         contenu_annexe2_tech += TablesAnnexes.table_cout_cae_jkm("Table II.8", code_client, id_compte,
@@ -228,15 +227,21 @@ class Annexes(object):
 
             # ## Début des tableaux
 
-            entete = Annexes.entete(edition, client, code_client, generaux.centre, reference)
-            contenu_tech = entete
-            contenu_fact = entete
+            contenu_tech = Annexes.entete(edition, client, code_client, generaux.centre, reference, "Internes",
+                                          "Internal")
+            contenu_fact = Annexes.entete(edition, client, code_client, generaux.centre, reference, "Factures",
+                                          "Billing")
+
+            tab_sup = Annexes.titre_annexe(code_client, client, edition, generaux, reference,
+                                           "Tableaux supplémentaires", "")
 
             # ## Annexe 1
 
-            annexe1 = Annexes.titre_annexe(code_client, client, edition, generaux, reference, "Récapitulatif", "I")
-            section1 = Annexes.section(code_client, client, edition, generaux, reference, "Récapitulatif", "I")
-            contenu_tech += annexe1 + section1
+            annexe1 = Annexes.titre_annexe(code_client, client, edition, generaux, reference,
+                                           "Récapitulatif pour le client", "I")
+            section1 = Annexes.section(code_client, client, edition, generaux, reference,
+                                       "Récapitulatif pour le client", "I")
+            contenu_tech += tab_sup + section1
             contenu_fact += annexe1 + section1
 
             contenu_fact += TablesAnnexes.table_prix_xf("Table I.1", scl, generaux, filtre, contenu_prix_xf)
@@ -259,8 +264,7 @@ class Annexes(object):
                 contenu_fact += contenu_annexe2_fact
 
             if contenu_annexe2_tech != "":
-                contenu_tech += Annexes.titre_annexe(code_client, client, edition, generaux, reference, titre_2,
-                                                     nombre_2)
+                contenu_tech += r'''\clearpage'''
                 contenu_tech += contenu_annexe2_tech
 
             # ## Annexe 3
@@ -296,8 +300,9 @@ class Annexes(object):
 
             annexe_5 = Annexes.titre_annexe(code_client, client, edition, generaux, reference,
                                             "Documents contractuels et informatifs", "V")
-            annexe_5 += Annexes.section(code_client, client, edition, generaux, reference,
-                                        "Documents contractuels et informatifs", "V")
+
+            doc_info = Annexes.titre_annexe(code_client, client, edition, generaux, reference,
+                                            "Documents contractuels et informatifs", "")
 
             # ## Finale
 
@@ -318,7 +323,7 @@ class Annexes(object):
             else:
                 pdfs = None
             if pdfs is not None and len(pdfs) > 0:
-                contenu_tech += annexe_5
+                contenu_tech += doc_info
             nom_tech = "annexeT_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_"
             nom_tech += str(edition.version) + "_" + code_client
             contenu_tech += r'''\end{document}'''
@@ -350,8 +355,11 @@ class Annexes(object):
             %(ref)s \hspace*{4cm} Client %(code)s - %(code_sap)s - %(nom)s - %(date)s
             \end{adjustwidth}
             \vspace*{8cm}
-            \begin{adjustwidth}{5cm}{}
-            \Large\textsc{Annexe %(nombre)s} \newline\newline
+            \begin{adjustwidth}{5cm}{}''' % dic_titre
+        if nombre != "":
+            contenu += r'''
+                \Large\textsc{Annexe %(nombre)s} \newline\newline''' % dic_titre
+        contenu += r'''
             \Large\textsc{%(titre)s} \newpage
             \end{adjustwidth}
             \end{titlepage}
@@ -385,7 +393,7 @@ class Annexes(object):
         return section
 
     @staticmethod
-    def entete(edition, client, code_client, centre, reference):
+    def entete(edition, client, code_client, centre, reference, type_f, type_e):
         entete = Latex.entete()
         entete += r'''
             \usepackage[margin=10mm, includehead]{geometry}
@@ -435,7 +443,7 @@ class Annexes(object):
             \textsc{''' + Latex.echappe_caracteres(centre) + r'''}
             \vspace*{8cm}
             \begin{adjustwidth}{5cm}{}
-            \Large\textsc{Annexes Factures \newline Billing Appendices}\newline
+            \Large\textsc{Annexes ''' + type_f + r''' \newline ''' + type_e + r''' Appendices}\newline
             \Large\textsc{''' + reference + r'''}\newline\newline\newline
             '''
 
