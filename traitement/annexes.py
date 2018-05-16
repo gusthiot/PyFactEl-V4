@@ -179,7 +179,7 @@ class Annexes(object):
 
                     # ## Annexe 2 du compte
 
-                    titre2 = "Récapitulatif du compte : " + intitule_compte
+                    titre2 = "Récapitulatif du projet : " + intitule_compte
                     section2 = Annexes.section(code_client, client, edition, generaux, reference, titre2, nombre_2)
                     contenu_annexe2_fact += section2
                     contenu_annexe2_tech += section2
@@ -213,7 +213,7 @@ class Annexes(object):
 
                     # ## Annexe 3 du compte
 
-                    titre3 = "Annexe détaillée du compte : " + intitule_compte
+                    titre3 = "Annexe détaillée du projet : " + intitule_compte
                     contenu_annexe3 += Annexes.section(code_client, client, edition, generaux, reference, titre3,
                                                        nombre_3)
                     contenu_annexe3 += TablesAnnexes.table_tps_cae_jkmu("Table III.1", code_client, id_compte,

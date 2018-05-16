@@ -349,7 +349,7 @@ class TablesAnnexes(object):
                 \multicolumn{2}{c}{} & \multicolumn{2}{|c|}{Procédés} & \multicolumn{1}{c|}{Rabais}
                 & \multicolumn{2}{c|}{Facture} & Montant \\
                 \cline{1-7}
-                Compte & Type & Machine & M.O. opér. & Déduc. HC & Montant & Rabais & \multicolumn{1}{c|}{net} \\
+                Projet & Type & Machine & M.O. opér. & Déduc. HC & Montant & Rabais & \multicolumn{1}{c|}{net} \\
                 \hline
                 '''
 
@@ -470,7 +470,7 @@ class TablesAnnexes(object):
 
         contenu = r'''
             \hline
-            Compte & Type & \multicolumn{1}{c|}{Procédés}'''
+            Projet & Type & \multicolumn{1}{c|}{Procédés}'''
 
         for article in generaux.articles_d3:
             structure += r'''r|'''
