@@ -41,46 +41,43 @@ class Latex(object):
         :param annexes: pages à concaténer à la fin
         :param nom_dossier: nom du dossier dans lequel enregistrer le pdf
         """
-        nom_temporaire = "temporaire"
-        with open(nom_temporaire + ".tex", 'w') as f:
+        with open(nom_fichier + ".tex", 'w') as f:
             f.write(contenu)
 
-        proc = subprocess.Popen(['pdflatex', nom_temporaire + ".tex"])
+        proc = subprocess.Popen(['pdflatex', nom_fichier + ".tex"])
         proc.communicate()
 
         # 2 fois pour que les longtable soient réguliers (courant de relancer latex)
 
-        proc = subprocess.Popen(['pdflatex', nom_temporaire + ".tex"])
+        proc = subprocess.Popen(['pdflatex', nom_fichier + ".tex"])
         proc.communicate()
 
         try:
-            os.unlink(nom_temporaire + '.tex')
-            os.unlink(nom_temporaire + '.log')
-            os.unlink(nom_temporaire + '.aux')
+            os.unlink(nom_fichier + '.tex')
+            os.unlink(nom_fichier + '.log')
+            os.unlink(nom_fichier + '.aux')
 
-            fichier_temp = nom_temporaire + ".pdf"
             fichier_fin = nom_fichier + ".pdf"
+
             if annexes is not None and len(annexes) > 0:
-                pdfs = [fichier_temp]
+                pdfs = []
                 for pos, chemins in sorted(annexes.items()):
                     for chemin in chemins:
                         pdfs.append(chemin)
                 merger = PdfFileMerger()
 
-                for pdf in pdfs:
-                    merger.append(pdf)
+                with open(nom_fichier + ".pdf", 'rb') as f:
+                    merger.append(f)
+                    for pdf in pdfs:
+                        merger.append(pdf)
 
-                merger.write('concatene.pdf')
+                    merger.write('concatene.pdf')
                 shutil.copy('concatene.pdf', fichier_fin)
                 os.unlink('concatene.pdf')
-            else:
-                shutil.copy(fichier_temp, fichier_fin)
 
             if nom_dossier != '':
                 shutil.copy(fichier_fin, nom_dossier)
-                shutil.copy(fichier_fin, fichier_temp)
                 os.unlink(fichier_fin)
-                os.unlink(fichier_temp)
         except OSError as err:
             Outils.affiche_message("OSError: {0}".format(err))
         except IOError as err:
