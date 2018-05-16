@@ -58,29 +58,29 @@ class Latex(object):
             os.unlink(nom_temporaire + '.log')
             os.unlink(nom_temporaire + '.aux')
 
+            fichier_temp = nom_temporaire + ".pdf"
+            fichier_fin = nom_fichier + ".pdf"
             if annexes is not None and len(annexes) > 0:
-                fichier = nom_temporaire + ".pdf"
-                pdfs = [fichier]
+                pdfs = [fichier_temp]
                 for pos, chemins in sorted(annexes.items()):
                     for chemin in chemins:
                         pdfs.append(chemin)
                 merger = PdfFileMerger()
 
                 for pdf in pdfs:
-                    merger.append(open(pdf, 'rb'))
-                    # merger.append(pdf)
+                    merger.append(pdf)
 
                 merger.write('concatene.pdf')
-                merger.close()
-                shutil.copy('concatene.pdf', nom_fichier + ".pdf")
+                shutil.copy('concatene.pdf', fichier_fin)
                 os.unlink('concatene.pdf')
             else:
-                shutil.copy(nom_temporaire + '.pdf', nom_fichier + ".pdf")
+                shutil.copy(fichier_temp, fichier_fin)
 
             if nom_dossier != '':
-                shutil.copy(nom_fichier + ".pdf", nom_dossier)
-                os.unlink(nom_fichier + '.pdf')
-                os.unlink(nom_temporaire + '.pdf')
+                shutil.copy(fichier_fin, nom_dossier)
+                shutil.copy(fichier_fin, fichier_temp)
+                os.unlink(fichier_fin)
+                os.unlink(fichier_temp)
         except OSError as err:
             Outils.affiche_message("OSError: {0}".format(err))
         except IOError as err:
