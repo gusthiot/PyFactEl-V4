@@ -1,5 +1,6 @@
 from importes import Fichier
 from outils import Outils
+import math
 
 
 class Acces(Fichier):
@@ -152,8 +153,11 @@ class Acces(Fichier):
             scma = self.sommes[code_client]['machines']
             if id_machine not in scma:
                 pur_hp = round(prix['prix_h_mach_p'] * machine['tx_penalite_hp'] / 100, 2)
-                pur_hc = round(prix['prix_h_mach_p'] * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
-                scma[id_machine] = {'duree_hp': 0, 'duree_hc': 0,  'pur_hp': pur_hp, 'pur_hc': pur_hc, 'users': {}}
+                pur_hc = round(prix['prix_h_mach_p'] * machine['tx_penalite_hc'] / 100 *
+                               (1 - machine['tx_rabais_hc'] / 100), 2)
+                du_hc = round(prix['prix_h_mach_p'] * machine['tx_rabais_hc'] / 100, 2)
+                scma[id_machine] = {'duree_hp': 0, 'duree_hc': 0,  'pur_hp': pur_hp, 'pur_hc': pur_hc, 'du_hc': du_hc,
+                                    'dhm': 0, 'users': {}}
             scma[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             scma[id_machine]['duree_hc'] += donnee['duree_machine_hc']
 
@@ -173,6 +177,10 @@ class Acces(Fichier):
         self.donnees = donnees_list
 
         for code_client in self.sommes:
+            for id_machine in self.sommes[code_client]['machines']:
+                scm = self.sommes[code_client]['machines'][id_machine]
+                scm['dhm'] += math.ceil(scm['du_hc'] * scm['duree_hc'])
+
             self.sommes[code_client]['categories'] = {}
             for id_compte in self.sommes[code_client]['comptes']:
                 sco = self.sommes[code_client]['comptes'][id_compte]

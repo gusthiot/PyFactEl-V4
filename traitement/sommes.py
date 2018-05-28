@@ -10,8 +10,8 @@ class Sommes(object):
 
     cles_somme_compte = ['somme_j_mai', 'somme_j_mai_d', 'somme_j_moi', 'somme_j_moi_d', 'somme_j_dhi', 'somme_j_dhi_d',
                          'somme_j_mach_mai', 'somme_j_mach_mai_d', 'somme_j_mach_moi', 'somme_j_mach_moi_d',
-                         'somme_j_mm', 'somme_j_mr', 'somme_j_mb', 'c1', 'c2',
-                         'mu1', 'mu2', 'mu3', 'mmo', 'mu1_d', 'mu2_d', 'mu3_d', 'mmo_d']
+                         'somme_j_mm', 'somme_j_mr','somme_j_mb', 'c1', 'c2', 'mu1', 'mu2', 'mu3', 'mmo', 'mu1_d',
+                         'mu2_d', 'mu3_d', 'mmo_d']
 
     cles_somme_client = ['mat', 'mot', 'dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'em',
                          'er', 'e', 'res', 'rm', 'rm_d', 'rr', 'r']
@@ -307,7 +307,13 @@ class Sommes(object):
 
             for code_client, somme in spcl.items():
                 client = clients.donnees[code_client]
-                somme['somme_t_mb'] += math.ceil(client['bh'] * somme['dht'])
+
+                somme_acces = acces.sommes[code_client]
+                for id_machine, scm in somme_acces['machines'].items():
+                    somme['somme_t_mb'] += scm['dhm']
+                somme['somme_t_mb'] *= client['bh']
+
+                # somme['somme_t_mb'] += math.ceil(client['bh'] * somme['dht'])
                 somme['em'], somme['er'] = Rabais.rabais_emolument(somme['mt'], client['emb'])
                 somme['e'] = somme['em'] - somme['er']
 

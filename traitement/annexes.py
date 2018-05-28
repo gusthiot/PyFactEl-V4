@@ -190,6 +190,12 @@ class Annexes(object):
                     contenu_annexe2_fact += TablesAnnexes.table_prix_lvr_jd("Table II.3", code_client, id_compte,
                                                                             intitule_compte, sco, livraisons.sommes,
                                                                             generaux)
+
+                    if av_hc == "RABAIS":
+                        contenu_annexe2_fact += TablesAnnexes.table_prix_jdmu("Table II.X", code_client, id_compte,
+                                                                              intitule_compte, sco, acces.sommes,
+                                                                              machines, users)
+
                     contenu_annexe2_tech += TablesAnnexes.table_prix_avtg_jm("Table II.4", code_client, id_compte,
                                                                              intitule_compte, sco, acces.sommes,
                                                                              machines, av_hc)
@@ -247,8 +253,16 @@ class Annexes(object):
             contenu_fact += TablesAnnexes.table_prix_xf("Table I.1", scl, generaux, filtre, contenu_prix_xf)
             contenu_fact += TablesAnnexes.table_prix_xaj("Table I.2", scl, generaux, contenu_prix_xaj)
             if av_hc == "BONUS":
-                contenu_fact += TablesAnnexes.table_prix_bonus_xj("Table I.3", code_client, scl, acces.sommes, client,
+                contenu_fact += TablesAnnexes.table_prix_bonus_xj("Table I.3", code_client, scl, acces.sommes,
                                                                   contenu_prix_bonus_xj)
+
+            if av_hc == "BONUS":
+                contenu_fact += TablesAnnexes.table_points_xbmu("Table I.X1", code_client, scl, acces.sommes, machines,
+                                                                users)
+
+            contenu_fact += TablesAnnexes.table_prix_xrmu("Table I.X2", code_client, scl, reservations.sommes, machines,
+                                                          users)
+
             contenu_tech += TablesAnnexes.table_prix_xa("Table I.4", scl, generaux)
             contenu_tech += TablesAnnexes.table_prix_xe("Table I.5", scl, client)
             contenu_tech += TablesAnnexes.table_prix_cae_xj("Table I.6", code_client, scl, acces.sommes, client,
@@ -394,6 +408,18 @@ class Annexes(object):
 
     @staticmethod
     def entete(edition, client, code_client, centre, reference, type_f, type_e):
+        """
+        création de l'entête client
+        :param edition: paramètres d'édition
+        :param client: données du client concerné
+        :param code_client: code du client concerné
+        :param centre: texte central
+        :param reference: référence de la facture
+        :param type_f: nom du type d'annexe français
+        :param type_e: nom du type d'annexe anglais
+        :return: entête latex
+        """
+
         entete = Latex.entete()
         entete += r'''
             \usepackage[margin=10mm, includehead]{geometry}

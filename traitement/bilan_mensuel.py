@@ -68,8 +68,6 @@ class BilanMensuel(object):
             nb_u = len(users)
             nb_c = len(cptes)
 
-            bht = client['bh'] * scl['dht']
-
             ligne = [edition.annee, edition.mois, reference, code_client, client['code_sap'], client['abrev_labo'],
                      client['nom_labo'], 'U', client['nature'], scl['em'], scl['er'], nb_u, nb_c,
                      Outils.format_2_dec(scl['mat']), Outils.format_2_dec(scl['mot']),
@@ -77,7 +75,7 @@ class BilanMensuel(object):
                      Outils.format_2_dec(scl['mt'])]
             for categorie in generaux.codes_d3():
                 ligne.append(Outils.format_2_dec(scl['tot_cat'][categorie]))
-            ligne += [Outils.format_2_dec(scl['somme_t']), math.ceil(bht)]
+            ligne += [Outils.format_2_dec(scl['somme_t']), Outils.format_2_dec(scl['somme_t_mb'])]
             lignes.append(ligne)
         return lignes
 
