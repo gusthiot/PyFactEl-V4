@@ -308,10 +308,11 @@ class Sommes(object):
             for code_client, somme in spcl.items():
                 client = clients.donnees[code_client]
 
-                somme_acces = acces.sommes[code_client]
-                for id_machine, scm in somme_acces['machines'].items():
-                    somme['somme_t_mb'] += scm['dhm']
-                somme['somme_t_mb'] *= client['bh']
+                if code_client in acces.sommes:
+                    somme_acces = acces.sommes[code_client]
+                    for id_machine, scm in somme_acces['machines'].items():
+                        somme['somme_t_mb'] += scm['dhm']
+                    somme['somme_t_mb'] *= client['bh']
 
                 # somme['somme_t_mb'] += math.ceil(client['bh'] * somme['dht'])
                 somme['em'], somme['er'] = Rabais.rabais_emolument(somme['mt'], client['emb'])

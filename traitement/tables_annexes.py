@@ -1490,8 +1490,8 @@ class TablesAnnexes(object):
                 for nom_machine, id_machine in sorted(mics.items()):
                     if somme[id_machine]['dhi'] > 0:
                         dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
-                                        'hc': somme[id_machine]['duree_hc'],
-                                        'dhi': somme[id_machine]['dhi']}
+                                        'hc': Outils.format_heure(somme[id_machine]['duree_hc']),
+                                        'dhi': Outils.format_2_dec(somme[id_machine]['dhi'])}
                         contenu += r'''
                             \hspace{2mm} %(machine)s & HC & %(hc)s & %(dhi)s \\
                             \hline
@@ -1505,14 +1505,14 @@ class TablesAnnexes(object):
                                     smu = somme[id_machine]['users'][id_user]
                                     if smu['duree_hc'] > 0:
                                         dico_user = {'user': Latex.echappe_caracteres(nom + " " + prenom),
-                                                     'hc': ""}
+                                                     'hc': Outils.format_heure(smu['duree_hc'])}
                                         contenu += r'''
-                                            \hspace{5mm} %(user)s & HC & %(hc)s & \\
+                                            \hspace{5mm} %(user)s & HC & %(hc)s \hspace{5mm} & \\
                                             \hline
                                         ''' % dico_user
 
-            dico = {'rabais_d': sco['somme_j_dhi_d'],
-                    'rabais': sco['somme_j_dhi']}
+            dico = {'rabais_d': Outils.format_2_dec(sco['somme_j_dhi_d']),
+                    'rabais': Outils.format_2_dec(sco['somme_j_dhi'])}
 
             contenu += r'''
                 \multicolumn{3}{|r|}{Arrondi} & %(rabais_d)s \\
@@ -1554,8 +1554,8 @@ class TablesAnnexes(object):
                 for nom_machine, id_machine in sorted(mics.items()):
                     if somme[id_machine]['dhm'] > 0:
                         dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
-                                        'hc': somme[id_machine]['duree_hc'],
-                                        'dhm': somme[id_machine]['dhm']}
+                                        'hc': Outils.format_heure(somme[id_machine]['duree_hc']),
+                                        'dhm': Outils.format_2_dec(somme[id_machine]['dhm'])}
                         contenu += r'''
                             \hspace{2mm} %(machine)s & HC & %(hc)s & %(dhm)s \\
                             \hline
@@ -1569,16 +1569,17 @@ class TablesAnnexes(object):
                                     smu = somme[id_machine]['users'][id_user]
                                     if smu['duree_hc'] > 0:
                                         dico_user = {'user': Latex.echappe_caracteres(nom + " " + prenom),
-                                                     'hc': smu['duree_hc']}
+                                                     'hc': Outils.format_heure(smu['duree_hc'])}
                                         contenu += r'''
-                                            \hspace{5mm} %(user)s & HC & %(hc)s & \\
+                                            \hspace{5mm} %(user)s & HC & %(hc)s \hspace{5mm} & \\
                                             \hline
                                         ''' % dico_user
 
+            dico = {'bht': scl['somme_t_mb']}
             contenu += r'''
-                \multicolumn{3}{|r|}{\textbf{Total points de bonus}} & ''' + scl['somme_t_mb'] + r''' \\
+                \multicolumn{3}{|r|}{\textbf{Total points de bonus}} & %(bht)s \\
                 \hline
-                '''
+                ''' % dico
 
             return Latex.long_tableau(contenu, structure, legende)
         else:
@@ -1619,10 +1620,13 @@ class TablesAnnexes(object):
                     scm = scl['res'][id_machine]
                     contenu_hp = ""
                     contenu_hc = ""
-                    dico_machine = {'machine': Latex.echappe_caracteres(nom_machine), 'duree_hp': scm['tot_hp'],
-                                    'pu_hp': somme[id_machine]['pu_hp'], 'montant_hp': scm['mont_hp'],
-                                    'duree_hc': scm['tot_hc'], 'pu_hc': somme[id_machine]['pu_hc'],
-                                    'montant_hc': scm['mont_hc']}
+                    dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
+                                    'duree_hp': Outils.format_heure(scm['tot_hp']),
+                                    'pu_hp': Outils.format_2_dec(somme[id_machine]['pu_hp']),
+                                    'montant_hp': Outils.format_2_dec(scm['mont_hp']),
+                                    'duree_hc': Outils.format_heure(scm['tot_hc']),
+                                    'pu_hc': Outils.format_2_dec(somme[id_machine]['pu_hc']),
+                                    'montant_hc': Outils.format_2_dec(scm['mont_hc'])}
                     if scm['mont_hp'] > 0:
                         contenu_hp += r'''
                                 %(machine)s & HP & %(duree_hp)s & %(pu_hp)s  & %(montant_hp)s \\
@@ -1642,7 +1646,8 @@ class TablesAnnexes(object):
                             for id_user in sorted(ids):
                                 smu = scm['users'][id_user]
                                 dico_user = {'user': Latex.echappe_caracteres(nom + " " + prenom),
-                                             'duree_hp': smu['tot_hp'], 'duree_hc': smu['tot_hc']}
+                                             'duree_hp': Outils.format_heure(smu['tot_hp']),
+                                             'duree_hc': Outils.format_heure(smu['tot_hc'])}
                                 if scm['mont_hp'] > 0 and smu['tot_hp'] > 0:
                                     contenu_hp += r'''
                                             \hspace{5mm} %(user)s & HP & %(duree_hp)s \hspace{5mm} & & \\
@@ -1657,10 +1662,10 @@ class TablesAnnexes(object):
                     contenu += contenu_hp
                     contenu += contenu_hc
 
-            dico = {'penalite_d': "",
-                    'rabais': "",
-                    'penalite': "",
-                    'total': ""}
+            dico = {'penalite_d': Outils.format_2_dec(scl['rm_d']),
+                    'rabais': scl['rm'],
+                    'penalite': scl['rr'],
+                    'total': scl['r']}
 
             contenu += r'''
                 \multicolumn{4}{|r|}{Arrondi} & %(penalite_d)s \\
