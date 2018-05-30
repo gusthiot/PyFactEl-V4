@@ -179,7 +179,7 @@ class Acces(Fichier):
         for code_client in self.sommes:
             for id_machine in self.sommes[code_client]['machines']:
                 scm = self.sommes[code_client]['machines'][id_machine]
-                scm['dhm'] += math.ceil(scm['du_hc'] * scm['duree_hc'])
+                scm['dhm'] += math.ceil(scm['du_hc'] * scm['duree_hc'] / 60)
 
             self.sommes[code_client]['categories'] = {}
             for id_compte in self.sommes[code_client]['comptes']:

@@ -1478,7 +1478,7 @@ class TablesAnnexes(object):
             legende = table + r''' - Rabais d’utilisation de machines en heures creuses'''
             contenu = r'''
                 \hline
-                \multicolumn{2}{|r|}{\scriptsize{\textbf{''' + intitule_compte + r'''}}} & \multicolumn{1}{c|}{Temps Mach.}
+                \multicolumn{2}{|l|}{\textbf{''' + intitule_compte + r'''}} & \multicolumn{1}{c|}{Temps Mach.}
                  & \multicolumn{1}{c|}{Rabais (CHF)} \\
                 \hline
                 '''
@@ -1555,7 +1555,7 @@ class TablesAnnexes(object):
                     if somme[id_machine]['dhm'] > 0:
                         dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
                                         'hc': Outils.format_heure(somme[id_machine]['duree_hc']),
-                                        'dhm': Outils.format_2_dec(somme[id_machine]['dhm'])}
+                                        'dhm': somme[id_machine]['dhm']}
                         contenu += r'''
                             \hspace{2mm} %(machine)s & HC & %(hc)s & %(dhm)s \\
                             \hline
@@ -1663,8 +1663,8 @@ class TablesAnnexes(object):
                     contenu += contenu_hc
 
             dico = {'penalite_d': Outils.format_2_dec(scl['rm_d']),
-                    'rabais': scl['rm'],
-                    'penalite': scl['rr'],
+                    'penalite': scl['rm'],
+                    'rabais': scl['rr'],
                     'total': scl['r']}
 
             contenu += r'''
