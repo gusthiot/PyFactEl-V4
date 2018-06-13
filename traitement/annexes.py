@@ -368,15 +368,15 @@ class Annexes(object):
         contenu = r'''
             \thispagestyle{empty}
             \begin{adjustwidth}{0cm}{}
-            %(centre)s \hspace*{\fill} \thepage \newline
-            %(ref)s \newline
-            \hspace*{\fill} %(nom)s \newline
-            \hspace*{\fill} %(code_sap)s \newline
+            %(centre)s \hspace*{\fill} \thepage \\
+            %(ref)s \\
+            \hspace*{\fill} %(nom)s \\
+            \hspace*{\fill} %(code_sap)s \\
             \end{adjustwidth}
-            \begin{adjustwidth}{5cm}{}
-            \Large\textsc{%(annexe)s %(date)s} \newline
+            \begin{center}
+            \Large\textsc{%(annexe)s %(date)s} \\
             \Large\textsc{%(titre)s}
-            \end{adjustwidth}
+            \end{center}
             \rule{\linewidth}{1pt}
              \vspace*{5cm}
             ''' % dic_titre
