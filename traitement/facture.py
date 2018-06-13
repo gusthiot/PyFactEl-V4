@@ -16,8 +16,7 @@ class Facture(object):
 
         self.prod2qual = prod2qual
 
-    def factures(self, sommes, destination, edition, generaux, clients, comptes,
-                 lien_annexes, lien_annexes_techniques, annexes, annexes_techniques):
+    def factures(self, sommes, destination, edition, generaux, clients, comptes, paramannexe):
         """
         génère la facture sous forme de csv
         
@@ -27,10 +26,7 @@ class Facture(object):
         :param generaux: paramètres généraux
         :param clients: clients importés
         :param comptes: comptes importés
-        :param lien_annexes: lien au dossier contenant les annexes
-        :param lien_annexes_techniques: lien au dossier contenant les annexes techniques
-        :param annexes: dossier contenant les annexes
-        :param annexes_techniques: dossier contenant les annexes techniques
+        :param paramannexe: paramètres d'annexe
         :return: données du combolist et des sections
         """
 
@@ -43,20 +39,23 @@ class Facture(object):
             suffixe = "_qualite.csv"
         else:
             suffixe = ".csv"
-        nom = "facture_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
-              str(edition.version) + suffixe
-        with destination.writer(nom) as fichier_writer:
+        nom_facture = "facture_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
+                      str(edition.version) + suffixe
+        with destination.writer(nom_facture) as fichier_writer:
             fichier_writer.writerow(["Poste", "Système d'origine", "Type de document de vente",
                                      "Organisation commerciale", "Canal de distribution", "Secteur d'activité", "", "",
                                      "Client", "Nom 2 du client", "Nom 3 du client", "Adresse e-mail du client",
                                      "Client", "Client", "Client", "Devise", "Mode d'envoi",
                                      "Référence de la facture", "", "", "Texte d'entête",
-                                     "Lien réseau vers l'annexe facture *.pdf", "Document interne",
-                                     "Lien réseau vers l'annexe technique *.pdf", "Document interne", "", "", "", "",
-                                     "", "", "Article", "", "Quantité", "Unité de quantité", "Type de prix",
-                                     "Prix net du poste", "Type de rabais", "Valeur rabais du poste",
-                                     "Date de livraison", "Centre financier", "", "Fonds à créditer", "", "",
-                                     "Code opération", "", "", "", "Texte libre du poste", "Nom"])
+                                     "Lien réseau vers l'annexe client .pdf", "Document interne",
+                                     "Lien réseau vers l'annexe projets .pdf", "Document interne",
+                                     "Lien réseau vers l'annexe détails .pdf", "Document interne",
+                                     "Lien réseau vers l'annexe pièces .pdf", "Document interne",
+                                     "Lien réseau vers l'annexe interne .pdf", "Document interne", "Article", "",
+                                     "Quantité", "Unité de quantité", "Type de prix", "Prix net du poste",
+                                     "Type de rabais", "Valeur rabais du poste", "Date de livraison",
+                                     "Centre financier", "", "Fonds à créditer", "", "", "Code opération", "", "", "",
+                                     "Texte libre du poste", "Nom"])
 
             combo_list = {}
 
@@ -76,24 +75,13 @@ class Facture(object):
                     genre = generaux.code_int
                 else:
                     genre = generaux.code_ext
-                nature = generaux.nature_client_par_code_n(client['nature'])
+                nature = generaux.code_ref_par_code_n(client['nature'])
                 reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
                 if edition.version > 0:
                     reference += "-" + str(edition.version)
 
                 filtre = generaux.filtrer_article_nul_par_code_n(client['nature'])
-    
-                nom_annexe = "annexe_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + \
-                             "_" + str(edition.version) + "_" + code_client + ".pdf"
-                lien_annexe = lien_annexes + nom_annexe
-                dossier_annexe = "../" + annexes + "/" + nom_annexe
-    
-                nom_annexe_technique = "annexeT_" + str(edition.annee) + "_" + \
-                                       Outils.mois_string(edition.mois) + "_" + str(edition.version) + "_" + \
-                                       code_client + ".pdf"
-                lien_annexe_technique = lien_annexes_techniques + nom_annexe_technique
-                dossier_annexe_technique = "../" + annexes_techniques + "/" + nom_annexe_technique
-    
+
                 if self.prod2qual:
                     code_sap_traduit = self.prod2qual.traduire_code_client(code_sap)
                 else:
@@ -117,13 +105,21 @@ class Facture(object):
                     <td> Unit Price <br /> [CHF] </td><td> Discount </td><td> Net amount <br /> [CHF] </td>
                     </tr>
                     '''
-    
-                fichier_writer.writerow([poste, generaux.origine, genre, generaux.commerciale,
-                                         generaux.canal, generaux.secteur, "", "",
-                                         code_sap_traduit, client['dest'], client['ref'], client['email'],
-                                         code_sap_traduit, code_sap_traduit,
-                                         code_sap_traduit, generaux.devise, client['mode'], reference, "", "",
-                                         generaux.entete, lien_annexe, "", lien_annexe_technique, "X"])
+
+                ligne = [poste, generaux.origine, genre, generaux.commerciale, generaux.canal, generaux.secteur, "", "",
+                         code_sap_traduit, client['dest'], client['ref'], client['email'], code_sap_traduit,
+                         code_sap_traduit, code_sap_traduit, generaux.devise, client['mode'], reference, "", "",
+                         generaux.entete]
+                for donnee in paramannexe.donnees:
+                    ligne.append(donnee['lien'])
+                    if generaux.code_ref_par_code_n(client['nature']) == "INT":
+                        ligne.append(donnee['int'])
+                    elif client['mode'] == "MAIL":
+                        ligne.append(donnee['ext_mail'])
+                    else:
+                        ligne.append(donnee['ext_postal'])
+
+                fichier_writer.writerow(ligne)
     
                 op_centre = client['nature'] + str(edition.annee)[2:] + Outils.mois_string(edition.mois)
 
@@ -152,28 +148,30 @@ class Facture(object):
                         if sco['c1'] > 0 and not (filtre == "OUI" and sco['c2'] == 0):
                             poste = inc*10
                             if sco['somme_j_mm'] > 0 and not (filtre == "OUI" and sco['mj'] == 0):
-                                fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[2], poste,
-                                                                           sco['somme_j_mm'], sco['somme_j_mr'], op_centre,
-                                                                           compte['numero'] + " - " + compte['intitule'],
-                                                                           edition))
-                                contenu_client += self.ligne_tableau(generaux.articles[2], poste, sco['somme_j_mm'],
-                                                                     sco['somme_j_mr'],
-                                                                     compte['numero'] + " - " + compte['intitule'], edition)
+                                fichier_writer.writerow(
+                                    self.ligne_facture(generaux, generaux.articles[2], poste,
+                                                       sco['somme_j_mm'], sco['somme_j_mr'], op_centre,
+                                                       compte['numero'] + " - " + compte['intitule'], edition)
+                                )
+                                contenu_client += self.ligne_tableau(
+                                    generaux.articles[2], poste, sco['somme_j_mm'], sco['somme_j_mr'],
+                                    compte['numero'] + " - " + compte['intitule'], edition
+                                )
                                 poste += 1
 
                             for article in generaux.articles_d3:
                                 categorie = article.code_d
                                 if sco['sommes_cat_m'][categorie] > 0 and not (filtre == "OUI"
                                                                                and sco['tot_cat'][article.code_d] == 0):
-                                    fichier_writer.writerow(self.ligne_facture(generaux, article, poste,
-                                                                               sco['sommes_cat_m'][categorie],
-                                                                               sco['sommes_cat_r'][categorie], op_centre,
-                                                                               compte['numero'] + " - " +
-                                                                               compte['intitule'], edition))
-                                    contenu_client += self.ligne_tableau(article, poste, sco['sommes_cat_m'][categorie],
-                                                                         sco['sommes_cat_r'][categorie],
-                                                                         compte['numero'] + " - " + compte['intitule'],
-                                                                         edition)
+                                    fichier_writer.writerow(
+                                        self.ligne_facture(generaux, article, poste, sco['sommes_cat_m'][categorie],
+                                                           sco['sommes_cat_r'][categorie], op_centre,
+                                                           compte['numero'] + " - " + compte['intitule'], edition)
+                                    )
+                                    contenu_client += self.ligne_tableau(
+                                        article, poste, sco['sommes_cat_m'][categorie], sco['sommes_cat_r'][categorie],
+                                        compte['numero'] + " - " + compte['intitule'], edition
+                                    )
                                     poste += 1
                             inc += 1
                 contenu_client += r'''
@@ -181,12 +179,16 @@ class Facture(object):
                     ''' + "%.2f" % scl['somme_t'] + r'''</td></tr>
                     </table>
                     '''
-                contenu_client += r'''<table><tr><td><a href="''' + dossier_annexe + r'''" target="new">''' + nom_annexe + r'''
-                    </a></td>'''
-                contenu_client += r'''<td><a href="''' + dossier_annexe_technique + r'''" target="new">
-                    ''' + nom_annexe_technique + r'''</a></td></tr></table>'''
+                contenu_client += r'''<table><tr>'''
+                for donnee in paramannexe.donnees:
+                    nom_annexe = donnee['nom'] + "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + \
+                                 "_" + str(edition.version) + "_" + code_client + ".pdf"
+                    dossier_annexe = "../" + donnee['dossier'] + "/" + nom_annexe
+                    contenu_client += r'''<td><a href="''' + dossier_annexe + r'''" target="new">''' + nom_annexe + r'''
+                        </a></td>'''
+                contenu_client += r'''</tr></table>'''
                 contenu_client += "</section>"
-                combo_list[client['abrev_labo'] + " ("+ code_client + ")"] = contenu_client
+                combo_list[client['abrev_labo'] + " (" + code_client + ")"] = contenu_client
         self.creer_html(destination, combo_list, edition)
         return combo_list
 

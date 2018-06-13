@@ -33,13 +33,11 @@ class Latex(object):
         return texte
 
     @staticmethod
-    def creer_latex_pdf(nom_fichier, contenu, annexes, nom_dossier=""):
+    def creer_latex_pdf(nom_fichier, contenu):
         """
         création d'un pdf à partir d'un contenu latex
         :param nom_fichier: nom du pdf final
         :param contenu: contenu latex
-        :param annexes: pages à concaténer à la fin
-        :param nom_dossier: nom du dossier dans lequel enregistrer le pdf
         """
         with open(nom_fichier + ".tex", 'w') as f:
             f.write(contenu)
@@ -57,27 +55,49 @@ class Latex(object):
             os.unlink(nom_fichier + '.log')
             os.unlink(nom_fichier + '.aux')
 
-            fichier_fin = nom_fichier + ".pdf"
+        except OSError as err:
+            Outils.affiche_message("OSError: {0}".format(err))
+        except IOError as err:
+            Outils.affiche_message("IOError: {0}".format(err))
 
-            if annexes is not None and len(annexes) > 0:
-                pdfs = []
-                for pos, chemins in sorted(annexes.items()):
-                    for chemin in chemins:
-                        pdfs.append(chemin)
+    @staticmethod
+    def finaliser_pdf(nom_fichier, chemin_dossier=""):
+        """
+        déplacer le pdf créé si nécessaire
+        :param nom_fichier: nom du pdf
+        :param chemin_dossier: chemin du dossier dans lequel enregistrer le pdf
+        """
+        fichier = nom_fichier + ".pdf"
+        try:
+            if chemin_dossier != '':
+                shutil.copy(fichier, chemin_dossier)
+                os.unlink(fichier)
+        except OSError as err:
+            Outils.affiche_message("OSError: {0}".format(err))
+        except IOError as err:
+            Outils.affiche_message("IOError: {0}".format(err))
+
+    @staticmethod
+    def concatenation_pdfs(nom_fichier, pdfs):
+        """
+        concatenation de pdfs
+        :param nom_fichier: nom du pdf final
+        :param pdfs: pages à concaténer
+        """
+        fichier = nom_fichier + ".pdf"
+        try:
+            if pdfs is not None and len(pdfs) > 1:
                 merger = PdfFileMerger()
-
-                with open(nom_fichier + ".pdf", 'rb') as f:
+                fs = []
+                for pdf in pdfs:
+                    f = open(pdf, 'rb')
                     merger.append(f)
-                    for pdf in pdfs:
-                        merger.append(pdf)
-
-                    merger.write('concatene.pdf')
-                shutil.copy('concatene.pdf', fichier_fin)
+                    fs.append(f)
+                merger.write('concatene.pdf')
+                for f in fs:
+                    f.close()
+                shutil.copy('concatene.pdf', fichier)
                 os.unlink('concatene.pdf')
-
-            if nom_dossier != '':
-                shutil.copy(fichier_fin, nom_dossier)
-                os.unlink(fichier_fin)
         except OSError as err:
             Outils.affiche_message("OSError: {0}".format(err))
         except IOError as err:

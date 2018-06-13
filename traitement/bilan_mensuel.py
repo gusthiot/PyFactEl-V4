@@ -59,7 +59,7 @@ class BilanMensuel(object):
         for code_client in sorted(sommes.sommes_clients.keys()):
             scl = sommes.sommes_clients[code_client]
             client = clients.donnees[code_client]
-            nature = generaux.nature_client_par_code_n(client['nature'])
+            nature = generaux.code_ref_par_code_n(client['nature'])
             reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
             if edition.version > 0:
                 reference += "-" + str(edition.version)

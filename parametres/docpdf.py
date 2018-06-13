@@ -8,7 +8,7 @@ class DocPdf(object):
     """
 
     nom_fichier = "docpdf.csv"
-    cles = ['nom', 'position', 'annexe_fact', 'annexe_tech', 'nature', 'code']
+    cles = ['nom', 'position', 'Annexe-pièces', 'Annexe-interne', 'nature', 'code']
     libelle = "Documents PDF"
 
     def __init__(self, dossier_source):
@@ -98,15 +98,15 @@ class DocPdf(object):
             if donnee['position'] < 1:
                 msg += " la position de la ligne " + str(ligne) + " doit être un entier > 0\n"
 
-            if donnee['annexe_fact'] == "":
-                msg += "le annexeF de la ligne " + str(ligne) + " ne peut être vide\n"
-            if not (donnee['annexe_fact'] == "OUI" or donnee['annexe_fact'] == "NON"):
-                msg += "le annexeF de la ligne " + str(ligne) + " doit être 'OUI' ou 'NON'\n"
+            if donnee['Annexe-pièces'] == "":
+                msg += "le annexe P.J. de la ligne " + str(ligne) + " ne peut être vide\n"
+            if not (donnee['Annexe-pièces'] == "OUI" or donnee['Annexe-pièces'] == "NON"):
+                msg += "le annexe P.J. de la ligne " + str(ligne) + " doit être 'OUI' ou 'NON'\n"
 
-            if donnee['annexe_tech'] == "":
-                msg += "le annexeT de la ligne " + str(ligne) + " ne peut être vide\n"
-            if not (donnee['annexe_tech'] == "OUI" or donnee['annexe_tech'] == "NON"):
-                msg += "le annexeT de la ligne " + str(ligne) + " doit être 'OUI' ou 'NON'\n"
+            if donnee['Annexe-interne'] == "":
+                msg += "le annexe Int de la ligne " + str(ligne) + " ne peut être vide\n"
+            if not (donnee['Annexe-interne'] == "OUI" or donnee['Annexe-interne'] == "NON"):
+                msg += "le annexe Int de la ligne " + str(ligne) + " doit être 'OUI' ou 'NON'\n"
 
             if donnee['nature'] != "" and donnee['nature'] not in generaux.obtenir_code_n():
                 msg += "la nature '" + donnee['nature'] + "' de la ligne " + str(ligne) +\

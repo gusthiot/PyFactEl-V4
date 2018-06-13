@@ -5,10 +5,9 @@ from latex import Latex
 class TablesAnnexes(object):
 
     @staticmethod
-    def table_tps_res_xmu(table, code_client, reservations, machines, users):
+    def table_tps_res_xmu(code_client, reservations, machines, users):
         """
         Tps RES X/M/U - Table Client Détail Temps Réservations/Machine/User
-        :param table: indice de table
         :param code_client: code du client concerné
         :param reservations: réservations importées
         :param machines: machines importées
@@ -18,7 +17,7 @@ class TablesAnnexes(object):
 
         if code_client in reservations.sommes:
             structure = r'''{|c|c|c|c|c|}'''
-            legende = table + r''' - Détail des réservations machines par utilisateur'''
+            legende = r'''Détail des réservations machines par utilisateur'''
             contenu = r'''
                 \cline{4-5}
                 \multicolumn{3}{c}{} & \multicolumn{2}{|c|}{Durée réservée} \\
@@ -82,14 +81,12 @@ class TablesAnnexes(object):
 
             return Latex.long_tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Détail des réservations machines par utilisateur :
-                table vide (pas de réservation machines)''')
+            return ""
 
     @staticmethod
-    def table_tps_m_cae_xmu(table, code_client, acces, contenu_cae_xmu):
+    def table_tps_m_cae_xmu(code_client, acces, contenu_cae_xmu):
         """
         Tps_M CAE X/M/U - Table Client Récap Temps mach avec pénalités /Machine/User
-        :param table: indice de table
         :param code_client: code du client concerné
         :param acces: accès importés
         :param contenu_cae_xmu: contenu généré pour cette table
@@ -98,7 +95,7 @@ class TablesAnnexes(object):
 
         if code_client in acces.sommes and contenu_cae_xmu != "":
             structure = r'''{|l|c|c|}'''
-            legende = table + r''' - Récapitulatif des utilisations machines par utilisateur'''
+            legende = r'''Récapitulatif des utilisations machines par utilisateur'''
             contenu = r'''
                 \cline{2-3}
                 \multicolumn{1}{c|}{} & HP & HC \\
@@ -108,14 +105,12 @@ class TablesAnnexes(object):
 
             return Latex.long_tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Récapitulatif des utilisations machines par
-                utilisateur : table vide (pas d’utilisation machines)''')
+            return ""
 
     @staticmethod
-    def table_tps_penares_xmu(table, code_client, scl, sommes_acces, sommes_reservations, machines, users):
+    def table_tps_penares_xmu(code_client, scl, sommes_acces, sommes_reservations, machines, users):
         """
         Tps Penares X/M/U - Table Client Durées Pénalités réserv./Machine/User
-        :param table: indice de table
         :param code_client: code du client concerné
         :param scl: sommes client calculées
         :param sommes_acces: sommes des accès importés
@@ -127,7 +122,7 @@ class TablesAnnexes(object):
 
         if code_client in sommes_reservations:
             structure = r'''{|l|c|c|c|c|c|c|}'''
-            legende = table + r''' - Statistiques des réservations et des utilisations machines'''
+            legende = r'''Statistiques des réservations et des utilisations machines'''
             contenu = r'''
                 \cline{3-7}
                 \multicolumn{2}{c}{} & \multicolumn{3}{|c|}{Réservation} & Utilisation & Pénalités \\
@@ -219,14 +214,12 @@ class TablesAnnexes(object):
 
             return Latex.long_tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Statistiques des réservations et des utilisations
-                machines : table vide (pas de pénalités de réservation)''')
+            return ""
 
     @staticmethod
-    def table_prix_xr(table, code_client, scl, sommes_reservations, machines):
+    def table_prix_xr(code_client, scl, sommes_reservations, machines):
         """
         Prix XR - Table Client Récap Pénalités Réservations
-        :param table: indice de table
         :param code_client: code du client concerné
         :param scl: sommes client calculées
         :param sommes_reservations: sommes des réservations importées
@@ -236,7 +229,7 @@ class TablesAnnexes(object):
 
         if code_client in sommes_reservations:
             structure = r'''{|l|c|c|r|r|}'''
-            legende = table + r''' - Pénalités de réservation'''
+            legende = r'''Pénalités de réservation'''
 
             contenu = r'''
                 \cline{3-5}
@@ -287,8 +280,7 @@ class TablesAnnexes(object):
 
             return Latex.tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Pénalités de réservation :
-                table vide (pas de pénalités de réservation)''')
+            return ""
 
     @staticmethod
     def contenu_tps_m_cae_xmu(code_client, scl, sommes_acces, machines, users, comptes):
@@ -355,10 +347,9 @@ class TablesAnnexes(object):
         return contenu
 
     @staticmethod
-    def table_prix_lvr_xdj(table, code_client, scl, sommes_livraisons, generaux, contenu_prix_lvr_xdj_tab):
+    def table_prix_lvr_xdj(code_client, scl, sommes_livraisons, generaux, contenu_prix_lvr_xdj_tab):
         """
         Prix LVR X/D/J - Table Client Récap Prestations livr./code D/Compte
-        :param table: indice de table
         :param code_client: code du client concerné
         :param scl: sommes client calculées
         :param sommes_livraisons: sommes des livraisons importées
@@ -369,7 +360,7 @@ class TablesAnnexes(object):
 
         if code_client in sommes_livraisons:
             structure = r'''{|l|r|r|r|}'''
-            legende = table + r''' - Récapitulatif des prestations livrées'''
+            legende = r'''Récapitulatif des prestations livrées'''
 
             contenu = ""
             i = 0
@@ -390,14 +381,12 @@ class TablesAnnexes(object):
 
             return Latex.tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Récapitulatif des prestations livrées :
-                table vide (pas de prestations livrées)''')
+            return ""
 
     @staticmethod
-    def table_prix_cae_xj(table, code_client, scl, sommes_acces, client, contenu_prix_cae_xj):
+    def table_prix_cae_xj(code_client, scl, sommes_acces, client, contenu_prix_cae_xj):
         """
         Prix CAE X/J - Table Client Récap Procédés/Compte
-        :param table: indice de table
         :param code_client: code du client concerné
         :param scl: sommes client calculées
         :param sommes_acces: sommes des accès importés
@@ -408,7 +397,7 @@ class TablesAnnexes(object):
 
         if code_client in sommes_acces:
             structure = r'''{|l|l|r|r|r|r|r|r|}'''
-            legende = table + r''' - Récapitulatif des procédés'''
+            legende = r'''Récapitulatif des procédés'''
 
             contenu = r'''
                 \cline{3-8}
@@ -432,21 +421,19 @@ class TablesAnnexes(object):
 
             return Latex.long_tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Récapitulatif des procédés :
-                table vide (pas d'utilisations machines)''')
+            return ""
 
     @staticmethod
-    def table_prix_xe(table, scl, client):
+    def table_prix_xe(scl, client):
         """
         Prix XE - Table Client Emolument
-        :param table: indice de table
         :param scl: sommes client calculées
         :param client: données client
         :return: table au format latex
         """
 
         structure = r'''{|r|r|r|r|}'''
-        legende = table + r''' - Émolument mensuel'''
+        legende = r'''Émolument mensuel'''
 
         dico = {'emb':  Outils.format_2_dec(client['emb']), 'tot': Outils.format_2_dec(scl['mt']),
                 'rabais': Outils.format_2_dec(scl['er']), 'emo': scl['e']}
@@ -464,17 +451,16 @@ class TablesAnnexes(object):
         return Latex.tableau(contenu, structure, legende)
 
     @staticmethod
-    def table_prix_xa(table, scl, generaux):
+    def table_prix_xa(scl, generaux):
         """
         Prix XA - Table Client Récap Articles
-        :param table: indice de table
         :param scl: sommes client calculées
         :param generaux: paramètres généraux
         :return: table au format latex
         """
 
         structure = r'''{|l|r|r|r|}'''
-        legende = table + r''' - Récapitulatif des articles'''
+        legende = r'''Récapitulatif des articles'''
 
         dico = {'emom': Outils.format_2_dec(scl['em']), 'emor': Outils.format_2_dec(scl['er']),
                 'emo': Outils.format_2_dec(scl['e']), 'resm': Outils.format_2_dec(scl['rm']),
@@ -516,10 +502,9 @@ class TablesAnnexes(object):
         return Latex.tableau(contenu, structure, legende)
 
     @staticmethod
-    def table_prix_bonus_xj(table, code_client, scl, sommes_acces, contenu_prix_bonus_xj):
+    def table_prix_bonus_xj(code_client, scl, sommes_acces, contenu_prix_bonus_xj):
         """
         Prix Bonus X/J - Table Client Récap Bonus/Compte
-        :param table: indice de table
         :param code_client: code du client concerné
         :param scl: sommes client calculées
         :param sommes_acces:  sommes des accès importés
@@ -529,7 +514,7 @@ class TablesAnnexes(object):
 
         if code_client in sommes_acces:
             structure = r'''{|l|r|}'''
-            legende = table + r''' - Récapitulatif des bonus'''
+            legende = r'''Récapitulatif des bonus'''
 
             contenu = r'''
                 \cline{2-2}
@@ -547,14 +532,12 @@ class TablesAnnexes(object):
 
             return Latex.long_tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Récapitulatif des bonus :
-                table vide (pas d'utilisations machines)''')
+            return ""
 
     @staticmethod
-    def table_prix_xaj(table, scl, generaux, contenu_prix_xaj):
+    def table_prix_xaj(scl, generaux, contenu_prix_xaj):
         """
         Prix XA/J - Table Client Récap Articles/Compte
-        :param table: indice de table
         :param scl: sommes client calculées
         :param generaux: paramètres généraux
         :param contenu_prix_xaj: contenu généré de la table
@@ -562,7 +545,7 @@ class TablesAnnexes(object):
         """
 
         structure = r'''{|l|l|r|r|'''
-        legende = table + r''' - Récapitulatif des projets'''
+        legende = r'''Récapitulatif des projets'''
 
         contenu = r'''
             \hline
@@ -594,10 +577,9 @@ class TablesAnnexes(object):
         return Latex.long_tableau(contenu, structure, legende)
 
     @staticmethod
-    def table_prix_xf(table, scl, generaux, filtre, contenu_prix_xf):
+    def table_prix_xf(scl, generaux, filtre, contenu_prix_xf):
         """
         Prix XF - Table Client Récap Postes de la facture
-        :param table: indice de table
         :param scl: sommes client calculées
         :param generaux: paramètres généraux
         :param filtre: si nul pour code n
@@ -610,7 +592,7 @@ class TablesAnnexes(object):
             brut += tt
         if scl['somme_t'] > 0 or (filtre == "NON" and brut > 0):
             structure = r'''{|c|l|r|r|r|}'''
-            legende = table + r''' - Récapitulatif des postes de la facture'''
+            legende = r'''Récapitulatif des postes de la facture'''
 
             dico = {'emom': Outils.format_2_dec(scl['em']), 'emor': Outils.format_2_dec(scl['er']),
                     'emo': Outils.format_2_dec(scl['e']), 'resm': Outils.format_2_dec(scl['rm']),
@@ -642,14 +624,12 @@ class TablesAnnexes(object):
                 '''
             return Latex.long_tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Récapitulatif des postes de la facture :
-                table vide (aucun article facturable)''')
+            return ""
 
     @staticmethod
-    def table_qte_lvr_jdu(table, code_client, id_compte, intitule_compte, generaux, livraisons, users):
+    def table_qte_lvr_jdu(code_client, id_compte, intitule_compte, generaux, livraisons, users):
         """
         Qté LVR J/D/U - Table Compte Détail Quantités livrées/Prestation (code D)/User
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -660,7 +640,7 @@ class TablesAnnexes(object):
         """
 
         structure = r'''{|l|c|c|c|}'''
-        legende = table + r''' - Détails des prestations livrées'''
+        legende = r'''Détails des prestations livrées'''
 
         contenu = r'''
             '''
@@ -735,10 +715,9 @@ class TablesAnnexes(object):
         return Latex.long_tableau(contenu, structure, legende)
 
     @staticmethod
-    def table_tps_cae_jkmu(table, code_client, id_compte, intitule_compte, users, machines, couts, acces):
+    def table_tps_cae_jkmu(code_client, id_compte, intitule_compte, users, machines, couts, acces):
         """
         Tps CAE J/K/M/U - Table Compte Détail Temps CAE/Catégorie Machine/Machine/User
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -751,7 +730,7 @@ class TablesAnnexes(object):
 
         if code_client in acces.sommes and id_compte in acces.sommes[code_client]['comptes']:
             structure = r'''{|l|l|l|c|c|c|}'''
-            legende = table + r''' - Détails des utilisations machines'''
+            legende = r'''Détails des utilisations machines'''
 
             contenu = r'''
                 \hline
@@ -841,14 +820,12 @@ class TablesAnnexes(object):
 
             return Latex.long_tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Détails des utilisations machines :
-                table vide (pas d’utilisation machines)''')
+            return ""
 
     @staticmethod
-    def table_cout_lvr_jd(table, code_client, id_compte, intitule_compte, sco, generaux, sommes_livraisons):
+    def table_cout_lvr_jd(code_client, id_compte, intitule_compte, sco, generaux, sommes_livraisons):
         """
         Coût LVR J/D - Table Compte Récap Coûts Prestations livrées/code D
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -860,7 +837,7 @@ class TablesAnnexes(object):
 
         contenu = ""
         structure = r'''{|l|r|c|r|r|r|r|}'''
-        legende = table + r''' - Coûts des prestations livrées'''
+        legende = r'''Coûts des prestations livrées'''
         if code_client in sommes_livraisons and id_compte in sommes_livraisons[code_client]:
             somme = sommes_livraisons[code_client][id_compte]
             for article in generaux.articles_d3:
@@ -912,14 +889,12 @@ class TablesAnnexes(object):
         if contenu != "":
             return Latex.tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Coûts des prestations livrées :
-                table vide (pas de prestations livrées)''')
+            return ""
 
     @staticmethod
-    def table_cout_cae_jkm(table, code_client, id_compte, intitule_compte, couts, machines, sommes_acces):
+    def table_cout_cae_jkm(code_client, id_compte, intitule_compte, couts, machines, sommes_acces):
         """
         Coût CAE J/K/M - Table Compte Récap Coûts Procédés/Catégorie Machine/Machine
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -931,7 +906,7 @@ class TablesAnnexes(object):
 
         if code_client in sommes_acces and id_compte in sommes_acces[code_client]['comptes']:
             structure = r'''{|l|c|c|r|r|r|r|r|r|r|r|}'''
-            legende = table + r''' - Coûts d'utilisation des machines et main d'oeuvre par catégorie'''
+            legende = r'''Coûts d'utilisation des machines et main d'oeuvre par catégorie'''
             contenu = ""
 
             somme = sommes_acces[code_client]['comptes'][id_compte]
@@ -989,14 +964,12 @@ class TablesAnnexes(object):
             return Latex.long_tableau(contenu, structure, legende)
 
         else:
-            return Latex.tableau_vide(table + r''' - Coûts d'utilisation des machines 
-                et main d'oeuvre par catégorie : table vide (pas d’utilisation machines)''')
+            return ""
 
     @staticmethod
-    def table_cout_ja(table, code_client, id_compte, generaux, sco, sommes_livraisons):
+    def table_cout_ja(code_client, id_compte, generaux, sco, sommes_livraisons):
         """
         Coût JA - Table Compte Récap  Articles
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param generaux: paramètres généraux
@@ -1006,7 +979,7 @@ class TablesAnnexes(object):
         """
 
         structure = r'''{|l|r|r|r|}'''
-        legende = table + r''' - Coûts d'utilisation '''
+        legende = r'''Coûts d'utilisation '''
 
         dico = {'mu1': Outils.format_2_dec(sco['mu1']), 'mu2': Outils.format_2_dec(sco['mu2']),
                 'mu3': Outils.format_2_dec(sco['mu3']), 'mmo': Outils.format_2_dec(sco['mmo'])}
@@ -1065,10 +1038,9 @@ class TablesAnnexes(object):
         return Latex.tableau(contenu, structure, legende)
 
     @staticmethod
-    def table_prix_cae_jm(table, code_client, id_compte, intitule_compte, sco, sommes_acces, machines, av_hc):
+    def table_prix_cae_jm(code_client, id_compte, intitule_compte, sco, sommes_acces, machines, av_hc):
         """
         Prix CAE J/M - Table Compte Récap Procédés/Machine
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -1081,7 +1053,7 @@ class TablesAnnexes(object):
 
         if code_client in sommes_acces and id_compte in sommes_acces[code_client]['comptes']:
             structure = r'''{|l|c|c|c|r|r|r|r|r|}'''
-            legende = table + r''' - Procédés (machine + main d'oeuvre)'''
+            legende = r'''Procédés (machine + main d'oeuvre)'''
 
             contenu = r'''
                 \cline{3-9}
@@ -1162,14 +1134,12 @@ class TablesAnnexes(object):
 
             return Latex.tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Procédés (machine + main d'oeuvre) :
-                table vide (pas d’utilisation machines)''')
+            return ""
 
     @staticmethod
-    def table_cout_cae_jk(table, code_client, id_compte, intitule_compte, sco, sommes_acces, couts):
+    def table_cout_cae_jk(code_client, id_compte, intitule_compte, sco, sommes_acces, couts):
         """
         Coût CAE J/K - Table Compte Récap Procédés/Catégorie Machine
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -1181,7 +1151,7 @@ class TablesAnnexes(object):
 
         if code_client in sommes_acces and id_compte in sommes_acces[code_client]['categories']:
             structure = r'''{|l|r|r|r|r|}'''
-            legende = table + r''' - Coûts d'utilisation des machines et main d'oeuvre'''
+            legende = r'''Coûts d'utilisation des machines et main d'oeuvre'''
             contenu = r'''
                     \hline
                     \multirow{2}{*}{\textbf{''' + intitule_compte + r'''}}
@@ -1224,14 +1194,12 @@ class TablesAnnexes(object):
 
             return Latex.tableau(contenu, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Coûts d'utilisation des machines 
-            et main d'oeuvre : table vide (pas d’utilisation machines)''')
+            return ""
 
     @staticmethod
-    def table_prix_avtg_jm(table, code_client, id_compte, intitule_compte, sco, sommes_acces, machines, av_hc):
+    def table_prix_avtg_jm(code_client, id_compte, intitule_compte, sco, sommes_acces, machines, av_hc):
         """
         Prix Avtg J/M - Table Compte Avantage HC (Rabais ou Bonus) par Machine
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -1244,7 +1212,7 @@ class TablesAnnexes(object):
 
         if code_client in sommes_acces and id_compte in sommes_acces[code_client]['comptes']:
             structure = r'''{|l|l|c|r|}'''
-            legende = table + r''' - ''' + av_hc + r''' d’utilisation de machines en heures creuses'''
+            legende = av_hc + r''' d’utilisation de machines en heures creuses'''
 
             contenu = r'''
                  \cline{3-4}
@@ -1285,10 +1253,9 @@ class TablesAnnexes(object):
             return ""
 
     @staticmethod
-    def table_prix_lvr_jd(table, code_client, id_compte, intitule_compte, sco, sommes_livraisons, generaux):
+    def table_prix_lvr_jd(code_client, id_compte, intitule_compte, sco, sommes_livraisons, generaux):
         """
         Prix LVR J/D - Table Compte Récap Prestations livrées/code D
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -1301,7 +1268,7 @@ class TablesAnnexes(object):
         if code_client in sommes_livraisons and id_compte in sommes_livraisons[code_client]:
             somme = sommes_livraisons[code_client][id_compte]
             structure = r'''{|l|r|c|r|r|r|}'''
-            legende = table + r''' - Prestations livrées'''
+            legende = r'''Prestations livrées'''
             contenu_prests = ""
             for article in generaux.articles_d3:
                 if article.code_d in somme:
@@ -1343,14 +1310,12 @@ class TablesAnnexes(object):
                         ''' % dico_prestations
             return Latex.tableau(contenu_prests, structure, legende)
         else:
-            return Latex.tableau_vide(table + r''' - Prestations livrées :
-                table vide (pas de prestations livrées)''')
+            return ""
 
     @staticmethod
-    def table_prix_cae_jk(table, code_client, id_compte, intitule_compte, sco, sommes_acces, couts):
+    def table_prix_cae_jk(code_client, id_compte, intitule_compte, sco, sommes_acces, couts):
         """
         Prix CAE J/K - Table Compte Récap Procédés/Catégorie Machine
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -1363,7 +1328,7 @@ class TablesAnnexes(object):
         if code_client in sommes_acces and id_compte in sommes_acces[code_client]['comptes']:
 
             structure = r'''{|l|c|c|r|r|r|r|}'''
-            legende = table + r''' - Procédés (Machine + Main d'œuvre)'''
+            legende = r'''Procédés (Machine + Main d'œuvre)'''
             contenu = r'''
                 \cline{2-7}
                 \multicolumn{1}{l|}{}
@@ -1407,17 +1372,16 @@ class TablesAnnexes(object):
             return ""
 
     @staticmethod
-    def table_prix_ja(table, sco, generaux):
+    def table_prix_ja(sco, generaux):
         """
         Prix JA - Table Compte Récap Articles
-        :param table: indice de table
         :param sco: sommes compte calculées
         :param generaux: paramètres généraux
         :return: table au format latex
         """
 
         structure = r'''{|l|r|r|r|}'''
-        legende = table + r''' - Récapitulatif des articles du projet'''
+        legende = r'''Récapitulatif des articles du projet'''
 
         dico = {'mm': Outils.format_2_dec(sco['somme_j_mm']), 'mr': Outils.format_2_dec(sco['somme_j_mr']),
                 'maij': Outils.format_2_dec(sco['somme_j_mai']), 'mj': Outils.format_2_dec(sco['mj']),
@@ -1459,10 +1423,9 @@ class TablesAnnexes(object):
         return Latex.tableau(contenu, structure, legende)
 
     @staticmethod
-    def table_prix_jdmu(table, code_client, id_compte, intitule_compte, sco, sommes_acces, machines, users):
+    def table_prix_jdmu(code_client, id_compte, intitule_compte, sco, sommes_acces, machines, users):
         """
         Prix JD/M/U - Table Compte Déductions HC (Rabais) par Machine
-        :param table: indice de table
         :param code_client: code du client concerné
         :param id_compte: id du compte concerné
         :param intitule_compte: intitulé du compte concerné
@@ -1475,7 +1438,7 @@ class TablesAnnexes(object):
 
         if sco['somme_j_dhi'] > 0 and code_client in sommes_acces and id_compte in sommes_acces[code_client]['comptes']:
             structure = r'''{|l|c|r|r|}'''
-            legende = table + r''' - Rabais d’utilisation de machines en heures creuses'''
+            legende = r'''Rabais d’utilisation de machines en heures creuses'''
             contenu = r'''
                 \hline
                 \multicolumn{2}{|l|}{\textbf{''' + intitule_compte + r'''}} & \multicolumn{1}{c|}{Temps Mach.}
@@ -1526,10 +1489,9 @@ class TablesAnnexes(object):
             return ""
 
     @staticmethod
-    def table_points_xbmu(table, code_client, scl, sommes_acces, machines, users):
+    def table_points_xbmu(code_client, scl, sommes_acces, machines, users):
         """
         Points XB/M/U - Table Client Récap Bonus/MAchine/User
-        :param table: indice de table
         :param code_client: code du client concerné
         :param scl: sommes client calculées
         :param sommes_acces: sommes des accès importés
@@ -1539,7 +1501,7 @@ class TablesAnnexes(object):
         """
         if scl['somme_t_mb'] > 0:
             structure = r'''{|l|c|r|r|}'''
-            legende = table + r''' - Récapitulatif des bonus d’utilisation en heures creuses'''
+            legende = r'''Récapitulatif des bonus d’utilisation en heures creuses'''
 
             contenu = r'''
                 \cline{3-4}
@@ -1586,10 +1548,9 @@ class TablesAnnexes(object):
             return ""
 
     @staticmethod
-    def table_prix_xrmu(table, code_client, scl, sommes_reservations, machines, users):
+    def table_prix_xrmu(code_client, scl, sommes_reservations, machines, users):
         """
         Prix XR/M/U - Table Client Récap Pénalités Réservations/Machine/user
-        :param table: indice de table
         :param code_client: code du client concerné
         :param scl: sommes client calculées
         :param sommes_reservations: sommes des réservations importées
@@ -1599,7 +1560,7 @@ class TablesAnnexes(object):
         """
         if scl['rm'] > 0:
             structure = r'''{|l|c|c|r|r|}'''
-            legende = table + r''' - Récapitulatif des pénalités de réservation'''
+            legende = r'''Récapitulatif des pénalités de réservation'''
 
             contenu = r'''
                 \cline{3-5}

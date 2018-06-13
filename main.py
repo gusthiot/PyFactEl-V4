@@ -33,6 +33,7 @@ from importes import (Client,
 from outils import Outils
 from parametres import (Edition,
                         DocPdf,
+                        Paramannexe,
                         Suppression,
                         Annulation,
                         Generaux)
@@ -91,6 +92,7 @@ if not ann_present and not sup_present and not pg_present:
 if pg_present:
     edition = Edition(dossier_source)
     generaux = Generaux(dossier_source)
+    paramannexe = Paramannexe(dossier_source)
 
     if Outils.existe(Outils.chemin([dossier_data, DocPdf.nom_fichier])):
         docpdf = DocPdf(dossier_source)
@@ -148,31 +150,26 @@ if pg_present:
     sommes = Sommes(verification, generaux)
     sommes.calculer_toutes(livraisons, reservations, acces, clients, machines)
 
-    annexes = "annexes"
-    dossier_annexes = Outils.chemin([dossier_enregistrement, annexes], generaux)
-    Outils.existe(dossier_annexes, True)
-    lien_annexes = Outils.lien_dossier([dossier_lien, annexes], generaux)
-    annexes_techniques = "annexes_techniques"
-    dossier_annexes_techniques = Outils.chemin([dossier_enregistrement, annexes_techniques], generaux)
-    Outils.existe(dossier_annexes_techniques, True)
-    lien_annexes_techniques = Outils.lien_dossier([dossier_lien, annexes_techniques], generaux)
+    for donnee in paramannexe.donnees:
+        donnee['chemin'] = Outils.chemin([dossier_enregistrement, donnee['dossier']], generaux)
+        Outils.existe(donnee['chemin'], True)
+        donnee['lien'] = Outils.lien_dossier([dossier_lien, donnee['dossier']], generaux)
 
     Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
     Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
     facture_prod = Facture()
     f_html_sections = facture_prod.factures(sommes, dossier_destination, edition, generaux, clients, comptes,
-                                            lien_annexes, lien_annexes_techniques, annexes, annexes_techniques)
+                                            paramannexe)
 
     prod2qual = Prod2Qual(dossier_source)
     if prod2qual.actif:
         facture_qual = Facture(prod2qual)
         generaux_qual = Generaux(dossier_source, prod2qual)
-        facture_qual.factures(sommes, dossier_destination, edition, generaux_qual, clients, comptes, lien_annexes,
-                              lien_annexes_techniques, annexes, annexes_techniques)
+        facture_qual.factures(sommes, dossier_destination, edition, generaux_qual, clients, comptes, paramannexe)
 
     if Latex.possibles():
-        Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, dossier_annexes,
-                        dossier_annexes_techniques, generaux, users, couts, docpdf)
+        Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, paramannexe,
+                        generaux, users, couts, docpdf)
 
     bm_lignes = BilanMensuel.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes,
                                              reservations)
@@ -193,7 +190,7 @@ if pg_present:
     for fichier in [acces.nom_fichier, clients.nom_fichier, emoluments.nom_fichier, coefprests.nom_fichier,
                     comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
                     reservations.nom_fichier, couts.nom_fichier, users.nom_fichier, generaux.nom_fichier,
-                    edition.nom_fichier, categprix.nom_fichier]:
+                    edition.nom_fichier, categprix.nom_fichier, paramannexe.nom_fichier]:
         dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
     if docpdf is not None:
         dossier_destination.ecrire(docpdf.nom_fichier, dossier_source.lire(docpdf.nom_fichier))
@@ -216,7 +213,7 @@ if sup_present:
         sys.exit("Erreur sur la version")
 
     dossier_csv = Outils.chemin([dossier_enregistrement, "csv_" + str(suppression.version) + "_" +
-                            suppression.client_unique])
+                                 suppression.client_unique])
     if Outils.existe(dossier_csv):
         msg = "La version " + str(suppression.version) + " du client " + suppression.client_unique + " existe déjà !"
         Outils.affiche_message(msg)
@@ -237,7 +234,7 @@ if sup_present:
 if ann_present:
     annulation = Annulation(dossier_source)
     dossier_enregistrement = Outils.chemin([annulation.chemin, annulation.annee,
-                                                    Outils.mois_string(annulation.mois)])
+                                            Outils.mois_string(annulation.mois)])
     if annulation.annule_version == 0:
         chemin_copernic = Outils.chemin([dossier_enregistrement, "csv_0", "copernic.csv"])
         if Outils.existe(chemin_copernic):
@@ -257,7 +254,7 @@ if ann_present:
             sys.exit("Erreur sur la version")
 
         chemin_copernic = Outils.chemin([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
-                                          annulation.client_unique, "copernic.csv"])
+                                         annulation.client_unique, "copernic.csv"])
         if Outils.existe(chemin_copernic):
             msg = "La version " + str(annulation.annule_version) + " à annuler pour le client " + \
                   annulation.client_unique + " a déjà été émise et ne peut plus être annulée !"
@@ -283,8 +280,8 @@ if ann_present:
         now = datetime.datetime.now()
         Outils.renommer_dossier([dossier_enregistrement, "csv_" + str(annulation.annule_version) + "_" +
                                 annulation.client_unique],
-            [dossier_enregistrement, "old_" + str(annulation.annule_version) + "_" + annulation.client_unique + "_" +
-             now.strftime("%Y%m%d_%H%M")])
+                                [dossier_enregistrement, "old_" + str(annulation.annule_version) + "_" +
+                                 annulation.client_unique + "_" + now.strftime("%Y%m%d_%H%M")])
 
         Resumes.annulation(annulation, DossierSource(dossier_enregistrement),
                            DossierDestination(dossier_enregistrement), DossierSource(dossier_csv))
