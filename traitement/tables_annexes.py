@@ -1558,7 +1558,7 @@ class TablesAnnexes(object):
         :param users: users importés
         :return: table au format latex
         """
-        if scl['rm'] > 0:
+        if True:  # scl['rm'] > 0:
             structure = r'''{|l|c|c|r|r|}'''
             legende = r'''Récapitulatif des pénalités de réservation'''
 

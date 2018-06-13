@@ -57,8 +57,7 @@ class Annexes(object):
 
             contenu_projets = ""
             contenu_details = ""
-            contenu_interne_1 = ""
-            contenu_interne_3 = ""
+            contenu_interne = ""
 
             if code_client in sommes.sommes_comptes:
                 comptes_utilises = Outils.comptes_in_somme(sommes.sommes_comptes[code_client], comptes)
@@ -203,22 +202,15 @@ class Annexes(object):
                     contenu_details += r'''\clearpage'''
 
                     if an_couts == "OUI":
-                        contenu_interne_1 += TablesAnnexes.table_cout_cae_jk(code_client, id_compte, intitule_compte,
-                                                                             sco, acces.sommes, couts)
-                        contenu_interne_1 += TablesAnnexes.table_cout_ja(code_client, id_compte, generaux, sco,
-                                                                         livraisons.sommes)
-                        contenu_interne_1 += TablesAnnexes.table_cout_cae_jkm(code_client, id_compte,
-                                                                              intitule_compte, couts, machines,
-                                                                              acces.sommes)
-                        contenu_interne_1 += TablesAnnexes.table_cout_lvr_jd(code_client, id_compte, intitule_compte,
-                                                                             sco, generaux, livraisons.sommes)
-                        contenu_interne_1 += r'''\clearpage'''
-
-                    contenu_interne_3 += TablesAnnexes.table_prix_avtg_jm(code_client, id_compte, intitule_compte, sco,
-                                                                          acces.sommes, machines, av_hc)
-                    contenu_interne_3 += TablesAnnexes.table_prix_cae_jm(code_client, id_compte, intitule_compte, sco,
-                                                                         acces.sommes, machines, av_hc)
-                    contenu_interne_3 += r'''\clearpage'''
+                        contenu_interne += TablesAnnexes.table_cout_cae_jk(code_client, id_compte, intitule_compte, sco,
+                                                                           acces.sommes, couts)
+                        contenu_interne += TablesAnnexes.table_cout_ja(code_client, id_compte, generaux, sco,
+                                                                       livraisons.sommes)
+                        contenu_interne += TablesAnnexes.table_cout_cae_jkm(code_client, id_compte, intitule_compte,
+                                                                            couts, machines, acces.sommes)
+                        contenu_interne += TablesAnnexes.table_cout_lvr_jd(code_client, id_compte, intitule_compte, sco,
+                                                                           generaux, livraisons.sommes)
+                        contenu_interne += r'''\clearpage'''
 
                     # ## compte
 
@@ -278,8 +270,13 @@ class Annexes(object):
                     if pdfs is not None and len(pdfs) > 0:
                         nom_pdf = 'Annexe-pièces' + suffixe
                         pieces = [nom_pdf + '.pdf']
+                        texte = ""
                         for pos, chemins in sorted(pdfs.items()):
                             for chemin in chemins:
+                                texte += str(pos) + r''' \hspace*{5cm} 
+                                    ''' + Latex.echappe_caracteres(chemin[chemin.rfind('/')+1:chemin.rfind('.')]) + r'''
+                                     \\ 
+                                    '''
                                 pieces.append(chemin)
                         contenu_annexe_pieces = Annexes.entete(edition)
                         contenu_annexe_pieces += Annexes.titre_annexe(client, edition, generaux, reference,
@@ -287,6 +284,7 @@ class Annexes(object):
                                                                       "Annexe facture")
                         contenu_annexe_pieces += Annexes.section(client, generaux, reference,
                                                                  "Documents contractuels et informatifs")
+                        contenu_annexe_pieces += texte
                         contenu_annexe_pieces += r'''\end{document}'''
                         Latex.creer_latex_pdf(nom_pdf, contenu_annexe_pieces)
                         pdfs_annexes['Annexe-pièces'] = pieces
@@ -296,8 +294,13 @@ class Annexes(object):
                 if pdfs is not None and len(pdfs) > 0:
                     nom_pdf = 'Annexe-interne-anntemp'
                     pieces = [nom_pdf + '.pdf']
+                    texte = ""
                     for pos, chemins in sorted(pdfs.items()):
                         for chemin in chemins:
+                            texte += str(pos) + r''' \hspace*{5cm} 
+                                ''' + Latex.echappe_caracteres(chemin[chemin.rfind('/')+1:chemin.rfind('.')]) + r'''
+                                 \\ 
+                                '''
                             pieces.append(chemin)
                     contenu_annexe_interne_a = Annexes.entete(edition)
                     contenu_annexe_interne_a += Annexes.titre_annexe(client, edition, generaux, reference,
@@ -306,6 +309,7 @@ class Annexes(object):
                     contenu_annexe_interne_a += Annexes.section(
                         client, generaux, reference, "Annexe interne / Documents contractuels et informatifs"
                     )
+                    contenu_annexe_interne_a += texte
                     contenu_annexe_interne_a += r'''\end{document}'''
                     Latex.creer_latex_pdf(nom_pdf, contenu_annexe_interne_a)
                     pdfs_annexes['Annexe-interne'] = pieces
@@ -316,7 +320,7 @@ class Annexes(object):
                                                                  "Coûts d'utilisation", "Annexe interne")
                 contenu_annexe_interne_b += Annexes.section(client, generaux, reference,
                                                             "Annexe interne / Coûts d’utilisation")
-                contenu_annexe_interne_b += contenu_interne_1
+                contenu_annexe_interne_b += contenu_interne
 
             contenu_annexe_interne_b += Annexes.titre_annexe(client, edition, generaux, reference,
                                                              "Tableaux supplémentaires", "Annexe interne")
@@ -326,15 +330,6 @@ class Annexes(object):
             contenu_annexe_interne_b += TablesAnnexes.table_prix_xe(scl, client)
             contenu_annexe_interne_b += TablesAnnexes.table_prix_cae_xj(code_client, scl, acces.sommes, client,
                                                                         contenu_prix_cae_xj)
-            if code_client in reservations.sommes or contenu_cae_xmu != "":
-                contenu_annexe_interne_b += TablesAnnexes.table_prix_xr(code_client, scl, reservations.sommes, machines)
-            contenu_annexe_interne_b += TablesAnnexes.table_prix_lvr_xdj(code_client, scl, livraisons.sommes, generaux,
-                                                                         contenu_prix_lvr_xdj_tab)
-            if av_hc == "BONUS":
-                contenu_annexe_interne_b += TablesAnnexes.table_prix_bonus_xj(code_client, scl, acces.sommes,
-                                                                              contenu_prix_bonus_xj)
-            contenu_annexe_interne_b += contenu_interne_3
-
             contenu_annexe_interne_b += r'''\end{document}'''
             nom_pdf = 'Annexe-interne' + suffixe
             Latex.creer_latex_pdf(nom_pdf, contenu_annexe_interne_b)

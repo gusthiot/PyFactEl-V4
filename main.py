@@ -159,13 +159,14 @@ if pg_present:
     Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
     facture_prod = Facture()
     f_html_sections = facture_prod.factures(sommes, dossier_destination, edition, generaux, clients, comptes,
-                                            paramannexe)
+                                            paramannexe, docpdf)
 
     prod2qual = Prod2Qual(dossier_source)
     if prod2qual.actif:
         facture_qual = Facture(prod2qual)
         generaux_qual = Generaux(dossier_source, prod2qual)
-        facture_qual.factures(sommes, dossier_destination, edition, generaux_qual, clients, comptes, paramannexe)
+        facture_qual.factures(sommes, dossier_destination, edition, generaux_qual, clients, comptes, paramannexe,
+                              docpdf)
 
     if Latex.possibles():
         Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, paramannexe,

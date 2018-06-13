@@ -16,7 +16,7 @@ class Facture(object):
 
         self.prod2qual = prod2qual
 
-    def factures(self, sommes, destination, edition, generaux, clients, comptes, paramannexe):
+    def factures(self, sommes, destination, edition, generaux, clients, comptes, paramannexe, docpdf):
         """
         génère la facture sous forme de csv
         
@@ -27,6 +27,7 @@ class Facture(object):
         :param clients: clients importés
         :param comptes: comptes importés
         :param paramannexe: paramètres d'annexe
+        :param docpdf: paramètres d'ajout de document pdf
         :return: données du combolist et des sections
         """
 
@@ -181,6 +182,13 @@ class Facture(object):
                     '''
                 contenu_client += r'''<table><tr>'''
                 for donnee in paramannexe.donnees:
+                    if donnee['nom'] == 'Annexe-pièces':
+                        if docpdf is None:
+                            continue
+                        pdfs = docpdf.pdfs_pour_client(client, 'Annexe-pièces')
+                        if pdfs is None or len(pdfs) == 0:
+                            continue
+
                     nom_annexe = donnee['nom'] + "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + \
                                  "_" + str(edition.version) + "_" + code_client + ".pdf"
                     dossier_annexe = "../" + donnee['dossier'] + "/" + nom_annexe
