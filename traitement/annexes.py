@@ -271,13 +271,13 @@ class Annexes(object):
                         nom_pdf = 'Annexe-pièces' + suffixe
                         pieces = [nom_pdf + '.pdf']
                         texte = ""
-                        for pos, chemins in sorted(pdfs.items()):
-                            for chemin in chemins:
+                        for pos, docs in sorted(pdfs.items()):
+                            for doc in docs:
                                 texte += str(pos) + r''' \hspace*{5cm} 
-                                    ''' + Latex.echappe_caracteres(chemin[chemin.rfind('/')+1:chemin.rfind('.')]) + r'''
+                                    ''' + Latex.echappe_caracteres(doc['nom']) + r'''
                                      \\ 
                                     '''
-                                pieces.append(chemin)
+                                pieces.append(doc['chemin'])
                         contenu_annexe_pieces = Annexes.entete(edition)
                         contenu_annexe_pieces += Annexes.titre_annexe(client, edition, generaux, reference,
                                                                       "Documents contractuels et informatifs",
@@ -295,13 +295,13 @@ class Annexes(object):
                     nom_pdf = 'Annexe-interne-anntemp'
                     pieces = [nom_pdf + '.pdf']
                     texte = ""
-                    for pos, chemins in sorted(pdfs.items()):
-                        for chemin in chemins:
+                    for pos, docs in sorted(pdfs.items()):
+                        for doc in docs:
                             texte += str(pos) + r''' \hspace*{5cm} 
-                                ''' + Latex.echappe_caracteres(chemin[chemin.rfind('/')+1:chemin.rfind('.')]) + r'''
+                                ''' + Latex.echappe_caracteres(doc['nom']) + r'''
                                  \\ 
                                 '''
-                            pieces.append(chemin)
+                            pieces.append(doc['chemin'])
                     contenu_annexe_interne_a = Annexes.entete(edition)
                     contenu_annexe_interne_a += Annexes.titre_annexe(client, edition, generaux, reference,
                                                                      "Documents contractuels et informatifs",

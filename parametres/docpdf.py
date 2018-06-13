@@ -67,9 +67,9 @@ class DocPdf(object):
             if donnee[type_annexe] == 'NON':
                 continue
             if not donnee['position'] in pdfs:
-                pdfs[donnee['position']] = [donnee['chemin']]
+                pdfs[donnee['position']] = [{'chemin': donnee['chemin'], 'nom': donnee['nom']}]
             else:
-                pdfs[donnee['position']].append(donnee['chemin'])
+                pdfs[donnee['position']].append({'chemin': donnee['chemin'], 'nom': donnee['nom']})
         return pdfs
 
     def est_coherent(self, generaux, clients):
