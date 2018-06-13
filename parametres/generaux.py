@@ -16,7 +16,7 @@ class Generaux(object):
     libelle = "Paramètres Généraux"
     cles_obligatoires = ['centre', 'origine', 'code_int', 'code_ext', 'commerciale', 'canal', 'secteur', 'devise',
                          'financier', 'fonds', 'entete', 'poste_emolument', 'poste_reservation',  'lien', 'chemin',
-                         'code_t', 'code_n', 'code-ref-fact', 'avantage_HC', 'annexe_cout', 'filtrer_article_nul',
+                         'code_t', 'code_n', 'code_ref_fact', 'avantage_HC', 'annexe_cout', 'filtrer_article_nul',
                          'code_d', 'code_sap', 'quantite', 'unite', 'type_prix', 'type_rabais', 'texte_sap',
                          'intitule_long', 'intitule_court', 'eligible_U1', 'eligible_U2', 'eligible_U3', 'modes',
                          'min_fact_rese']
@@ -76,7 +76,7 @@ class Generaux(object):
             else:
                 erreurs += "le code D '" + dd + "' n'est pas unique\n"
 
-        if len(self._donnees['code_n']) != len(self._donnees['code-ref-fact']):
+        if len(self._donnees['code_n']) != len(self._donnees['code_ref_fact']):
             erreurs += "le nombre de colonees doit être le même pour le code N et pour le code référence du client\n"
 
         if (len(self._donnees['code_d']) != len(self._donnees['code_sap'])) or \
@@ -143,7 +143,7 @@ class Generaux(object):
         return [a.code_d for a in self.articles_d3]
 
     def code_ref_par_code_n(self, code_ref):
-        return self._donnees['code-ref-fact'][
+        return self._donnees['code_ref_fact'][
             self._donnees['code_n'].index(code_ref)]
 
     def avantage_hc_par_code_n(self, avantage_hc):

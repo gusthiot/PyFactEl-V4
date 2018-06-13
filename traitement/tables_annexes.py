@@ -1624,9 +1624,9 @@ class TablesAnnexes(object):
                     contenu += contenu_hc
 
             dico = {'penalite_d': Outils.format_2_dec(scl['rm_d']),
-                    'penalite': scl['rm'],
-                    'rabais': scl['rr'],
-                    'total': scl['r']}
+                    'penalite': Outils.format_2_dec(scl['rm']),
+                    'rabais': Outils.format_2_dec(scl['rr']),
+                    'total': Outils.format_2_dec(scl['r'])}
 
             contenu += r'''
                 \multicolumn{4}{|r|}{Arrondi} & %(penalite_d)s \\
