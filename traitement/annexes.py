@@ -236,8 +236,8 @@ class Annexes(object):
                 if av_hc == "BONUS":
                     contenu_annexe_client += TablesAnnexes.table_points_xbmu(code_client, scl, acces.sommes, machines,
                                                                              users)
-                    contenu_annexe_client += TablesAnnexes.table_prix_xrmu(code_client, scl, reservations.sommes,
-                                                                           machines, users)
+                contenu_annexe_client += TablesAnnexes.table_prix_xrmu(code_client, scl, reservations.sommes, machines,
+                                                                       users)
                 contenu_annexe_client += r'''\end{document}'''
                 Latex.creer_latex_pdf('Annexe-client' + suffixe, contenu_annexe_client)
                 pdfs_annexes['Annexe-client'] = ['Annexe-client' + suffixe + ".pdf"]
