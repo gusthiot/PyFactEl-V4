@@ -112,7 +112,9 @@ class Facture(object):
                          code_sap_traduit, code_sap_traduit, generaux.devise, client['mode'], reference, "", "",
                          generaux.entete]
                 for donnee in paramannexe.donnees:
-                    ligne.append(donnee['lien'])
+                    nom_annexe = donnee['nom'] + "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + \
+                                 "_" + str(edition.version) + "_" + code_client + ".pdf"
+                    ligne.append(donnee['lien'] + nom_annexe)
                     if generaux.code_ref_par_code_n(client['nature']) == "INT":
                         ligne.append(donnee['int'])
                     elif client['mode'] == "MAIL":
