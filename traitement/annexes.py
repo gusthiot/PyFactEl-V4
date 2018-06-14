@@ -421,6 +421,7 @@ class Annexes(object):
             \usepackage{dcolumn}
             \usepackage{changepage}
             \usepackage[scriptsize]{caption}
+            \captionsetup[table]{position=bottom}
             \usepackage{fancyhdr}\usepackage{float}
             \restylefloat{table}
 
