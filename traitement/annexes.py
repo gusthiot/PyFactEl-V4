@@ -378,7 +378,7 @@ class Annexes(object):
             \Large\textsc{%(titre)s}
             \end{center}
             \rule{\linewidth}{1pt}
-             \vspace*{8mm}
+             \vspace*{5mm}
             ''' % dic_titre
 
         return contenu
@@ -414,7 +414,7 @@ class Annexes(object):
 
         entete = Latex.entete()
         entete += r'''
-            \usepackage[margin=12mm, includehead]{geometry}
+            \usepackage[margin=12mm, includehead, includefoot]{geometry}
             \usepackage{multirow}
             \usepackage{graphicx}
             \usepackage{longtable}
