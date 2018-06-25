@@ -27,10 +27,11 @@ class Compte(Fichier):
                     return 1
         return 0
 
-    def est_coherent(self, comptes_actifs):
+    def est_coherent(self, clients, comptes_actifs):
         """
         vérifie que les données du fichier importé sont cohérentes (code client dans clients,
         ou alors absent des clients actifs, id compte unique), et efface les colonnes mois et année
+        :param clients: clients importés
         :param comptes_actifs: codes des clients présents dans accès, réservations et livraisons
         :return: 1 s'il y a une erreur, 0 sinon
         """
@@ -53,6 +54,9 @@ class Compte(Fichier):
                 if donnee['id_compte'] in comptes_actifs:
                     msg += "le code client de la ligne " + str(ligne) + " ne peut être vide si le compte est utilisé\n"
                 continue
+            if donnee['code_client'] not in clients.donnees:
+                msg += "le code client " + donnee['code_client'] + " de la ligne " + str(ligne) + \
+                       " n'est pas référencé\n"
 
             if donnee['id_compte'] == "":
                 msg += "le compte id de la ligne " + str(ligne) + " ne peut être vide\n"

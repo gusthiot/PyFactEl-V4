@@ -85,7 +85,7 @@ class Verification(object):
 
         comptes_actifs = Verification.obtenir_comptes_actifs(acces, livraisons)
 
-        verif += comptes.est_coherent(comptes_actifs)
+        verif += comptes.est_coherent(clients, comptes_actifs)
 
         clients_actifs = Verification.obtenir_clients_actifs(comptes_actifs, comptes)
 
