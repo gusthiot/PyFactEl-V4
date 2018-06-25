@@ -94,6 +94,7 @@ class Verification(object):
             sys.exit("Trop de clients pour version > 0")
 
         self.a_verifier = 0
+
         if len(clients_actifs) == 1:
             edition.client_unique = clients_actifs[0]
         return verif
